@@ -109,15 +109,18 @@ class JarvisOrderViewset(ModelViewSet):
         page_size = self.request.query_params.get('page_size')
         order_date = self.request.query_params.get('date')
         section = self.request.query_params.get('section')
+        payment_status = self.request.query_params.get('payment_status')
 
         if q:
             queryset = queryset.filter(Q(shipping_address__name__icontains=q) | Q(shipping_address__mobile__icontains=q) | 
                                         Q(user__email__icontains=q))
 
-
         if order_date:
             start_date, end_date = order_date.split(' - ')
             queryset = queryset.filter(date__date__gte=datetime.strptime(start_date, '%d-%m-%Y'), date__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
+
+        if payment_status:
+            queryset = queryset.filter(payment_status__in=payment_status.split(','))
 
         if page_size:
             self.pagination_class.page_size = int(page_size)
