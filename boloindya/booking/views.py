@@ -656,10 +656,15 @@ class EventDetailsV2(APIView):
 				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
-				final_df.drop(['event_id'], axis=1, inplace=True)
 				final_df['followers_count'] = final_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
 				final_df = final_df.sort_values(by=['followers_count'], ascending=False)
-				print(final_df.dtypes)
+				final_df['language_ids'] = final_df['language_ids'].apply(lambda x: ','.join(x))
+				# creator data
+				user_data = User.objects.filter(id__in=final_df['creator_id'].unique()).values('username','st__bio', 'id')
+				user_df = pd.DataFrame.from_records(user_data)
+				final_df = pd.merge(final_df, user_df,left_on='creator_id',right_on='id')
+				final_df.drop(['event_id','id_y'], axis=1, inplace=True)
+				final_df = final_df.rename(columns={'id_x': 'id', 'st__bio': 'creator_bio', 'username': 'creator_username', 'language_ids': 'event_language', 'category_id': 'event_category'})
 				result = final_df.to_dict('records')
 				if result:
 					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
