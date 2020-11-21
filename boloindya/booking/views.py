@@ -621,3 +621,83 @@ def update_event_slot_status(slots_df):
 	slots_df['event_status'] = np.where((slots_df['start_time']<=datetime.now())&(slots_df['end_time']>=datetime.now()), '1', '0')
 	slots_df['event_status'] = np.where(slots_df['end_time']<datetime.now(), '2', slots_df.event_status)
 	return slots_df
+
+class EventDetailsV2(APIView):
+	def get(self, request, *args, **kwargs):
+		try:
+			event_id = request.GET.get('event_id',None)
+			if event_id:
+				return self.get_event_detail(event_id)
+			else:
+				if request.user.is_authenticated:
+					page_no = request.GET.get('page',1)
+					event_type = request.GET.get('event_type','all')
+					return self.get_event_list(page_no, event_type)
+				else:
+					return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
+
+	def get_event_list(self, page_no, event_type):
+		events = Event.objects.filter(event_type = event_type, is_approved=True, is_active = True).values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description', 'creator_id','language_ids','category_id')
+		events_df = pd.DataFrame.from_records(events)
+		result = []
+		if not events_df.empty:
+			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
+			if not event_slots_df.empty:
+				#fetch available slots event only
+				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_events_ids = []
+				if not available_slots_event_df.empty:
+					available_events_ids = available_slots_event_df['event_id'].unique()
+				event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
+				event_slots_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['event_id'].isin(available_events_ids))]
+				event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
+				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
+				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
+				final_df.drop(['event_id'], axis=1, inplace=True)
+				final_df['followers_count'] = final_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
+				final_df = final_df.sort_values(by=['followers_count'], ascending=False)
+				print(final_df.dtypes)
+				result = final_df.to_dict('records')
+				if result:
+					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
+				for value in result:
+					value.pop('start_time',None)
+					value.pop('end_time',None)
+		paginator = Paginator(result, settings.GET_BOOKINGS_API_PAGE_SIZE)
+		try:
+			result = paginator.page(page_no).object_list
+		except:
+			result = []
+		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+
+	def get_event_detail(self, event_id):
+		event = Event.objects.filter(id=event_id).select_related('creator')
+		event_slots = []
+		result = {}
+		if event:
+			event_slots = event[0].event_slot.all()
+		event_values = event.values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description','creator_id','category_id','language_ids')
+		event_df = pd.DataFrame.from_records(event_values)
+		event_slots_df = pd.DataFrame.from_records(event_slots.values('start_time','end_time','event_id'))
+		if not event_slots_df.empty:
+			event_slots_df = event_slots_df.groupby(by=["event_id"]).agg({'start_time': 'min', 'end_time': 'max'})[['start_time','end_time']].reset_index()
+			event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
+			event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
+			final_df = pd.merge(event_df, event_slots_df, left_on='id', right_on='event_id')
+			final_df['creator_username'] = event[0].creator.username
+			final_df['creator_bio'] = event[0].creator.st.bio
+			final_df.drop(['event_id'], axis=1, inplace=True)
+			final_df['language_ids'] = final_df['language_ids'].apply(lambda x: ','.join(x))
+			final_df = final_df.rename(columns={'language_ids': 'event_language', 'category_id': 'event_category'})
+			result = final_df.to_dict('records')
+			if result:
+				[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
+			for value in result:
+				value.pop('start_time',None)
+				value.pop('end_time',None)
+			if result:
+				result = result[0]
+		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)

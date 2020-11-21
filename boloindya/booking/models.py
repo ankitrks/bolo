@@ -60,6 +60,11 @@ class PayOutConfig(models.Model):
 	commission_default = models.CharField(max_length=10)
 	tnc_text = models.TextField(blank = True, null = True)
 
+event_type_options = (
+	("all","ALL"),
+	("trending","Trending"),
+	("recomended","Recomended")
+	)
 class Event(RecordTimeStamp):
 	creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='events')
 	title = models.TextField(blank = True, null = True)
@@ -76,6 +81,7 @@ class Event(RecordTimeStamp):
 	language_ids = ArrayField(models.CharField(max_length=200), blank=True, default=list)
 	is_approved = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)
+	event_type = models.CharField(choices = event_type_options,default='all', blank = True, null = True, max_length = 25)
 
 event_slot_options = (
 	('available', "Available"),
