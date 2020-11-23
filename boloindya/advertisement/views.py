@@ -21,7 +21,7 @@ from rest_framework.test import APIClient
 from rest_framework.pagination import PageNumberPagination
 
 from dynamodb_api import create as dynamodb_create
-from redis_utils import get_redis
+from redis_utils import get_redis, redis_cli, redis_cli_read_only
 from payment.razorpay import create_order
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
@@ -656,6 +656,16 @@ class AdEventCreateAPIView(APIView):
             'created_at': datetime.now()
         })
         dynamodb_create(AdEvent, data)
+
+        if data.get('event') in ('skip',):
+            redis_key = 'ad:user:%s:skip'%request.user.id
+            redis_cli.rpush(redis_key, data.get('ad_id'))
+            
+            if redis_cli_read_only.ttl(redis_key) in (-1, -2):
+                now = datetime.now()
+                print 'seconds', (datetime.strptime('%s-%s-%s 23:59:59'%(now.year, now.month, now.day), '%Y-%m-%d %H:%M:%S') - now).seconds
+                redis_cli.expire(redis_key, (datetime.strptime('%s-%s-%s 23:59:59'%(now.year, now.month, now.day), '%Y-%m-%d %H:%M:%S') - now).seconds )
+
         return Response({'message': 'SUCCESS'}, status=201)
 
 
@@ -664,15 +674,44 @@ class GetAdForUserAPIView(APIView):
         params = request.query_params
         user_ad = {}
         ad_pool = get_redis('ad:pool')
+        skipped_ad_list = redis_cli_read_only.lrange('ad:user:%s:skip'%params.get('user_id'), 0, -1)
 
         if not ad_pool:
             return Response({'results': {}})
 
-        next_position = 0
+        for key, items in ad_pool.iteritems():
+            new_ad_list = []
 
-        for scroll in sorted(map(int, ad_pool.keys())):
-            next_position = scroll
-            user_ad[str(next_position)] = get_redis('ad:%s'%ad_pool.get(str(scroll))[0].get('id'))  # Todo: Need to imporve it
+            for ad in items:
+                if str(ad.get('id'))  not in skipped_ad_list:
+                    new_ad_list.append(ad)
+
+            ad_pool[key] = new_ad_list
+
+        next_position = 0
+        ad_selection_history = {}
+
+        ad_sequence = []
+        for key, items in ad_pool.iteritems():
+            ad_sequence += [key]*len(items)
+
+        for scroll in sorted(map(int, ad_sequence )):
+            next_position += scroll
+
+            ad_list = ad_pool.get(str(scroll))
+            min_value = ad_selection_history.get(ad_list[0].get('id'), 0)
+            min_value_index = 0
+
+            for i, ad in enumerate(ad_list):
+                ad_min_value = ad_selection_history.get(ad.get('id'), 0)
+                if ad_min_value < min_value: 
+                    min_value = ad_min_value
+                    min_value_index = i
+                
+            ad = ad_list.pop(min_value_index)
+            ad_selection_history[ad.get('id')] = next_position
+
+            user_ad[str(next_position)] = get_redis('ad:%s'%ad.get('id'))  # Todo: Need to imporve it
 
         return Response({
             'results': user_ad
