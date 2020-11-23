@@ -8,6 +8,8 @@ from django.shortcuts import render
 from django.db.models import Sum, Q
 from django.test import Client
 from django.views.generic import RedirectView, TemplateView, DetailView
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import LoginView
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -618,6 +620,7 @@ class OrderPaymentRedirectView(RedirectView):
         if not order.payment_gateway_order_id:
             razorpay_order = create_order(order.amount_including_tax, "INR", receipt=order.order_number, notes={})
             order.payment_gateway_order_id = razorpay_order.get('id')
+            order.paid_amount = order.amount_including_tax
 
         order.save()
         return '/payment/razorpay/%s/pay?type=order&order_id=%s'%(order.payment_gateway_order_id, order.id)
@@ -735,7 +738,20 @@ class AdTemplateView(TemplateView):
 
 
 class OrderTemplateView(TemplateView):
-    template_name = 'advertisement/order/index.html'
+    template_name = 'advertisement/order/dashboard.html'
 
 class ProductTemplateView(TemplateView):
     template_name = 'advertisement/product/index.html'
+
+class OrderDashboardLogin(LoginView):
+    template_name = 'advertisement/order/login.html'
+    success_url = '/ad/order/'
+
+    # def post(self, request, *args, **kwargs):
+    #     print 'request posrt data', request.POST
+    #     username = request.POST.get('username')
+    #     password = request.POST.get('password')
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         login(request, user)
+    #     else:

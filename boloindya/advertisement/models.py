@@ -6,9 +6,58 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from dynamodb_api import create as dynamodb_create
+
+
+""" DynamoDB models """
+AdEvent = 'AdEvent_%s'%settings.DYNAMODB_ENV
+Counter = 'Counter_%s'%settings.DYNAMODB_ENV
+Event = 'Event_%s'%settings.DYNAMODB_ENV
+
+
+""" RDS Models """
+
+class PermissionManager(models.Manager):
+    def for_brand_user(self, brand_user):
+        return super(PermissionManager, self).get_queryset().filter(lines__product__brand=brand_user.brand)
+
+
+class EventLogManager(models.Manager):
+    def update(self, **kwargs):
+        print 'in update', kwargs
+        print '__  data ', self.__dict__
+        return super(EventLogManager, self).update(**kwargs)
+
+
+class ModelRemastered(models.Model):
+    class Meta:
+        abstract = True
+
+    def save(self, **kwargs):
+        if kwargs.get('user'):
+            request = kwargs.pop('user')
+
+        event = 'UPDATE_%s'
+
+        if not self.id:
+            event = 'CREATE_%s'
+
+        instance = super(ModelRemastered, self).save(**kwargs)
+
+        dynamodb_create(Event, {
+            'event': event%self.__class__.__name__.upper(),
+            'id': instance.id,
+            'table': instance._meta.db_table
+        })
+
+
+
 class RecordTimeStamp(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True, blank=False, null=False)
     last_modified = models.DateTimeField(auto_now=True, auto_now_add=False)
+    
+    objects = EventLogManager()
+
     class Meta:
         abstract = True
 
@@ -25,6 +74,7 @@ class Brand(RecordTimeStamp):
     company_logo = models.CharField(blank=True, null=True, max_length=200)
     brand_id = models.CharField(blank=True, null=True, max_length=20)
     poc = models.CharField(blank=True, null=True, max_length=50)
+    poc_user = models.OneToOneField(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='brand')
     phone_number = models.CharField(blank=True, null=True, max_length=20)
     email = models.CharField(blank=True, null=True, max_length=50)
     signed_contract_doc_file_url = models.CharField(blank=True, null=True, max_length=200)
@@ -234,6 +284,9 @@ class Order(RecordTimeStamp):
     payment_gateway_order_id = models.CharField(max_length=30, null=True, blank=True)
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=20, null=True, blank=True)
     order_number = models.CharField(max_length=30, null=True, blank=True)
+    # paid_amount = models.FloatField(null=True, blank=True)
+
+    objects = PermissionManager()
 
     @property
     def amount_including_tax(self):
@@ -287,6 +340,14 @@ class Playtime(AdEventAbstract):
     playtime = models.PositiveIntegerField(default=0)
 
 
-""" DynamoDB models """
-AdEvent = 'AdEvent_%s'%settings.DYNAMODB_ENV
-Counter = 'Counter_%s'%settings.DYNAMODB_ENV
+class Install(AdEventAbstract):
+    pass
+
+class ShopNow(AdEventAbstract):
+    pass
+
+class LearnMore(AdEventAbstract):
+    pass
+
+class PlaceOrder(AdEventAbstract):
+    pass

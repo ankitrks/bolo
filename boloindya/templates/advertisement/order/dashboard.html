@@ -1,0 +1,664 @@
+{% extends 'advertisement/base_new_layout.html' %}
+
+{% load static %}
+
+{% block css %}
+    <style>
+        .home-navbar{
+            position: fixed;
+            background-color: #121111;
+            border-radius: 24px;
+            top: 40px;
+            left: 20px;
+            width: 90px;
+            color: white;
+            height: 70%;
+            padding: 35px
+        }
+
+        .page-title{
+            font-size: 50px;
+        }
+
+        .greeting-div{
+            background: #F5F5F7;
+            border-radius: 14px;
+            height: 160px;
+        }
+
+        .verticle-center{
+            min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+            display: flex;
+            align-items: center;
+        }
+
+        .header-row{
+            height: 200px;
+            margin-top: 40px;
+        }
+
+        .container.main{
+            max-width: 91%;
+            margin-left: 8%;
+            margin-right: 1%;
+        }
+
+        .hello-figure{
+            margin-top: -32px;
+        }
+
+        .count-div{
+            background: #F5F5F7;
+            border-radius: 14px;
+            height: 80px;
+            width: 180px;
+        }
+
+        .count{
+            font-size: 30px;
+        }
+
+        .count-text{
+            font-size: 15px;
+        }
+
+        .search-icon{
+            background: #F5F5F7;
+            border-style: none;
+        }
+
+        .search-input{
+            background: #F5F5F7;
+            border-style: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .search-input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: #9F9F9F;
+            opacity: 1; /* Firefox */
+            font-weight: 500;
+        }
+
+        #filterGroup{
+            width: 130px;
+            background: #F5F5F7;
+            border-style: none;
+            color: black;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .jsgrid-table{
+            font-family: Avenir;
+        }
+
+        .jsgrid-grid-header{
+            height: 40px;
+            font-size: 14px;
+            border-style: none;
+            background: white !important;
+            /* margin-bottom: -25px; */
+        }
+
+        .jsgrid-grid-body{
+            border-style: none;
+        }
+
+        .jsgrid-header-row>.jsgrid-header-cell {
+            background: white !important;
+            border-style: none;
+        }
+
+        .jsgrid-table .jsgrid-row, .jsgrid-table .jsgrid-alt-row{
+            height: 35px;
+            font-size: 13px;
+            font-weight: 500;
+            border-style: none;
+        }
+
+        .jsgrid-row>.jsgrid-cell{
+            background: #F5F5F7;
+        }
+
+        .jsgrid-alt-row>.jsgrid-cell{
+            background: white;
+            border-style: none;
+        }
+
+        .jsgrid-pager-container{
+            margin-top: 10px;
+            background: #F5F5F7;
+            color:black;
+            font-family: Avenir;
+            font-size: 11px;
+            margin-left:auto; 
+            margin-right:0;
+        }
+
+        .jsgrid-pager .jsgrid-pager-page, .jsgrid-pager-nav-button{
+            border: 1px solid black;
+            margin: 0px 3px;
+        }
+
+        .jsgrid-pager .jsgrid-pager-page a, .jsgrid-pager-nav-button a{
+            color:black;
+        }
+
+        .jsgrid-pager-current-page{
+            color: white;
+            background: black;
+        }
+
+        #fileTypeDiv .bootstrap-select, #recordCountDiv .bootstrap-select{
+            width: 108px;
+            height: 15px;
+            margin-top: -12px;
+            background: #F5F5F7;
+        }
+
+        #fileTypeDiv .filter-option-inner-inner, #recordCountDiv .filter-option-inner-inner{
+            font-family: Avenir;
+            font-size: 12px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover{
+            background: #F5F5F7;
+        }
+
+        .dropdown-menu{
+            padding: 0px;
+            font-family: Avenir;
+            font-size: 12px;
+            font-weight: 500;
+            color: black;
+            background: #F5F5F7;
+        }
+
+        .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item.active.selected{
+            color: white;
+            background: black;
+        }
+
+        .recordCountIcon{
+            background: #F5F5F7;
+        }
+
+        .modal-content{
+            color: white;
+            background: #121111;
+        }
+
+        .modal-footer, .modal-header{
+            border: none;
+        }
+
+        .modal-body{
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+        #productNameFilterModal .search-input, #productNameFilterModal .search-icon, #productNameFilterModal .productNameList{
+            background: black;
+            color: white
+        }
+
+        #productNameFilterModal .search-input::placeholder{
+            color: white
+        }
+
+        #productNameFilterModal .productNameList{
+            margin: 2px 20px;
+            padding: 25px;
+        }
+
+        #productNameFilterModal .modal-content{
+            width: 700px;
+        }
+
+        .modal-footer{
+            text-align: center!important;
+        }
+
+        .apply-button{
+            width: 228px;
+            height: 43px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-size: 18px;
+            padding-top: 9px;
+        }
+
+        .daterangepicker{
+            background: #121111;
+            color: white;
+            position: fixed;
+            top: 100px;
+            left: 300px;
+            font-family: Avenir;
+        }
+
+        .daterangepicker .calendar-table{
+            background: black;
+            border: none;
+        }
+
+        .daterangepicker td.start-date.active, .daterangepicker td.end-date.active, .daterangepicker td.start-date:hover, .daterangepicker td.end-date:hover{
+            border-radius: 50% !important;
+            background: #10A5F9 !important;
+            color: white !important;
+
+        }
+        .daterangepicker td.in-range.available {
+            color: #A9D3AB;
+            background: black;
+        }
+
+        .daterangepicker td.off{
+            color: #3C3844;
+            background: black;
+        }
+
+        .daterangepicker td.available{
+            color: #7A7585;;
+        }
+
+        .daterangepicker .drp-buttons{
+            border: none;
+        }
+
+        .daterangepicker .applyBtn{
+            width: 228px;
+            height: 30px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-size: 14px;
+            padding-top: 4px;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <div class="container home-navbar">
+        <div class="row my-4">
+            <div class="col">
+                <img src="{% static '/img/brand-dashboard/home-icon.svg' %}" >
+            </div>
+        </div>
+        <div class="row my-4">
+            <div class="col">
+                <img src="{% static '/img/brand-dashboard/setting-icon.svg' %}" >
+            </div>
+        </div>
+        <div class="row my-4">
+            <div class="col align-self-end">
+                <img src="{% static '/img/brand-dashboard/logout-icon.svg' %}" >
+            </div>
+        </div>
+    </div>
+    <div class="container main">
+        <div class="row verticle-center header-row">
+            <div class="col-7">
+                <div class="page-title">
+                    Brand Partner Dashboard
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row greeting-div">
+                    <div class="col greeting-message my-5 pl-5">
+                        <div class="row">
+                            <h2>Hello John Doe!</h2>
+                        </div>
+                        <div class="row">
+                            It's good to see you again
+                        </div>
+                    </div>
+                    <div class="col hello-figure">
+                        <img src="{% static '/img/brand-dashboard/hello-figure.svg' %}" >
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2 ">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 pl-2 count">
+                        1000
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text">
+                        Lifetime Orders
+                    </div>
+                </div>
+            </div>
+            <div class="col-2 ">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 pl-2 count">
+                        1000
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text">
+                        Lifetime Orders
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 pl-2 count">
+                        1000
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text">
+                        Lifetime Orders
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-4 mr-4">
+                <div class="row justify-content-between">
+                    <div class="col-4">
+                        Order
+                    </div>
+                    <div class="col-4 text-right">
+                        <select name="" id="" class="selectpicker">
+                            <option value="">Weekly</option>
+                            <option value="">Monthly</option>
+                            <option value="">Yearly</option>
+                            <option value="">Lifetime</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <canvas id="myChart1"></canvas>
+                </div>
+                
+            </div>
+            <div class="col-4 mx-4">
+                <div class="row justify-content-between">
+                    <div class="col-4">
+                        Revenue
+                    </div>
+                    <div class="col-4 text-right">
+                        <select name="" id="" >
+                            <option value="">Weekly</option>
+                            <option value="">Monthly</option>
+                            <option value="">Yearly</option>
+                            <option value="">Lifetime</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <canvas id="myChart2"></canvas>
+                </div>
+                
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <div class="row justify-content-between">
+                    <div class="col-2">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon.svg' %}" ></div>
+                            </div>
+                            <input type="text" class="form-control search-input avenir-font" id="inlineFormInputGroup" placeholder="Search by Name, Phone, E-mail">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="col">
+                                <div class="btn-group avenir-font" role="group" aria-label="Button group with nested dropdown">
+                                    <div class="btn-group" role="group">
+                                        <button id="filterGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <img src="{% static '/img/brand-dashboard/filter-icon.svg' %}" class="pr-4">Filter
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="filterGroup">
+                                            <a class="dropdown-item" href="#" id="productNameFilter" data-toggle="modal" data-target="#productNameFilterModal">Product Name</a>
+                                            <a class="dropdown-item" href="#" id="orderDateFilter" >Order Date</a>
+                                            <a class="dropdown-item" href="#" id="orderAmountFilter" data-toggle="modal" data-target="#orderAmountFilterModal">Order Amount</a>
+                                        </div>
+                                        <input type="hidden" name="orderDateInput">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col" id="fileTypeDiv">
+                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon">
+                                <select name="fileType" id="" class="selectpicker">
+                                    <option value="">File Type</option>
+                                    <option value="csv">CSV</option>
+                                </select>
+                            </div>
+                            <div class="col" id="recordCountDiv">
+                                <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon">
+                                <select name="recordsCount" id="" class="selectpicker">
+                                    <option value="10">10 Records</option>
+                                    <option value="20">20 Records</option>
+                                    <option value="50">50 Records</option>
+                                    <option value="100">100 Records</option>
+                                    <option value="500">500 Records</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row" id="userOrderTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="productNameFilterModal" tabindex="-1" role="dialog" aria-labelledby="productNameFilterModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productNameFilterModalLabel">Product Name</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-title">Sort A->Z</div>
+                    <div class="modal-title">Sort Z->A</div>
+                    <div class="row avenir-font">
+                        <div class="input-group m-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                            </div>
+                            <input type="text" class="form-control search-input avenir-font" id="inlineFormInputGroup" placeholder="Search by Name, Phone, E-mail">
+                        </div>
+                    </div>
+                    <div class="row avenir-font">
+                        <div class="col productNameList">
+                            <div class="row">
+                                <input type="checkbox" class="checkbox-default">Product 1
+                            </div>
+                            <div class="row">
+                                <input type="checkbox">Product 2
+                            </div>
+                            <div class="row">
+                                <input type="checkbox">Product 3
+                            </div>
+                            <div class="row">
+                                <input type="checkbox">Product 4
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderDateFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderDateFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDateFilterModalLabel">Order Date</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderAmountFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderAmountFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <span class="apply-button">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script>
+        var ctx = document.getElementById('myChart1').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: 'rgb(0, 0, 0)',
+                    borderColor: 'rgb(0, 0, 0)',
+                    data: [0, 10, 5, 2, 20, 30, 45],
+                    fill: false,
+                }],
+
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    </script>
+    <script>
+        var ctx = document.getElementById('myChart2').getContext('2d');
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [{
+                    label: false,
+                    backgroundColor: 'rgb(0, 0, 0)',
+                    borderColor: 'rgb(0, 0, 0)',
+                    data: [0, 10, 5, 2, 20, 30, 45],
+                    fill: false,
+                }]
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    </script>
+
+    <script>
+        let paymentStatusFilter = [];
+        $("#userOrderTable").jsGrid({
+            width: "100%",
+            height: "300px",
+
+            inserting: false,
+            editing: false,
+            sorting: false,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            filtering: false,
+            pagerFormat: "{first} {pages} {last}",
+            pageButtonCount: 3,
+            pageSize: $("#pageSize").val(),
+            fields: [
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false},
+                { title: "Name", name: "shipping_address.name", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Phone", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Email", name: "shipping_address.email", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Shipping Address", itemTemplate: function(_, item){
+                        return item.shipping_address.address1 + ', ' + item.shipping_address.address2
+                    }
+                },
+                { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
+                { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
+                { title: "Product Name", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
+                { title: "Actions", name: "payment_status", type: "text", width: 60, align: "center", },
+            ],
+            controller: {
+                loadData: function(filter) {
+                    let q = $('[name="q"]').val()
+                    if(q)
+                        filter['q'] = q
+                    filter['page'] = filter['pageIndex']
+                    filter['page_size'] = $("#pageSize").val()
+                    filter['payment_status'] = paymentStatusFilter.join(',')
+
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/ad/jarvis/order/",
+                        data: filter,
+                        headers: headers
+                    });
+                },
+                
+            },
+            onDataLoaded: function(gridInstance){
+                // $('.daterange-field').find('input').daterangepicker({
+                //     locale: {
+                //         format: 'DD-MM-YYYY'
+                //     }
+                // });
+
+                // $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
+                // $('#paymentStatusFilterButton').popover({
+                //     placement: 'bottom',
+                //     html: true,
+                //     content: function(){
+                //         console.log('popover html', $('#paymentStatusFilterOption').html())
+                //         return $('#paymentStatusFilterOption').html();
+                //     },
+                //     container: 'body'
+                // })
+                
+            }
+        });
+
+        let grid = $("#userOrderTable").data("JSGrid");
+    </script>
+    <script>
+        $(document).ready(function(){
+            $('input[name="orderDateInput"]').daterangepicker();
+        })
+        $('#orderDateFilter').click(function(){
+            $('input[name="orderDateInput"]').click()
+        })
+        
+    </script>
+{% endblock js %}

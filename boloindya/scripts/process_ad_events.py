@@ -41,6 +41,7 @@ def process_ad_event(Model, event, keys):
             max_id = int(item.get('id'))
 
     if not max_id == 0:
+        Model.objects.bulk_create(event_list)
         update_last_processed_id('ad:%s:last_processed_id'%event, max_id)
 
 
@@ -51,6 +52,11 @@ def process_events_in_parallel():
     pool.apply_async(process_ad_event, args=(Skipped, 'skip', ('user_id', 'ad_id', 'created_at')))
     pool.apply_async(process_ad_event, args=(Clicked, 'click', ('user_id', 'ad_id', 'created_at')))
     pool.apply_async(process_ad_event, args=(Playtime, 'playtime', ('user_id', 'ad_id', 'created_at', 'playtime')))
+    pool.apply_async(process_ad_event, args=(Install, 'install_now', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(Playtime, 'shop_now', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(Playtime, 'buy_now', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(LearnMore, 'learn_more', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(PlaceOrder, 'place_order', ('user_id', 'ad_id', 'created_at')))
 
     pool.close()
     pool.join()
