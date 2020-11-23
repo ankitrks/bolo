@@ -82,6 +82,7 @@ class Event(RecordTimeStamp):
 	is_approved = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)
 	event_type = models.CharField(choices = event_type_options,default='all', blank = True, null = True, max_length = 25)
+	banner_landscape_img_url = models.TextField(blank = True, null = True)
 
 event_slot_options = (
 	('available', "Available"),

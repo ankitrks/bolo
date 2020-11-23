@@ -640,8 +640,73 @@ class EventDetailsV2(APIView):
 			print(e)
 			return JsonResponse({'message': str(e), 'data':{}}, status=status.HTTP_400_BAD_REQUEST)
 
+	def post(self, request, *args, **kwargs):
+		import datetime
+		try:
+			if request.user.is_authenticated:
+				title = request.POST.get('title','')
+				description = request.POST.get('description','')
+				promo_profile_pic = request.FILES.get('promo_profile_pic','')
+				promo_banner = request.FILES.get('promo_banner_landscape','')
+				slots = request.POST.get('slots','')
+				price_per_user = request.POST.get('price_per_user',0)
+				language_ids = request.POST.get('language_selected',[])
+				hash_tags = request.POST.get('hashtags', None)
+				category_id = request.POST.get('category_selected',None)
+
+				if promo_profile_pic and not promo_profile_pic.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+				if promo_banner and not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+
+				if language_ids:
+					language_ids = json.loads(language_ids)
+				event = Event(creator_id = request.user.id, title=title,description=description,price=price_per_user,category_id = category_id, language_ids = language_ids)
+				event.save()
+
+				#upload image
+				self.download_and_upload_events_v2(event.id, promo_profile_pic, promo_banner)
+
+				hash_tags_to_add = []
+				if hash_tags:
+					hash_tags = json.loads(hash_tags)
+					for index, value in enumerate(hash_tags):
+						if value.startswith("#"):
+							try:
+								tag = TongueTwister.objects.using('default').get(hash_tag__iexact=value.strip('#'))
+							except :
+								tag = TongueTwister.objects.create(hash_tag=value.strip('#'))
+							hash_tags_to_add.append(tag)
+				if hash_tags_to_add:
+					event.hash_tags.add(*hash_tags_to_add)
+
+				#slots create
+				event_slots = []
+				event_id = event.id
+				if slots:
+					slots = json.loads(slots)
+					start_date = datetime.datetime.strptime(slots['start_date'], "%Y-%m-%d").date()
+					end_date = datetime.datetime.strptime(slots['end_date'], "%Y-%m-%d").date()
+					while(start_date<=end_date):
+						for value in slots['time']:
+							start_time = get_time(value['start_time'])
+							end_time = get_time(value['end_time'])
+
+							event_slot_start_time = datetime.datetime.combine(start_date,start_time)
+							event_slot_end_time = datetime.datetime.combine(start_date,end_time)
+							event_slots.append({"start_time": event_slot_start_time, "end_time": event_slot_end_time, "event_id": event_id})
+						start_date+=datetime.timedelta(days=1)
+					slot_list = [EventSlot(**vals) for vals in event_slots]
+					EventSlot.objects.bulk_create(slot_list)
+				return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK)
+			else:
+				return JsonResponse({'message':'Unauthorised User'}, status=status.HTTP_401_UNAUTHORIZED)
+		except Exception as e:
+			print(e)
+			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 	def get_event_list(self, page_no, event_type):
-		events = Event.objects.filter(event_type = event_type, is_approved=True, is_active = True).values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description', 'creator_id','language_ids','category_id')
+		events = Event.objects.filter(event_type = event_type, is_approved=True, is_active = True).values('id', 'title', 'thumbnail_img_url', 'banner_landscape_img_url', 'profile_pic_img_url','price', 'description', 'creator_id','language_ids','category_id')
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
@@ -659,13 +724,18 @@ class EventDetailsV2(APIView):
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
 				final_df['followers_count'] = final_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
 				final_df = final_df.sort_values(by=['followers_count'], ascending=False)
-				final_df['language_ids'] = final_df['language_ids'].apply(lambda x: ','.join(x))
+				final_df['language_ids'] = final_df['language_ids'].apply(lambda x: self.get_language_name(x))
 				# creator data
 				user_data = User.objects.filter(id__in=final_df['creator_id'].unique()).values('username','st__bio', 'id')
 				user_df = pd.DataFrame.from_records(user_data)
 				final_df = pd.merge(final_df, user_df,left_on='creator_id',right_on='id')
-				final_df.drop(['event_id','id_y'], axis=1, inplace=True)
-				final_df = final_df.rename(columns={'id_x': 'id', 'st__bio': 'creator_bio', 'username': 'creator_username', 'language_ids': 'event_language', 'category_id': 'event_category'})
+
+				#category details
+				category_data = Category.objects.filter(id__in=final_df['category_id'].unique()).values('id','title')
+				category_df = pd.DataFrame.from_records(category_data)
+				final_df = pd.merge(final_df,category_df, left_on='category_id', right_on='id')
+				final_df.drop(['event_id','id_y','id', 'category_id'], axis=1, inplace=True)
+				final_df = final_df.rename(columns={'id_x': 'id', 'st__bio': 'creator_bio', 'username': 'creator_username', 'language_ids': 'event_language', 'title_x':'title', 'title_y': 'event_category', 'banner_landscape_img_url': 'banner_img_url'})
 				result = final_df.to_dict('records')
 				if result:
 					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
@@ -685,7 +755,7 @@ class EventDetailsV2(APIView):
 		result = {}
 		if event:
 			event_slots = event[0].event_slot.all()
-		event_values = event.values('id', 'title', 'thumbnail_img_url', 'banner_img_url', 'profile_pic_img_url','price', 'description','creator_id','category_id','language_ids')
+		event_values = event.values('id', 'title', 'thumbnail_img_url', 'banner_landscape_img_url', 'profile_pic_img_url','price', 'description','creator_id','category_id','language_ids')
 		event_df = pd.DataFrame.from_records(event_values)
 		event_slots_df = pd.DataFrame.from_records(event_slots.values('start_time','end_time','event_id'))
 		if not event_slots_df.empty:
@@ -700,7 +770,7 @@ class EventDetailsV2(APIView):
 				final_df['category_id'] = event_category_title
 				final_df.drop(['event_id'], axis=1, inplace=True)
 				final_df['language_ids'] = final_df['language_ids'].apply(lambda x: self.get_language_name(x))
-				final_df = final_df.rename(columns={'language_ids': 'event_language', 'category_id': 'event_category'})
+				final_df = final_df.rename(columns={'language_ids': 'event_language', 'category_id': 'event_category', 'banner_landscape_img_url': 'banner_img_url'})
 				result = final_df.to_dict('records')
 				if result:
 					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
@@ -714,3 +784,51 @@ class EventDetailsV2(APIView):
 	def get_language_name(self,lang_array):
 		data = ",".join(list(map(lambda x: language_options_dict[x], lang_array)))
 		return data
+
+	def download_and_upload_events_v2(self, event_id, promo_profile_pic, promo_banner):
+		try:
+			from jarvis.views import urlify
+			#upload images async
+			promo_profile_pic_path, promo_profile_pic_name, banner_file_path, promo_banner_name = None, None, None, None
+			if promo_profile_pic:
+				ts1 = time.time()
+				promo_profile_pic_name_temp= promo_profile_pic.name.split('.')
+				promo_profile_pic_name = str(urlify(promo_profile_pic_name_temp[0]))+"_"+ str(ts1).replace(".", "")+"."+str(promo_profile_pic_name_temp[1])
+				promo_profile_pic_path = '/tmp/'+promo_profile_pic_name
+				with open(promo_profile_pic_path,'wb') as f:
+					for chunk in promo_profile_pic.chunks():
+						if chunk:
+							f.write(chunk)
+			if promo_banner:
+				ts2 = time.time()
+				promo_banner_temp= promo_banner.name.split('.')
+				promo_banner_name = str(urlify(promo_banner_temp[0]))+"_"+ str(ts2).replace(".", "")+"."+str(promo_banner_temp[1])
+				banner_file_path = '/tmp/'+promo_banner_name
+				with open(banner_file_path,'wb') as f:
+					for chunk in promo_banner.chunks():
+						if chunk:
+							f.write(chunk)
+			self.upload_event_media_v2(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
+		except Exception as e:
+			print(e)
+
+	def upload_event_media_v2(self, event_id, promo_profile_pic, promo_banner, profile_pic_name, promo_banner_name):
+		import os
+		key = "public/booking_shows/"
+		try:
+			banner_img_url, thumbnail_img_url, profile_pic_img_url = None, None, None
+			booking = Event.objects.filter(pk=event_id)
+			if promo_profile_pic:
+				profile_pic_img_url = upload_media(promo_profile_pic, profile_pic_name, key)
+			if promo_banner:
+				banner_img_url = upload_media(promo_banner, promo_banner_name, key)
+			if banner_img_url:
+				thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
+			if profile_pic_img_url and banner_img_url and thumbnail_img_url:
+				booking.update(banner_landscape_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
+				if os.path.exists(promo_banner):
+					os.remove(promo_banner)
+				if os.path.exists(promo_profile_pic):
+					os.remove(promo_profile_pic)
+		except Exception as e:
+			print(e)
