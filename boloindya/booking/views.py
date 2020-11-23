@@ -14,12 +14,13 @@ from django.views.generic import RedirectView
 from rest_framework import status
 from rest_framework.views import APIView
 
+from forum.category.models import Category
 from forum.user.models import UserProfile
 from forum.topic.models import TongueTwister
 from forum.user.utils.bolo_redis import get_userprofile_counter
 from .serializers import BookingSerializer, PayOutConfigSerializer
 from .models import *
-from .utils import booking_options
+from .utils import booking_options, language_options_dict
 # Create your views here.
 from datetime import datetime, timedelta
 from drf_spirit.views import remove_extra_char
@@ -692,17 +693,24 @@ class EventDetailsV2(APIView):
 			event_slots_df['start_time'] = event_slots_df['start_time'].dt.date
 			event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 			final_df = pd.merge(event_df, event_slots_df, left_on='id', right_on='event_id')
-			final_df['creator_username'] = event[0].creator.username
-			final_df['creator_bio'] = event[0].creator.st.bio
-			final_df.drop(['event_id'], axis=1, inplace=True)
-			final_df['language_ids'] = final_df['language_ids'].apply(lambda x: ','.join(x))
-			final_df = final_df.rename(columns={'language_ids': 'event_language', 'category_id': 'event_category'})
-			result = final_df.to_dict('records')
-			if result:
-				[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
-			for value in result:
-				value.pop('start_time',None)
-				value.pop('end_time',None)
-			if result:
-				result = result[0]
+			if not final_df.empty:
+				final_df['creator_username'] = event[0].creator.username
+				final_df['creator_bio'] = event[0].creator.st.bio
+				event_category_title =Category.objects.get(id=final_df['category_id'][0]).title
+				final_df['category_id'] = event_category_title
+				final_df.drop(['event_id'], axis=1, inplace=True)
+				final_df['language_ids'] = final_df['language_ids'].apply(lambda x: self.get_language_name(x))
+				final_df = final_df.rename(columns={'language_ids': 'event_language', 'category_id': 'event_category'})
+				result = final_df.to_dict('records')
+				if result:
+					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
+				for value in result:
+					value.pop('start_time',None)
+					value.pop('end_time',None)
+				if result:
+					result = result[0]
 		return JsonResponse({'message': 'success', 'data':  result}, status=status.HTTP_200_OK)
+
+	def get_language_name(self,lang_array):
+		data = ",".join(list(map(lambda x: language_options_dict[x], lang_array)))
+		return data
