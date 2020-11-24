@@ -2796,18 +2796,17 @@ def verify_otp_with_country_code(request):
             # otp_obj.used_at = timezone.now()
             # otp_obj.update(used_at = timezone.now())
             if not is_reset_password and not is_for_change_phone and otp_obj:
-                if mobile_no in ['7726080653']:
-                    return JsonResponse({'message': 'Invalid Mobile No / OTP', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
-                try:
-                    userprofile = UserProfile.objects.using('default').get(mobile_no = mobile_no)
-                except:
-                    try:
-                        userprofile = UserProfile.objects.using('default').get(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no)
-                    except MultipleObjectsReturned:
-                        userprofile = UserProfile.objects.using('default').filter(Q(social_identifier='')|Q(social_identifier=None),mobile_no = mobile_no).order_by('id').last()
-                        is_created=False
-                    except:
-                        userprofile = None
+                userprofile = UserProfile.objects.using('default').filter(mobile_no=mobile_no).order_by('vb_count')
+
+                if userprofile.count() == 0:
+                    userprofile = None
+                elif userprofile.count() == 1:
+                    userprofile = userprofile[1]
+                    is_created=False
+                else:
+                    userprofile = userprofile.last() 
+                    is_created=False
+
                 if userprofile:
                     if not userprofile.user.is_active:
                         return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
