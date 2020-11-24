@@ -648,6 +648,7 @@ class EventDetailsV2(APIView):
 				description = request.POST.get('description','')
 				promo_profile_pic = request.FILES.get('promo_profile_pic','')
 				promo_banner = request.FILES.get('promo_banner_landscape','')
+				promo_thumbnail = request.FILES.get('promo_thumbnail', '')
 				slots = request.POST.get('slots','')
 				price_per_user = request.POST.get('price_per_user',0)
 				language_ids = request.POST.get('language_selected',[])
@@ -658,6 +659,8 @@ class EventDetailsV2(APIView):
 					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
 				if promo_banner and not promo_banner.name.endswith(('.jpg','.png', '.jpeg')):
 					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
+				if promo_thumbnail and not promo_thumbnail.name.endswith(('.jpg','.png', '.jpeg')):
+					return JsonResponse({'message':'fail','reason':'This is not a jpg/png file'}, status=status.HTTP_200_OK)
 
 				if language_ids:
 					language_ids = json.loads(language_ids)
@@ -665,7 +668,7 @@ class EventDetailsV2(APIView):
 				event.save()
 
 				#upload image
-				self.download_and_upload_events_v2(event.id, promo_profile_pic, promo_banner)
+				self.download_and_upload_events_v2(event.id, promo_profile_pic, promo_banner, promo_thumbnail)
 
 				hash_tags_to_add = []
 				if hash_tags:
@@ -785,8 +788,9 @@ class EventDetailsV2(APIView):
 		data = ",".join(list(map(lambda x: language_options_dict[x], lang_array)))
 		return data
 
-	def download_and_upload_events_v2(self, event_id, promo_profile_pic, promo_banner):
+	def download_and_upload_events_v2(self, event_id, promo_profile_pic, promo_banner, promo_thumbnail):
 		try:
+			print(promo_profile_pic, promo_banner, promo_thumbnail)
 			from jarvis.views import urlify
 			#upload images async
 			promo_profile_pic_path, promo_profile_pic_name, banner_file_path, promo_banner_name = None, None, None, None
@@ -808,11 +812,21 @@ class EventDetailsV2(APIView):
 					for chunk in promo_banner.chunks():
 						if chunk:
 							f.write(chunk)
-			self.upload_event_media_v2(event_id, promo_profile_pic_path, banner_file_path, promo_profile_pic_name, promo_banner_name)
+
+			if promo_thumbnail:
+				ts3 = time.time()
+				promo_thumbnail_temp = promo_thumbnail.name.split('.')
+				promo_thumbnail_name = str(urlify(promo_thumbnail_temp[0]))+"_"+ str(ts3).replace(".", "")+"."+str(promo_thumbnail_temp[1])
+				thumbnail_file_path = '/tmp/'+promo_thumbnail_name
+				with open(thumbnail_file_path,'wb') as f:
+					for chunk in promo_thumbnail.chunks():
+						if chunk:
+							f.write(chunk)
+			self.upload_event_media_v2(event_id, promo_profile_pic_path, banner_file_path, thumbnail_file_path, promo_profile_pic_name, promo_banner_name, promo_thumbnail_name)
 		except Exception as e:
 			print(e)
 
-	def upload_event_media_v2(self, event_id, promo_profile_pic, promo_banner, profile_pic_name, promo_banner_name):
+	def upload_event_media_v2(self, event_id, promo_profile_pic, promo_banner, promo_thumbnail, profile_pic_name, promo_banner_name, promo_thumbnail_name):
 		import os
 		key = "public/booking_shows/"
 		try:
@@ -823,12 +837,14 @@ class EventDetailsV2(APIView):
 			if promo_banner:
 				banner_img_url = upload_media(promo_banner, promo_banner_name, key)
 			if banner_img_url:
-				thumbnail_img_url = get_thumbnail_url(banner_img_url,key)
+				thumbnail_img_url = upload_media(promo_thumbnail, promo_thumbnail_name, key)
 			if profile_pic_img_url and banner_img_url and thumbnail_img_url:
 				booking.update(banner_landscape_img_url = banner_img_url, thumbnail_img_url=thumbnail_img_url, profile_pic_img_url=profile_pic_img_url)
 				if os.path.exists(promo_banner):
 					os.remove(promo_banner)
 				if os.path.exists(promo_profile_pic):
 					os.remove(promo_profile_pic)
+				if os.path.exists(promo_thumbnail):
+					os.remove(promo_thumbnail)
 		except Exception as e:
 			print(e)
