@@ -380,9 +380,7 @@ class EventDetails(APIView):
 		events_df = pd.DataFrame.from_records(events)
 		result = []
 		if not events_df.empty:
-			events_df['followers_count'] = events_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
-			events_df = events_df.sort_values(by=['followers_count'], ascending=False)
 			if not event_slots_df.empty:
 				#fetch available slots event only
 				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
@@ -395,6 +393,8 @@ class EventDetails(APIView):
 				event_slots_df['end_time'] = event_slots_df['end_time'].dt.date
 				final_df = pd.merge(events_df, event_slots_df, left_on='id', right_on='event_id')
 				final_df.drop(['event_id'], axis=1, inplace=True)
+				final_df['followers_count'] = final_df['creator_id'].apply(lambda user_id: get_userprofile_counter(user_id)['follower_count'])
+				final_df = final_df.sort_values(by=['followers_count'], ascending=False)
 				result = final_df.to_dict('records')
 				if result:
 					[value.update({"slots":[{"start_time": value['start_time'], "end_time": value['end_time']}]}) for value in result]
