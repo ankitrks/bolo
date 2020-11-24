@@ -23,6 +23,7 @@ import coupon.urls
 import booking.urls
 import payment.urls
 import booking.api_urls
+import booking.api_urls_v2
 import advertisement.api_urls
 import advertisement.urls
 import report.urls
@@ -75,6 +76,7 @@ patterns = [
     url(r'^api/v1/', include(drf_spirit.urls, namespace='api')),
     url(r'^api/v1/', include(coupon.urls, namespace='api')),
     url(r'^api/v1/', include(booking.api_urls, namespace='api')),
+    url(r'^api/v2/', include(booking.api_urls_v2, namespace='api')),
     url(r'^api/v2/fetch_audio_list', drf_spirit.views.audio_list),
     url(r'fcm/', include('fcm.urls')),
     url(r'^jarvis/',include('jarvis.urls', namespace='jarvis')),
