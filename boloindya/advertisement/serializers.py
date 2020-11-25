@@ -162,7 +162,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date', 'user')
-        read_only_fields = ('id', 'state', 'payment_status', 'date', 'user')
+        read_only_fields = ('id', 'payment_status', 'date', 'user')
         depth = 1
 
     def get_date(self, instance):
@@ -189,6 +189,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order.amount += float(line['amount'])
 
         order.order_number = 'ORDER_%d'%order.id
+        order.state = 'order_placed'
         order.save()
         return order
 
@@ -196,19 +197,25 @@ class OrderSerializer(serializers.ModelSerializer):
         print "Instance", instance
         print "validated data", validated_data
 
-        address = instance.shipping_address
-        for attr, value in validated_data.pop('shipping_address').iteritems():
-            setattr(address, attr, value)
-        address.save()
+        if validated_data.get('shipping_address'):
+            address = instance.shipping_address
+            for attr, value in validated_data.pop('shipping_address').iteritems():
+                setattr(address, attr, value)
+            address.save()
 
-        line = instance.lines.all()[0]
-        for attr, value in validated_data.pop('lines')[0].iteritems():
-            setattr(line, attr, value)
-        line.amount = line.product.final_amount * line.quantity
-        line.save()
+        if validated_data.get('lines'):
+            line = instance.lines.all()[0]
+            for attr, value in validated_data.pop('lines')[0].iteritems():
+                setattr(line, attr, value)
+            line.amount = line.product.final_amount * line.quantity
+            line.save()
 
-        instance.amount = line.product.final_amount * line.quantity
-        instance.payment_gateway_order_id = None
+            instance.amount = line.product.final_amount * line.quantity
+            instance.payment_gateway_order_id = None
+
+        for attr, value in validated_data.iteritems():
+            setattr(instance, attr, value)
+
         instance.save()
         
         return instance

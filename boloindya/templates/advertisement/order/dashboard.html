@@ -279,6 +279,39 @@
             font-size: 14px;
             padding-top: 4px;
         }
+
+        #orderAmountFilterModal .modal-content{
+            width: 800px;
+            height: 250px;
+        }
+
+        #orderAmountFilterModal .ui-slider-horizontal{
+            height: 3px;
+            border-radius: 3px;
+        }
+
+        #orderAmountFilterModal .ui-widget-header{
+            background: #0270BE;
+            height: 3px;
+            margin-top: -1px;
+        }
+
+        #orderAmountFilterModal .ui-slider .ui-slider-handle {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+        }
+
+        #orderAmountFilterModal #price-slider-range{
+            margin-top: 30px;
+        }
+
+        #amountSliderInput{
+            border:0; 
+            color: white; 
+            background: #121111;
+            font-weight: bold
+        }
     </style>
 {% endblock css %}
 
@@ -307,13 +340,13 @@
                     Brand Partner Dashboard
                 </div>
             </div>
-            <div class="col-4">
+            <div class="col-5">
                 <div class="row greeting-div">
                     <div class="col greeting-message my-5 pl-5">
                         <div class="row">
-                            <h2>Hello John Doe!</h2>
+                            <h2>Hello {% if user.st.name %}{{ user.st.name }}{% else %}{{ user.username }}{% endif %}!</h2>
                         </div>
-                        <div class="row">
+                        <div class="row avenir-font">
                             It's good to see you again
                         </div>
                     </div>
@@ -325,33 +358,33 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-2 ">
+            <div class="col-2 " id="lifetimeOrder">
                 <div class="row count-div">
-                    <div class="col-6 pt-3 pl-2 count">
-                        1000
+                    <div class="col-6 pt-3 count value-count text-center">
+                        -
                     </div>
-                    <div class="col-6 pt-3 avenir-font count-text">
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
                         Lifetime Orders
                     </div>
                 </div>
             </div>
-            <div class="col-2 ">
+            <div class="col-2" id="uniqueOrder">
                 <div class="row count-div">
-                    <div class="col-6 pt-3 pl-2 count">
-                        1000
+                    <div class="col-6 pt-3 count value-count text-center" >
+                        -
                     </div>
-                    <div class="col-6 pt-3 avenir-font count-text">
-                        Lifetime Orders
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
+                        Unique Orders
                     </div>
                 </div>
             </div>
-            <div class="col-2">
+            <div class="col-2" id="monthOrder">
                 <div class="row count-div">
-                    <div class="col-6 pt-3 pl-2 count">
-                        1000
+                    <div class="col-6 pt-3 count value-count text-center" >
+                        -
                     </div>
-                    <div class="col-6 pt-3 avenir-font count-text">
-                        Lifetime Orders
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
+                        Month's Orders
                     </div>
                 </div>
             </div>
@@ -399,12 +432,12 @@
         <div class="row mt-5">
             <div class="col">
                 <div class="row justify-content-between">
-                    <div class="col-2">
+                    <div class="col-3">
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
                                 <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon.svg' %}" ></div>
                             </div>
-                            <input type="text" class="form-control search-input avenir-font" id="inlineFormInputGroup" placeholder="Search by Name, Phone, E-mail">
+                            <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail" name="q" autocomplete="off">
                         </div>
                     </div>
                     <div class="col-4">
@@ -425,7 +458,7 @@
                                 </div>
                             </div>
                             <div class="col" id="fileTypeDiv">
-                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon">
+                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon" id="exportOrder">
                                 <select name="fileType" id="" class="selectpicker">
                                     <option value="">File Type</option>
                                     <option value="csv">CSV</option>
@@ -433,7 +466,7 @@
                             </div>
                             <div class="col" id="recordCountDiv">
                                 <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon">
-                                <select name="recordsCount" id="" class="selectpicker">
+                                <select name="recordsCount" id="pageSize" class="selectpicker">
                                     <option value="10">10 Records</option>
                                     <option value="20">20 Records</option>
                                     <option value="50">50 Records</option>
@@ -461,51 +494,20 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-title">Sort A->Z</div>
-                    <div class="modal-title">Sort Z->A</div>
+                    <div class="modal-title sort-asc">Sort A->Z</div>
+                    <div class="modal-title sort-desc">Sort Z->A</div>
                     <div class="row avenir-font">
                         <div class="input-group m-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
                             </div>
-                            <input type="text" class="form-control search-input avenir-font" id="inlineFormInputGroup" placeholder="Search by Name, Phone, E-mail">
+                            <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail">
                         </div>
                     </div>
                     <div class="row avenir-font">
                         <div class="col productNameList">
-                            <div class="row">
-                                <input type="checkbox" class="checkbox-default">Product 1
-                            </div>
-                            <div class="row">
-                                <input type="checkbox">Product 2
-                            </div>
-                            <div class="row">
-                                <input type="checkbox">Product 3
-                            </div>
-                            <div class="row">
-                                <input type="checkbox">Product 4
-                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <span class="apply-button">Apply</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="orderDateFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderDateFilterModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderDateFilterModalLabel">Order Date</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
                 </div>
                 <div class="modal-footer justify-content-center">
                     <span class="apply-button">Apply</span>
@@ -518,13 +520,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                 </div>
                 <div class="modal-body">
-                    ...
+                        <input type="text" id="amountSliderInput" readonly class="mt-5">
+                       
+                      <div id="price-slider-range"></div>
                 </div>
                 <div class="modal-footer">
                     <span class="apply-button">Apply</span>
@@ -557,8 +561,7 @@
             // Configuration options go here
             options: {}
         });
-    </script>
-    <script>
+
         var ctx = document.getElementById('myChart2').getContext('2d');
         var chart = new Chart(ctx, {
             // The type of chart we want to create
@@ -579,10 +582,37 @@
             // Configuration options go here
             options: {}
         });
-    </script>
 
-    <script>
         let paymentStatusFilter = [];
+        let orderStatusList = [
+            { name: "Draft", value: 'draft' },
+            { name: "Order Placed", value: 'order_placed' },
+            { name: "Shipped", value: 'shipped' },
+            { name: "Returned", value: 'returned' },
+            { name: "Out of Stock", value: 'out_of_stock' },
+            { name: "Delivered", value: 'delivered' }
+        ]
+
+        let getExtraFilterData = function(){
+            let filter = {}
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            filter['payment_status'] = paymentStatusFilter.join(',')
+            filter['date'] = $('input[name="orderDateInput"]').val()
+            filter['amount_range'] = $("#amountSliderInput").val()
+
+            productIdList = []
+            $.each($('#productNameFilterModal .productNameList input[type=checkbox]:checked'), function(i, item){
+                productIdList.push($(this).val())
+            })
+
+            if(productIdList.length > 0)
+                filter['product_ids'] = productIdList.join(',')
+
+            return filter
+        }
+
         $("#userOrderTable").jsGrid({
             width: "100%",
             height: "300px",
@@ -598,7 +628,19 @@
             pageButtonCount: 3,
             pageSize: $("#pageSize").val(),
             fields: [
-                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false},
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false,
+                    itemTemplate: function(value, _){
+                        console.log('item template', this._grid.data, value, _)
+                        let index = 0;
+                        $.each(this._grid.data, function(i, item){
+                            if(item.id == value){
+                                index = i;
+                                return false
+                            }
+                        })
+                        return index + 1
+                    }
+                },
                 { title: "Name", name: "shipping_address.name", type: "text", width: 60, align: "center", filtering: false},
                 { title: "Phone", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
                 { title: "Email", name: "shipping_address.email", type: "text", width: 60, align: "center", filtering: false},
@@ -609,16 +651,27 @@
                 { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
                 { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
                 { title: "Product Name", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
-                { title: "Actions", name: "payment_status", type: "text", width: 60, align: "center", },
-            ],
+                { title: "Actions", name: "state", type: "text", width: 60, align: "center", 
+                    itemTemplate: function(value, item){
+                        let html = `<select class="order-status" data-id=${ item.id }>`;
+                        $.each(orderStatusList, function(i, item){
+                            if(value == item.value)
+                                html += `<option value="${ item.value }" selected>${ item.name }</option>`
+                            else
+                                html += `<option value="${ item.value }" >${ item.name }</option>`
+                        })
+
+                        html += '</select>'
+                        return html
+                },
+            }],
             controller: {
                 loadData: function(filter) {
-                    let q = $('[name="q"]').val()
-                    if(q)
-                        filter['q'] = q
                     filter['page'] = filter['pageIndex']
                     filter['page_size'] = $("#pageSize").val()
-                    filter['payment_status'] = paymentStatusFilter.join(',')
+
+                    filter = Object.assign(filter, getExtraFilterData())
+                    console.log("filter", filter)
 
                     return $.ajax({
                         type: "GET",
@@ -651,14 +704,152 @@
         });
 
         let grid = $("#userOrderTable").data("JSGrid");
-    </script>
-    <script>
-        $(document).ready(function(){
-            $('input[name="orderDateInput"]').daterangepicker();
-        })
-        $('#orderDateFilter').click(function(){
-            $('input[name="orderDateInput"]').click()
-        })
+
         
+
+        let addDateFilter = function(){
+            $('input[name="orderDateInput"]').daterangepicker({
+                    opens: 'center',
+                    locale: {
+                        format: 'DD-MM-YYYY'
+                    }
+                }, function(start, end, label) {
+                    grid.reset();
+                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
+            $('input[name="orderDateInput"]').on('show.daterangepicker', function(ev, picker) {
+                // $('.daterangepicker').css({'top': '50%', 'left': '50%'})
+            });
+            $('#orderDateFilter').click(function(){
+                $('input[name="orderDateInput"]').click()
+            })
+            $('input[name="orderDateInput"]').val('')
+        }
+
+        let updateDashboardCount = function(){
+            $.ajax('/api/v1/ad/dashboard-counts', {
+                method: 'GET',
+                success: function(response){
+                    $("#lifetimeOrder").find('.value-count').text(response.lifetime_order)
+                    $("#uniqueOrder").find('.value-count').text(response.unique_order)
+                    $("#monthOrder").find('.value-count').text(response.month_order)
+
+                }
+            })
+        }
+
+        let addAmountFilterData = function(){
+            $.ajax('/api/v1/ad/filter-data/?type=amount', {
+                method: 'GET',
+                success: function(response){
+                    console.log("respoe", response)
+                    $( "#price-slider-range" ).slider({
+                    range: true,
+                    min: response.min,
+                    max: response.max,
+                    values: [ response.min, response.max],
+                    slide: function( event, ui ) {
+                        $( "#amountSliderInput" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                    }
+                    });
+                    $( "#amountSliderInput" ).val(response.min + " - " + response.max );
+                }
+            })
+        }
+
+        let addProductFilterData = function(brandId, sort){
+            let data = {
+                'type': 'product'
+            }
+
+            data['name'] = $('#productNameFilterModal .search-input').val()
+
+            if(brandId)
+                data['brand_id'] = brandId
+
+            if(sort)
+                data['sort'] = sort
+
+            $.ajax('/api/v1/ad/filter-data/?' + $.param(data), {
+                method: 'GET',
+                success: function(response){
+                    let productList = $('#productNameFilterModal .productNameList')
+                    productList.html('')
+                    $.each(response.results, function(i, item){
+                        productList.append(`<div class="row">
+                            <input type="checkbox" value="${ item.id }" > ${ item.name }
+                        </div>`)
+                    })
+                }
+            })
+        }
+
+        $(document).ready(function(){
+            updateDashboardCount()
+            addDateFilter()
+            addAmountFilterData()
+            addProductFilterData()
+
+            $(document).on('keyup', '[name=q]', function(){
+                grid.reset()
+            })
+
+            $(document).on('click', '#orderAmountFilterModal .apply-button', function(){
+                $('#orderAmountFilterModal').find('.close').click()
+                grid.reset()
+            })
+
+            $(document).on('keyup', '#productNameFilterModal .search-input', function(){
+                addProductFilterData(null, null)
+            })
+
+            $(document).on('click', '#productNameFilterModal .sort-asc', function(){
+                addProductFilterData(null, 'asc')
+            })
+
+            $(document).on('click', '#productNameFilterModal .sort-desc', function(){
+                addProductFilterData(null, 'desc')
+            })
+
+            $(document).on('click', '#productNameFilterModal .apply-button', function(){
+                $('#productNameFilterModal').find('.close').click()
+                grid.reset()
+            })
+
+            $(document).on('click', '#exportOrder', function(){
+                let fileType = $('select[name=fileType]').val();
+                let params = {}
+
+                if(fileType)
+                    params['format'] = fileType
+                
+                params = Object.assign(params, getExtraFilterData())
+
+                window.open('/report/ad/order/download?' + $.param(params), '_self')
+            });
+
+            $(document).on('change', '#pageSize', function(){
+                grid.reset()
+            })
+
+            $(document).on('change', '.order-status', function(){
+                let orderId = $(this).attr('data-id');
+                $.ajax({
+                        type: "PATCH",
+                        url: "/api/v1/ad/jarvis/order/" + orderId + '/',
+                        data: {
+                            'state': $(this).val()
+                        },
+                        headers: headers,
+                        success: function(response){
+                            console.log("response", response)
+                            // grid.reset()
+                        }
+                    });
+
+            })
+
+        })
+
     </script>
 {% endblock js %}

@@ -256,8 +256,10 @@ class Address(RecordTimeStamp):
 
 ORDER_STATE_CHOICES = (
     ('draft', 'Draft'),
-    ('pending_for_approval', 'Pending for Approval'),
-    ('accepted_by_vender', 'Accepted by vendor'),
+    ('order_placed', 'Order Placed'),
+    ('shipped', 'Shipped'),
+    ('out_of_stock', 'Out of Stock'),
+    ('returned', 'Returned'),
     ('delivered', 'Delivered')
 )
 

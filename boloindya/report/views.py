@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import csv
+from datetime import datetime
 
 from django.shortcuts import render
 from django.views.generic import View
@@ -110,12 +111,30 @@ class AdOrderDownload(DownloadView):
             left join advertisement_address address on address.id = o.shipping_address_id
             left join advertisement_state st on st.id = address.state_id
             left join advertisement_city city on city.id = address.city_id
+            where true 
         """
         params = []
 
         if self.request.GET.get('payment_status'):
-            query += " where o.payment_status in %s "
+            query += " and o.payment_status in %s "
             params.append(tuple(self.request.GET.get('payment_status').split(',')))
+
+        if self.request.GET.get('product_ids'):
+            query += "  and product.id in %s " 
+            params.append(tuple(self.request.GET.get('product_ids')))
+
+        if self.request.GET.get('amount_range'):
+            min_amount, max_amount = self.request.GET.get('amount_range').split(' - ')
+            query += " and o.amount >= %s and o.amount <= %s "
+            params.append(min_amount)
+            params.append(max_amount)
+
+        if self.request.GET.get('date'):
+            start_date, end_date = self.request.GET.get('date').split(' - ')
+            query += " and o.date between %s and %s "
+            params.append(datetime.strptime(start_date, '%d-%m-%Y'))
+            params.append(datetime.strptime(end_date, '%d-%m-%Y'))
+
 
         query +=  " order by o.created_at"
 

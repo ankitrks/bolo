@@ -515,3 +515,7 @@ class DatabaseRecordCount(models.Model):
 
     def __unicode__(self):
         return '%s = %s'%(self.name, self.count)
+
+    @staticmethod
+    def get_value(name):
+        return DatabaseRecordCount.objects.get(name=name).count
