@@ -2801,7 +2801,7 @@ def verify_otp_with_country_code(request):
                 if userprofile.count() == 0:
                     userprofile = None
                 elif userprofile.count() == 1:
-                    userprofile = userprofile[1]
+                    userprofile = userprofile[0]
                     is_created=False
                 else:
                     userprofile = userprofile.last() 
