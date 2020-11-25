@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from datetime import date
 
 class RecordTimeStamp(models.Model):
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True, blank=False, null=False)
@@ -234,6 +235,7 @@ class Order(RecordTimeStamp):
     payment_gateway_order_id = models.CharField(max_length=30, null=True, blank=True)
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=20, null=True, blank=True)
     order_number = models.CharField(max_length=30, null=True, blank=True)
+    is_invoice_sent = models.BooleanField(default=False)
 
     @property
     def amount_including_tax(self):
@@ -246,6 +248,26 @@ class OrderLine(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
+class OrderInvoice(RecordTimeStamp):
+    order = models.ForeignKey(Order, related_name='invoice', on_delete=models.CASCADE)
+    product_qty = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+    unit_tax = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+    igst_percentage =  models.DecimalField(max_digits = 10, decimal_places = 2, default=18.0)
+    net_amount_payble = models.DecimalField(max_digits = 10, decimal_places = 2,default=0.0)
+    payment_mode = models.TextField(blank = True, null = True)
+    unit_discount = models.PositiveIntegerField(default=0)
+    invoice_pdf_url = models.TextField(blank = True, null = True)
+    invoice_number = models.TextField(blank = True, null = True)
+
+    def save(self, *args, **kwargs):
+        super(OrderInvoice, self).save(*args, **kwargs)
+        if not self.invoice_number:
+            today = date.today()
+            current_month_invoice = OrderInvoice.objects.filter(created_at__year=today.year,created_at__month=today.month).count()
+            next_invoice_counter = "%03d" % (current_month_invoice + 1,)
+            self.invoice_number = str(today.strftime('%y'))+str(today.month)+str(next_invoice_counter)
+            self.save()
 
 class ProductReview(RecordTimeStamp):
     title = models.CharField(max_length=200)
