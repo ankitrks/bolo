@@ -8,8 +8,8 @@ from django.shortcuts import render
 from django.db.models import Sum, Q
 from django.test import Client
 from django.views.generic import RedirectView, TemplateView, DetailView
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.db import connections
 
 
@@ -762,6 +762,9 @@ class OrderDashboardLogin(LoginView):
     template_name = 'advertisement/order/login.html'
     success_url = '/ad/order/'
 
+    def get_success_url(self):
+        return self.success_url
+
     # def post(self, request, *args, **kwargs):
     #     print 'request posrt data', request.POST
     #     username = request.POST.get('username')
@@ -771,11 +774,19 @@ class OrderDashboardLogin(LoginView):
     #         login(request, user)
     #     else:
 
+class OrderDashboardLogout(LogoutView):
+    template_name = 'advertisement/order/login.html'
+    success_url = '/ad/login/'
+
+class ResetPasswordView(PasswordResetView):
+    template_name = 'advertisement/order/reset_password.html'
+    success_url = '/ad/login/'
+
+
 class FilterDataAPIView(APIView):
     def get(self, request, *args, **kwargs):
         print "request.query_params", request.query_params
         filter_type = request.query_params.get('type')
-        cursor = connections['read'].cursor()
 
         if filter_type == 'amount':
             return Response({
@@ -803,3 +814,54 @@ class FilterDataAPIView(APIView):
             return Response({
                 'results': queryset.values('id', 'name')
             })
+
+class ChartDataAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        chart_type = request.query_params.get('chart_type')
+        data_type = request.query_params.get('data_type')
+        cursor = connections['read'].cursor()
+
+        if chart_type == 'order':
+            if data_type == 'weekly':
+                return Response({
+                    'dataset': [3, 5, 6, 1, 4, 3, 0],
+                    'labels': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                })
+            elif data_type == 'monthly':
+                return Response({
+                    'dataset': [3, 5, 6, 1, 4, 3, 0, 3, 5, 6, 1, 4, 3, 0, 3, 5, 6, 1, 4, 3, 0,3, 5, 6, 1, 4, 3, 0, 3, 5],
+                    'labels': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
+                })
+            elif data_type == 'yearly':
+                return Response({
+                    'dataset': [30, 50, 61, 121, 41, 13, 100, 113, 25, 67, 10],
+                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                })
+            elif data_type == 'lifetime':
+                return Response({
+                    'dataset': [30, 50, 61, 121, 41, 13, 100, 113, 25, 67, 10],
+                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                })
+
+        elif chart_type == 'revenue':
+            if data_type == 'weekly':
+                return Response({
+                    'dataset': [4353, 1213, 5311, 2423, 1223, 1111, 4312],
+                    'labels': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                })
+            elif data_type == 'monthly':
+                return Response({
+                    'dataset': [3312, 1235, 1641, 1341, 3441, 1341, 1240, 3412, 1254, 3641, 1141, 4411, 3141, 1404, 1243, 1245, 6141, 1112, 4321, 3643, 2075, 3856, 5356, 6233, 1153, 4542, 3422, 2405, 2523, 5265],
+                    'labels': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
+                })
+            elif data_type == 'yearly':
+                return Response({
+                    'dataset': [34245, 51245, 64672, 81215, 43255, 34636, 56330, 74234, 63552, 62356, 62312],
+                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                })
+            elif data_type == 'lifetime':
+                return Response({
+                    'dataset': [34245, 51245, 64672, 81215, 43255, 34636, 56330, 74234, 63552, 62356, 62312],
+                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                })
+

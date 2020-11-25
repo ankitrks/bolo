@@ -47,6 +47,37 @@
             font-weight: 500;
             color: #10A5F9;
         }
+
+        .modal-footer, .modal-header{
+            border: none;
+        }
+
+        #forgotPasswordModal .modal-content{
+            width: 547px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+            box-shadow: 5px 5px 17px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-size: 20px;
+        }
+
+        #forgotPasswordModal .apply-button, #forgotPasswordSuccessModal .apply-button{
+            width: 228px;
+            height: 43px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-weight: 500;
+            font-size: 20px;
+            color: #FFFFFF;
+            padding-top: 7px;
+        }
+
+        #forgotPasswordModal [name=forgot-password-input]{
+            height: 45px;
+            margin-top: 5px;
+        }
     </style>
     
 {% endblock css %}
@@ -93,13 +124,13 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col text-right">
-                            <a href="#"><span class=" avenir-font forgot-password-link">Forgot Password</span></a>
+                            <a href="#"><span class=" avenir-font forgot-password-link" data-toggle="modal" data-target="#forgotPasswordModal">Forgot Password</span></a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col text-center">
                             <span class="">
-                                <button class="login-button avenir-font">Login</button>
+                                <button class="login-button avenir-font apply-button">Login</button>
                             </span>
                         </div>
                     </div>
@@ -107,5 +138,39 @@
             </div>
         </form>
         {{ form.errors }}
+    </div>
+
+
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body text-center">
+                    Please enter email ID to reset your password
+                    <div class="input-group">
+                        <input type="text" class="form-control avenir-font" name="forgot-password-input" placeholder="Type here....">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button text-center" data-toggle="modal" data-target="#forgotPasswordSuccessModal" data-dismiss="modal" aria-label="Close">Ok</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="forgotPasswordSuccessModal" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body text-center">
+                    Reset password link has been successfully sent to your email ID
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">Ok</span>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}

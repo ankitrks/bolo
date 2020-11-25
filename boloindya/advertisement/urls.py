@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .views import AdevertisementCallView, brand_onboard_form, ad_creation_form, product_onboard_form, search_fields_for_advertisement, brand_management, product_management, particular_ad
-from .views import OrderPaymentRedirectView, OrderTemplateView, AdTemplateView, ProductTemplateView, OrderDashboardLogin
+from .views import OrderPaymentRedirectView, OrderTemplateView, AdTemplateView, ProductTemplateView, OrderDashboardLogin, OrderDashboardLogout, ResetPasswordView
 
 urlpatterns = [
     url(r'^brand/onboard/$', staff_member_required(brand_onboard_form)),
@@ -17,4 +17,6 @@ urlpatterns = [
     url(r'^order/$', staff_member_required( OrderTemplateView.as_view())),
     url(r'^product/$', staff_member_required( ProductTemplateView.as_view())),
     url(r'^login/$', OrderDashboardLogin.as_view()),
+    url(r'^logout/$', OrderDashboardLogout.as_view()),
+    url(r'^reset-password/$', ResetPasswordView.as_view()),
 ]

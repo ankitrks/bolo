@@ -38,8 +38,8 @@
         }
 
         .container.main{
-            max-width: 91%;
-            margin-left: 8%;
+            max-width: 90%;
+            margin-left: 9%;
             margin-right: 1%;
         }
 
@@ -87,6 +87,7 @@
             color: black;
             font-size: 12px;
             font-weight: 500;
+            margin-top: 6px;
         }
 
         .jsgrid-table{
@@ -150,18 +151,22 @@
             background: black;
         }
 
-        #fileTypeDiv .bootstrap-select, #recordCountDiv .bootstrap-select{
+        #fileTypeDiv .bootstrap-select, #recordCountDiv .bootstrap-select, #orderDateTypeOption .bootstrap-select, #revenueDateTypeOption .bootstrap-select{
             width: 108px;
             height: 15px;
             margin-top: -12px;
             background: #F5F5F7;
         }
 
-        #fileTypeDiv .filter-option-inner-inner, #recordCountDiv .filter-option-inner-inner{
+        #fileTypeDiv .filter-option-inner-inner, #recordCountDiv .filter-option-inner-inner, #orderDateTypeOption .filter-option-inner-inner, #revenueDateTypeOption .filter-option-inner-inner{
             font-family: Avenir;
             font-size: 12px;
-            font-weight: 500;
             color: black;
+            padding-left: 6px;
+        }
+
+        #orderDateTypeOption .filter-option-inner-inner, #revenueDateTypeOption .filter-option-inner-inner{
+            font-weight: 600;
         }
 
         .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover{
@@ -172,7 +177,7 @@
             padding: 0px;
             font-family: Avenir;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             color: black;
             background: #F5F5F7;
         }
@@ -206,7 +211,7 @@
         }
 
         #productNameFilterModal .search-input::placeholder{
-            color: white
+            color: #9F9F9F;
         }
 
         #productNameFilterModal .productNameList{
@@ -280,6 +285,14 @@
             padding-top: 4px;
         }
 
+        .daterangepicker .cancelBtn{
+            background: #272727;
+            border-radius: 5px;
+            /* width: 228px; */
+            height: 30px;
+            color: #818181;
+        }
+
         #orderAmountFilterModal .modal-content{
             width: 800px;
             height: 250px;
@@ -306,12 +319,74 @@
             margin-top: 30px;
         }
 
+        #amountMinLabel, #amountMaxLabel{
+            font-size: 20px;
+        }
+
         #amountSliderInput{
             border:0; 
             color: white; 
             background: #121111;
             font-weight: bold
         }
+
+        .cancel-button{
+            background: #272727;
+            border-radius: 5px;
+            width: 228px;
+            height: 43px;
+            color: #818181;
+            font-family: Avenir;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            padding-top: 8px;
+        }
+
+        #signoutModal .modal-content{
+            width: 584px;
+            height: 161px;
+        }
+
+        #signoutModal .apply-button{
+            width: 228px;
+            height: 43px;
+        }
+
+        #exportOrder{
+            margin-right: -5px;
+            height: 31px;
+            margin-top: 5px;
+        }
+
+        #stockIcon{
+            padding: 9px;
+            margin-top: 4px;
+            margin-right: -4px;
+        }
+
+        .popover-header, .popover-body{
+            background: #121111;
+            color: #FFFFFF;
+            font-family: Avenir;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .popover-header{
+            border-bottom: 1px solid #7A7585
+        }
+
+        .popover-body:hover{
+            color: #10A5F9;
+        }
+
+        .bs-popover-right>.arrow::after{
+            background: #121111;
+            border-right-color: #121111;
+        }
+
     </style>
 {% endblock css %}
 
@@ -322,13 +397,13 @@
                 <img src="{% static '/img/brand-dashboard/home-icon.svg' %}" >
             </div>
         </div>
-        <div class="row my-4">
+        <div class="row my-4" id="setting">
             <div class="col">
                 <img src="{% static '/img/brand-dashboard/setting-icon.svg' %}" >
             </div>
         </div>
-        <div class="row my-4">
-            <div class="col align-self-end">
+        <div class="row" style="margin-top: 380px;">
+            <div class="col align-self-end" data-toggle="modal" data-target="#signoutModal">
                 <img src="{% static '/img/brand-dashboard/logout-icon.svg' %}" >
             </div>
         </div>
@@ -390,41 +465,41 @@
             </div>
         </div>
         <div class="row mt-5">
-            <div class="col-4 mr-4">
+            <div class="col-5 mr-4">
                 <div class="row justify-content-between">
-                    <div class="col-4">
-                        Order
+                    <div class="col-4" style="font-size: 20px;">
+                        Orders
                     </div>
-                    <div class="col-4 text-right">
-                        <select name="" id="" class="selectpicker">
-                            <option value="">Weekly</option>
-                            <option value="">Monthly</option>
-                            <option value="">Yearly</option>
-                            <option value="">Lifetime</option>
+                    <div class="col-4 text-right" id="orderDateTypeOption">
+                        <select name="" id="orderChartPeriod" class="selectpicker">
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="lifetime">Lifetime</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
-                    <canvas id="myChart1"></canvas>
+                    <canvas id="orderChart"></canvas>
                 </div>
                 
             </div>
-            <div class="col-4 mx-4">
+            <div class="col-5 mx-4">
                 <div class="row justify-content-between">
-                    <div class="col-4">
+                    <div class="col-4" style="font-size: 20px;">
                         Revenue
                     </div>
-                    <div class="col-4 text-right">
-                        <select name="" id="" >
-                            <option value="">Weekly</option>
-                            <option value="">Monthly</option>
-                            <option value="">Yearly</option>
-                            <option value="">Lifetime</option>
+                    <div class="col-4 text-right" id="revenueDateTypeOption">
+                        <select name="" id="revenueChartPeriod" class="selectpicker">
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="lifetime">Lifetime</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
-                    <canvas id="myChart2"></canvas>
+                    <canvas id="RevenueChart"></canvas>
                 </div>
                 
             </div>
@@ -440,7 +515,7 @@
                             <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail" name="q" autocomplete="off">
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-5">
                         <div class="row">
                             <div class="col">
                                 <div class="btn-group avenir-font" role="group" aria-label="Button group with nested dropdown">
@@ -465,7 +540,7 @@
                                 </select>
                             </div>
                             <div class="col" id="recordCountDiv">
-                                <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon">
+                                <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
                                 <select name="recordsCount" id="pageSize" class="selectpicker">
                                     <option value="10">10 Records</option>
                                     <option value="20">20 Records</option>
@@ -526,11 +601,60 @@
                         </button>
                 </div>
                 <div class="modal-body">
-                        <input type="text" id="amountSliderInput" readonly class="mt-5">
-                       
-                      <div id="price-slider-range"></div>
+                    <div class="row text-center">
+                        <div class="col">
+                            <input type="text" id="amountSliderInput" readonly class="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" id="amountMinLabel"></div>
+                        <div class="col text-right" id="amountMaxLabel"></div>
+                    </div>
+                    <div id="price-slider-range"></div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="signoutModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="">Are you sure you want to Signout?</h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button">Signout</span>
+                    <span class="cancel-button" data-dismiss="modal" aria-label="Close">Cancel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="orderAmountFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <input type="text" id="amountSliderInput" readonly class="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" id="amountMinLabel"></div>
+                        <div class="col text-right" id="amountMaxLabel"></div>
+                    </div>
+                    <div id="price-slider-range"></div>
+                </div>
+                <div class="modal-footer justify-content-center">
                     <span class="apply-button">Apply</span>
                 </div>
             </div>
@@ -540,48 +664,29 @@
 
 {% block js %}
     <script>
-        var ctx = document.getElementById('myChart1').getContext('2d');
-        var chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'line',
+        let createChart = function(chartName, canvas, labels, dataset){
+            return new Chart(canvas, {
+                // The type of chart we want to create
+                type: 'line',
 
-            // The data for our dataset
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'My First dataset',
-                    backgroundColor: 'rgb(0, 0, 0)',
-                    borderColor: 'rgb(0, 0, 0)',
-                    data: [0, 10, 5, 2, 20, 30, 45],
-                    fill: false,
-                }],
+                // The data for our dataset
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartName,
+                        backgroundColor: 'rgb(0, 0, 0)',
+                        borderColor: 'rgb(0, 0, 0)',
+                        data: dataset,
+                        fill: false,
+                    }],
 
-            },
+                },
 
-            // Configuration options go here
-            options: {}
-        });
+                // Configuration options go here
+                options: {}
+            });
+        }
 
-        var ctx = document.getElementById('myChart2').getContext('2d');
-        var chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'line',
-
-            // The data for our dataset
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: false,
-                    backgroundColor: 'rgb(0, 0, 0)',
-                    borderColor: 'rgb(0, 0, 0)',
-                    data: [0, 10, 5, 2, 20, 30, 45],
-                    fill: false,
-                }]
-            },
-
-            // Configuration options go here
-            options: {}
-        });
 
         let paymentStatusFilter = [];
         let orderStatusList = [
@@ -615,7 +720,7 @@
 
         $("#userOrderTable").jsGrid({
             width: "100%",
-            height: "300px",
+            height: "450px",
 
             inserting: false,
             editing: false,
@@ -630,7 +735,6 @@
             fields: [
                 { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false,
                     itemTemplate: function(value, _){
-                        console.log('item template', this._grid.data, value, _)
                         let index = 0;
                         $.each(this._grid.data, function(i, item){
                             if(item.id == value){
@@ -649,7 +753,7 @@
                     }
                 },
                 { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
-                { title: "Order Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
+                { title: "Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
                 { title: "Product Name", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
                 { title: "Actions", name: "state", type: "text", width: 60, align: "center", 
                     itemTemplate: function(value, item){
@@ -683,22 +787,6 @@
                 
             },
             onDataLoaded: function(gridInstance){
-                // $('.daterange-field').find('input').daterangepicker({
-                //     locale: {
-                //         format: 'DD-MM-YYYY'
-                //     }
-                // });
-
-                // $('[data-toggle="popover"]').popover({html: true, container: 'body', width: '300px'})
-                // $('#paymentStatusFilterButton').popover({
-                //     placement: 'bottom',
-                //     html: true,
-                //     content: function(){
-                //         console.log('popover html', $('#paymentStatusFilterOption').html())
-                //         return $('#paymentStatusFilterOption').html();
-                //     },
-                //     container: 'body'
-                // })
                 
             }
         });
@@ -714,11 +802,14 @@
                         format: 'DD-MM-YYYY'
                     }
                 }, function(start, end, label) {
-                    grid.reset();
+                    
                     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             });
             $('input[name="orderDateInput"]').on('show.daterangepicker', function(ev, picker) {
                 // $('.daterangepicker').css({'top': '50%', 'left': '50%'})
+            });
+            $('input[name="orderDateInput"]').on('apply.daterangepicker', function(ev, picker) {
+                grid.reset();
             });
             $('#orderDateFilter').click(function(){
                 $('input[name="orderDateInput"]').click()
@@ -753,6 +844,8 @@
                     }
                     });
                     $( "#amountSliderInput" ).val(response.min + " - " + response.max );
+                    $( "#amountMinLabel" ).text(response.min)
+                    $( "#amountMaxLabel" ).text(response.max)
                 }
             })
         }
@@ -776,9 +869,10 @@
                     let productList = $('#productNameFilterModal .productNameList')
                     productList.html('')
                     $.each(response.results, function(i, item){
-                        productList.append(`<div class="row">
-                            <input type="checkbox" value="${ item.id }" > ${ item.name }
-                        </div>`)
+                        productList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                            <label class="form-check-label">${ item.name }</label>
+                        </div></div>`)
                     })
                 }
             })
@@ -789,6 +883,24 @@
             addDateFilter()
             addAmountFilterData()
             addProductFilterData()
+            $('#setting').popover({
+                title: "User Access",
+                html: true,
+                content: `<span data-toggle="modal" data-target="#changePasswordModal">Change Password</span>`
+            })
+
+            var orderChart = createChart(
+                                'Orders',
+                                document.getElementById('orderChart').getContext('2d'),
+                                [],
+                                []
+                            );
+            var revenueChart = createChart(
+                                'Revenue',
+                                document.getElementById('RevenueChart').getContext('2d'),
+                                [],
+                                []
+                            );
 
             $(document).on('keyup', '[name=q]', function(){
                 grid.reset()
@@ -847,6 +959,41 @@
                         }
                     });
 
+            })
+
+            $(document).on('change', '#orderChartPeriod', function(){
+                $.ajax({
+                    type: "GET",
+                    url: "/api/v1/ad/chart-data/?chart_type=order&data_type=" + $(this).val(),
+                    headers: headers,
+                    success: function(response){
+                        console.log("response", response)
+                        orderChart.data.labels = response.labels
+                        orderChart.data.datasets[0].data = response.dataset
+                        orderChart.update()
+                    }
+                });
+            })
+
+            $(document).on('change', '#revenueChartPeriod', function(){
+                $.ajax({
+                    type: "GET",
+                    url: "/api/v1/ad/chart-data/?chart_type=revenue&data_type=" + $(this).val(),
+                    headers: headers,
+                    success: function(response){
+                        console.log("response", response)
+                        revenueChart.data.labels = response.labels
+                        revenueChart.data.datasets[0].data = response.dataset
+                        revenueChart.update()
+                    }
+                });
+            })
+
+            $("#orderChartPeriod" ).trigger("change");
+            $("#revenueChartPeriod" ).trigger("change");
+
+            $(document).on('click', '#signoutModal .apply-button', function(){
+                window.location = '/ad/logout/'
             })
 
         })

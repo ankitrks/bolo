@@ -5,7 +5,7 @@ from rest_framework import routers
 from advertisement.views import (AdDetailAPIView, ReviewListAPIView, CityListAPIView, ProductDetailAPIView,
                                     AddressViewset, OrderViewset, OrderCreateAPIView, AdEventCreateAPIView,
                                     GetAdForUserAPIView, DashBoardCountAPIView, JarvisOrderViewset, JarvisAdViewset,
-                                    JarvisProductViewset, FilterDataAPIView)
+                                    JarvisProductViewset, FilterDataAPIView, ChartDataAPIView)
 
 router = routers.SimpleRouter()
 router.register('address', AddressViewset)
@@ -30,6 +30,7 @@ urlpatterns += [
     url(r'^dashboard-counts$', DashBoardCountAPIView.as_view()),
     url(r'^jarvis/', include(jarvis_router.urls)),
     url(r'^filter-data/', FilterDataAPIView.as_view()),
+    url(r'^chart-data/', ChartDataAPIView.as_view()),
 ]
 
 print "urlpatterns", urlpatterns
