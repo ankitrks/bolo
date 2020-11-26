@@ -5659,3 +5659,24 @@ def send_push_notification(request):
         return JsonResponse(response.json(), status=200)
     else:
         return JsonResponse({"message": response.text}, status=500)
+
+from rest_framework.test import APIRequestFactory, force_authenticate
+from random import  Random
+random_instance = Random()
+factory = APIRequestFactory()
+popular_video_byte_view = PopularVideoBytes.as_view()
+follow_post_view = GetFollowPost
+
+def get_popular_video_bytes_load_test(request):
+    user = User.objects.get(id=random_instance.randint(1, 140000))
+    request = factory.get('/api/v2/get_popular_video_bytes/?language_id=%s&page=1'%str(random_instance.randint(1, 11)))
+    force_authenticate(request, user=user)
+    return popular_video_byte_view(request)
+
+
+def get_follow_post_load_test(request):
+    user = User.objects.get(id=random_instance.randint(1, 140000))
+    request = factory.get('/api/v1/get_follow_post/?language_id=%s&page=1'%str(random_instance.randint(1, 11)))
+    force_authenticate(request, user=user)
+    return follow_post_view(request)
+
