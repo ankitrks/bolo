@@ -14,7 +14,7 @@ class BookingCallView(TemplateView):
 
     def get(self, request, channel_id, *args, **kwargs):
         self.channel_id = channel_id
-        self.is_allowed = False
+        self.is_allowed = True #False
         try:
             is_authenticated, current_logged_in_user = self.get_user_from_token()
             if is_authenticated:

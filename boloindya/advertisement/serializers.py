@@ -46,7 +46,8 @@ class AdSerializer(serializers.ModelSerializer):
                     'price', 'ad_type', 'state', 'is_deleted', 'brand_obj_id')
 
     def get_cta(self, instance):
-        return list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
+        cta_data = list(instance.cta.all().values('title', 'code', 'enable_time', 'action'))
+        return sorted(cta_data,key=lambda x: x['code']=='skip', reverse=True)
 
     def get_type(self, instance):
         return 'ad'

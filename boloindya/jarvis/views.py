@@ -68,6 +68,7 @@ from coupon.models import Coupon, UserCoupon
 from coupon.forms import CouponForm
 from booking.models import Event, EventBooking
 from drf_spirit.views import get_tokens_for_user
+from booking.serializers import EventBookingSerializer
 import pandas as pd
 
 def get_bucket_details(bucket_name=None):
@@ -3758,3 +3759,19 @@ def upload_coupon_image(bucket, image_file, folder_name):
     image_url = upload_to_s3_without_transcode(image_file_name,bucket,folder_name)
     os.remove(urlify(image_file_name))
     return image_url
+
+class EventBookingDatableList(generics.ListAPIView):
+    serializer_class = EventBookingSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_superuser or 'moderator' in list(self.request.user.groups.all().values_list('name',flat=True)) or self.request.user.is_staff:
+            return EventBooking.objects.order_by('-created_at')
+        else: 
+            return []
+
+@login_required
+def event_booking_list_datable(request):
+    if request.user.is_superuser or 'moderator' in list(request.user.groups.all().values_list('name',flat=True)) or request.user.is_staff:
+        token = get_tokens_for_user(request.user)
+        access_token = token.get('access')
+        return render(request,'jarvis/pages/events/event_bookings_new.html', {'token': access_token})

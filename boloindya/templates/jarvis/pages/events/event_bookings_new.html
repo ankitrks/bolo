@@ -1,0 +1,250 @@
+{% extends "jarvis/layout/base.html" %}
+{% block styles %}
+<style>
+    #overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+.percentcomplete{
+    position: absolute;
+    top: 50%;
+    left:50%;
+    color: white;
+    transform: translate(-50%,-50%);
+}
+.video_elements{
+    display: none;
+}
+.campaign_banner{
+    display: block;
+    width: 200px;
+    height: 120px;
+}
+
+#create_new_campaign{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width : 200px;
+}
+
+ul {
+    float:left;
+    list-style: none;
+    padding: 0px;
+    border: 1px solid black;
+    margin-top: 0px;
+    width: 100%;
+    max-height: 120px;
+    display: block;
+    overflow-y: scroll;
+    background: white;
+}
+ul li {
+    padding: 2px;
+    cursor: pointer;
+    border-bottom: 1px solid black;
+}
+#response li:hover{
+    background: #1989CD;
+    color: white;
+}
+</style>
+{% endblock styles %}
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<section class="content">
+    {% csrf_token %}
+    <br>
+    <button class="btn" style="float:right;" id="export_csv"><a id="export_csv_data"><i class="fa fa-download"></i></a> Download CSV</button>
+     <div class="col-xs-12 table-responsive ">
+        <table class="table table-striped nowrap" id="event_bookings_table">
+            <thead>
+                <tr>
+                    <th>S No.</th>
+                    <th>Event Booking ID</th>
+                    <th>Creator User Name</th>
+                    <th>Event Title</th>
+                    <th>Event Description</th>
+                    <th>Booking Status</th>
+                    <th>Payment Status</th>
+                    <th>Event Slot Start Time</th>
+                    <th>Event Slot End Time</th>
+                    <th>Price</th>
+                    <th>Booked By</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</section>
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.print.min.js"></script>
+<script>
+    $(document).ready( function () {
+        var eventBookingTable = $('#event_bookings_table').DataTable({
+          'processing': true,
+          'serverSide': true,
+          'lengthMenu': [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]],
+          "pagingType": "full_numbers",
+          'ajax': {
+            url: '/jarvis/event_booking_list/?format=datatables',
+            "beforeSend": function(xhr){
+            xhr.setRequestHeader("Authorization",
+               "Bearer {{token}}");
+            }
+          },
+          initComplete: function () {
+                this.api().columns(6).every( function () {
+                var column = this;
+                $('#dataTables-example .head .head_hide').html('');
+
+                var select = $('<select id="formfilter" class="filterdropdown"><option value="">Payment Status(All)</option></select>')
+                    .appendTo( $(column.header()).empty())
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        console.log(val);
+                        column.search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+                    });
+                select.append( '<option value="success">Success</option>' );
+            });},
+          'columns': [
+              {'data': null,
+              render: function (data, type, row, meta) {
+                     return meta.row + meta.settings._iDisplayStart + 1;
+                    }},
+              {'data': 'id'},
+              {'data': 'creator_username', 'name':'creator_username'},
+              {'data':'event_title', 'name':'event_title'},
+              {'data':'event_description', 'name':'event_description'},
+              {'data':'state', 'name':'state'},
+              {'data':'payment_status', 'name':'payment_status'},
+              {'data':'event_slot_start_time', 'name':'event_slot_start_time'},
+              {'data':'event_slot_end_time', 'name':'event_slot_end_time'},
+              {'data':'price','name':'price'},
+              {'data':'booked_by_username','name':'booked_by'}
+          ],
+
+      });
+    console.log("test")
+    // $('#event_bookings_table').DataTable().rows().data().each(function (value, index){console.log(value)});
+});
+</script>
+<script>
+        class exportCSVFile{
+        constructor(headers, itemsNotFormatted, fileTitle){
+            this.headers = headers
+            this.formattedItems = this.formatItems(itemsNotFormatted);
+            this.fileTitle = fileTitle
+
+            this.createFile()
+        }
+
+        formatItems(itemsNotFormatted){
+            let itemsFormatted = [];
+
+            itemsNotFormatted.forEach((item) => {
+                itemsFormatted.push({
+                    "Event Booking ID": item.id || '',
+                    "Creator User Name": item.creator_username || '', 
+                    "Event Title": item.event_title || '',
+                    "Event Description": item.event_description || '',
+                    "Booking Status": item.state || '',
+                    "Payment Status": item.payment_status || '',
+                    "Event Slot Start Time": item.event_slot_start_time || '',
+                    "Event Slot End Time": item.event_slot_end_time || '',
+                    "Price": item.price || '',
+                    "Booked By": item.booked_by_username || ''
+                });
+            });
+
+            return itemsFormatted
+        }
+
+        createFile(){
+            if (this.headers) {
+                this.formattedItems.unshift(this.headers);
+            }
+
+            // Convert Object to JSON
+            var jsonObject = JSON.stringify(this.formattedItems);
+            var csv = this.convertToCSV(jsonObject);
+
+            console.log(" === csv === ", csv);
+
+            var exportedFilename = this.fileTitle + '.csv' || 'export.csv';
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(blob, exportedFilename);
+            } else {
+                var link = document.getElementById("export_csv_data");
+                console.log(link.download)
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", exportedFilename);
+                    link.click();
+                    console.log("hola")
+                }
+            }
+        }
+
+        convertToCSV(objArray) {
+            console.log(" objArray ", objArray)
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str
+
+        }
+    }
+
+    let dataTables = $("#event_bookings_table").data("DataTable");
+    $(document).on('click', '#export_csv', function(){
+    let array = []; 
+    $('#event_bookings_table').DataTable().rows().data().each(function (value, index){
+            array.push(value)
+        });
+
+    console.log("array", array);
+    let file = new exportCSVFile(["Event Booking ID", "Creator User Name", "Event Title", "Event Description", "Booking Status", "Payment Status", "Event Slot Start Time", "Event Slot End Time", "Price", "Booked By"], array, 'report')
+    
+});
+</script>
+{% endblock content %} 
+

@@ -1,0 +1,93 @@
+{% load static %}
+{% load kyc_template_tag %}
+<!DOCTYPE html>
+<body>
+<div>
+    <table style="width:100%;padding:10px;margin:10px">
+        <tbody>
+            <tr>
+                <td style="width:60%"><img src="https://in-boloindya.s3.ap-south-1.amazonaws.com/public/boloindya_logo.png" class="CToWUd">
+                    <br>
+                    <h3>{{ company_name }}</h3>
+                </td>
+                <td style="width:40%">
+                    <br>
+                    <h5>Tax Invoice/Bill of Supply/Cash Memo<br>(Original for Recipient)</h5>
+                </td>
+            </tr>
+            <tr>
+                <td><b>PAN No: </b>{{ company_pan_no }}</td>
+                <td><b>Shipping Address: </b>{{ shipping_address }}</td>
+            </tr>
+            <tr>
+                <td><b>GST REGISTRATION No: </b>{{ gst_registration_no }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>Invoice No: #{{ invoice_number }}</h3>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3>Invoice Details:<br>Invoice Date: {{ invoice_date }}</h3>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="width:100%;padding:10px;margin:10px;border:1px solid black;border-collapse:collapse" border="1">
+        <thead bgcolor="#DCDCDC">
+            <tr>
+                <td><strong>Sl No</strong></td>
+                <td style="width:15%;"><strong> Description</strong></td>
+                <td><strong>Product Quantity</strong></td>
+                <td><strong>Unit Price</strong></td>
+                <td><strong>Total amount</strong></td>
+                <td><strong>Discount</strong></td>
+                <td><strong>Tax Rate</strong></td>
+                <td><strong>Tax Type</strong></td>
+                <td><strong>Payable Amount</strong></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>{{ description }}</td>
+                <td>{{ product_qty }}</td>
+                <td>{{ price }}</td>
+                <td>{{ total_amount }}</td>
+                <td>{{ discount }}</td>
+                <td>
+                    <p>18%</p>
+                </td>
+                <td>
+                    <p>IGST</p>
+                </td>
+                <td>{{ net_amount_payble }}</td>
+            </tr>
+            <tr>
+                <td colspan="8">Total (Rounded off to nearest smallest integer) </td>
+                <td>{{ net_amount_rounded_off }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="width:100%;padding:10px;margin:10px">
+        <tbody>
+            <tr>
+                <td><b>Amount in Words: {{ amount_in_words }} </b></td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="width:100%">
+        <tbody>
+            <tr>
+                <td style="text-align:right"><b>For {{ company_name }}</b></td>
+            </tr>
+            <tr>
+                <td style="text-align:right">
+                    <p><img style="width:177px;height:80px" src="https://ci4.googleusercontent.com/proxy/V8n5OeAma9TkGnTXHx2p_-bSfPQUQF6imEM7iZ-QF-ggSe1DUGHIeQ200q0L3SZ--tputu9hSFErNAaE2sMTWtdt=s0-d-e1-ft#https://www.careeranna.com/upload/varunsign.png" id="m_816560260684000888wordmark" class="CToWUd"></p><b>Authorised Signatory</b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
