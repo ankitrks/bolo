@@ -1,0 +1,234 @@
+{% extends 'advertisement/base_new_layout.html' %}
+
+{% load static %}
+
+{% block css %}
+    <style>
+        body{
+            background-image: url("{% static 'img/brand-dashboard/login-background.png' %}");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .container{
+            margin-top: 15%;
+            max-width: 100%;
+        }
+
+        .title-text{
+            font-size: 65px;
+            font-weight: 700;
+        }
+
+        .subtitle-text{
+            font-weight: 400;
+            font-size: 27px;
+            margin-top: 15px; 
+            margin-bottom: 15px;
+        }
+
+        .form-control{
+            height: 70px;
+            font-size: 14px;
+            border-width: 2px;
+            border-color: black;
+        }
+
+        .login-button{
+            width: 228px;
+            height: 43px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            color: white;
+        }
+
+        .forgot-password-link{
+            font-size: 15px;
+            font-weight: 500;
+            color: #10A5F9;
+        }
+
+        .modal-footer, .modal-header{
+            border: none;
+        }
+
+        #forgotPasswordModal .modal-content{
+            width: 547px;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+            box-shadow: 5px 5px 17px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            font-size: 20px;
+        }
+
+        .apply-button{
+            width: 228px;
+            height: 43px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-weight: 500;
+            font-size: 20px;
+            color: #FFFFFF;
+            padding-top: 7px;
+        }
+
+        #forgotPasswordModal [name=forgot-password-input]{
+            height: 45px;
+            margin-top: 5px;
+        }
+
+        .modal-content{
+            margin-top: 50%;
+        }
+    </style>
+    
+{% endblock css %}
+
+{% block content %}
+    <div class="container" >
+        <form class="" action="" method="POST">
+            {% csrf_token %}
+            <div class="row " >
+                <div class="col d-flex justify-content-center title-text" >
+                    <span>Welcome To Bolo Indya Partner Panel</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4 m-auto">
+                    <div class="row">
+                        <div class="col text-center avenir-font subtitle-text" >
+                            <span>Enter credentials to kickstart</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" >
+                            <small>E-mail ID</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="username" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" >
+                            <small>Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="password" class="form-control avenir-font" name="password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col text-right">
+                            <a href="#"><span class=" avenir-font forgot-password-link" data-toggle="modal" data-target="#forgotPasswordModal">Forgot Password</span></a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">
+                            <span class="">
+                                <button class="login-button avenir-font apply-button">Login</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        {{ form.errors }}
+    </div>
+
+
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="forgotPasswordForm" action="/ad/send-reset-password-mail/" method="POST">
+                    <div class="modal-header">
+                    </div>
+                    <div class="modal-body text-center">
+                            {% csrf_token %}
+                            Please enter email ID to reset your password
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="email" placeholder="Type here....">
+                            </div>
+                        
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <span  class="apply-button text-center"  onclick="submitForgotPasswordForm()">
+                            Ok
+                        </span>
+                        <span id="successMessageOpenner" data-toggle="modal" data-target="#forgotPasswordSuccessModal" style="display: none;" data-dismiss="modal" aria-label="Close"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="forgotPasswordSuccessModal" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body text-center">
+                    Reset password link has been successfully sent to your email ID
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">Ok</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="resetPasswordSuccessModal" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                </div>
+                <div class="modal-body text-center">
+                    Password Reset successfully
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">Ok</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script>
+        var submitForgotPasswordForm = function(){
+            $("#forgotPasswordForm").submit()
+            // $.ajax('/ad/send-reset-password-mail/', {
+            //     method: 'POST',
+            //     data: {
+            //         'email': $('[name=forgot-password-input]').val(),
+            //     },
+            //     headers: headers,
+            //     success: function(response){
+            //         console.log("response", response)
+            //         $("#successMessageOpenner").click()
+            //     }
+            // })
+        }
+        $(document).ready(function(){
+            var url = new URL(window.location.href);
+            if(url.searchParams.get("reset_password") == 'success'){
+                $("#successMessageOpenner").click()
+            }
+
+            if(url.searchParams.get("password_changed") == 'success'){
+                $("#resetPasswordSuccessModal").modal({show: true})
+            }
+            
+            
+        })
+    </script>
+
+{% endblock js %}

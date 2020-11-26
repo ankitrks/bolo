@@ -1,20 +1,24 @@
 # # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from multiprocessing import Process, Pool, Manager, Lock
 
 from django.shortcuts import render
 from django.db.models import Sum, Q
 from django.test import Client
 from django.views.generic import RedirectView, TemplateView, DetailView
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from django.db import connections
+from django.db.models.functions import Lower
 
-from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
+
+from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authentication import SessionAuthentication
-
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -23,12 +27,13 @@ from rest_framework.pagination import PageNumberPagination
 from dynamodb_api import create as dynamodb_create
 from redis_utils import get_redis, redis_cli, redis_cli_read_only
 from payment.razorpay import create_order
+from drf_spirit.models import DatabaseRecordCount
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
 from advertisement.models import (Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent,
                                     Seen, Skipped, Clicked, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
-                                        OrderCreateSerializer, OrderLineSerializer)
+                                        OrderCreateSerializer, OrderLineSerializer, ChangePasswordSerializer)
 
 
 
@@ -104,28 +109,50 @@ class JarvisOrderViewset(ModelViewSet):
     authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = self.queryset.exclude(state='draft')
         q = self.request.query_params.get('q')
         page_size = self.request.query_params.get('page_size')
         order_date = self.request.query_params.get('date')
         section = self.request.query_params.get('section')
         payment_status = self.request.query_params.get('payment_status')
+        amount_range = self.request.query_params.get('amount_range')
+        product_ids = self.request.query_params.get('product_ids')
+        product_sort = self.request.query_params.get('product_sort')
 
         if q:
             queryset = queryset.filter(Q(shipping_address__name__icontains=q) | Q(shipping_address__mobile__icontains=q) | 
-                                        Q(user__email__icontains=q))
+                                        Q(shipping_address__email__icontains=q))
 
         if order_date:
+            print "order date", order_date
             start_date, end_date = order_date.split(' - ')
             queryset = queryset.filter(date__date__gte=datetime.strptime(start_date, '%d-%m-%Y'), date__date__lte=datetime.strptime(end_date, '%d-%m-%Y'))
+
+        if amount_range:
+            print 'amount range', amount_range
+            min_amount, max_amount = amount_range.split(' - ')
+            queryset = queryset.filter(amount__gte=float(min_amount), amount__lte=float(max_amount))
+            query = queryset.query.sql_with_params()
+            print 'query', query[0]%query[1]
 
         if payment_status:
             queryset = queryset.filter(payment_status__in=payment_status.split(','))
 
+        if product_ids:
+            queryset = queryset.filter(lines__product_id__in=product_ids.split(','))
+
         if page_size:
             self.pagination_class.page_size = int(page_size)
 
-        return queryset.order_by('id')
+        if product_sort:
+            if product_sort == 'asc':
+                queryset = queryset.order_by(Lower('lines__product_id__name'))
+            elif product_sort == 'desc':
+                queryset = queryset.order_by(Lower('lines__product_id__name').desc())
+        else:
+            queryset.order_by('-id')
+
+        return queryset 
 
 class JarvisProductViewset(ModelViewSet):
     queryset = Product.objects.all()
@@ -618,6 +645,7 @@ class OrderPaymentRedirectView(RedirectView):
         if not order.payment_gateway_order_id:
             razorpay_order = create_order(order.amount_including_tax, "INR", receipt=order.order_number, notes={})
             order.payment_gateway_order_id = razorpay_order.get('id')
+            order.paid_amount = order.amount_including_tax
 
         order.save()
         return '/payment/razorpay/%s/pay?type=order&order_id=%s'%(order.payment_gateway_order_id, order.id)
@@ -748,11 +776,9 @@ class DashBoardCountAPIView(APIView):
         processes = []
 
         for args in query_list:
-            print "creating process"
             self.get_count(*args)
             # processes.append(Process(target=self.get_count, args=args))
 
-        print "processes", processes
         # for p in processes:
         #     p.start()
 
@@ -761,20 +787,256 @@ class DashBoardCountAPIView(APIView):
         #     p.join()
 
         # print "prcessed joinede"
-        print "returnong response"
         return Response({args[0]: args[2].value  for args in query_list})
 
     def get_count(self, key, query, val_container):
-        print "getting count "
         val_container.value = query.count()
-        print "writing done"
 
 class AdTemplateView(TemplateView):
     template_name = 'advertisement/ad/index.html'
 
 
 class OrderTemplateView(TemplateView):
-    template_name = 'advertisement/order/index.html'
+    template_name = 'advertisement/order/dashboard.html'
 
 class ProductTemplateView(TemplateView):
     template_name = 'advertisement/product/index.html'
+
+class OrderDashboardLogin(LoginView):
+    template_name = 'advertisement/order/login.html'
+    success_url = '/ad/order/'
+
+    def get_success_url(self):
+        return self.success_url
+
+    # def post(self, request, *args, **kwargs):
+    #     print 'request posrt data', request.POST
+    #     username = request.POST.get('username')
+    #     password = request.POST.get('password')
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         login(request, user)
+    #     else:
+
+class OrderDashboardLogout(LogoutView):
+    # template_name = 'advertisement/order/login.html'
+    next_page = '/ad/login/'
+
+class OrderPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'advertisement/order/reset_password.html'
+    success_url = '/ad/login/?password_changed=success'
+
+
+class OrderPasswordResetMailView(PasswordResetView):
+    template_name = 'advertisement/order/login.html'
+    success_url = '/ad/login/?reset_password=success'
+    email_template_name = 'advertisement/order/password_reset_email.html'
+
+
+class FilterDataAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        print "request.query_params", request.query_params
+        filter_type = request.query_params.get('type')
+
+        if filter_type == 'amount':
+            return Response({
+                'min': DatabaseRecordCount.get_value('ad_order_amount_min'),
+                'max': DatabaseRecordCount.get_value('ad_order_amount_max')
+            })
+        elif filter_type == 'product':
+            name = request.query_params.get('name')
+            brand_id = request.query_params.get('brand_id')
+            sort = request.query_params.get('sort')
+
+            queryset = Product.objects.all()
+
+            if name:
+                queryset = Product.objects.filter(name__icontains=name)
+
+            if brand_id:
+                queryset = queryset.filter(brand_id=brand_id)
+
+            if sort and sort == 'desc':
+                queryset = queryset.order_by('-name')
+            else:
+                queryset = queryset.order_by('name')
+
+            return Response({
+                'results': queryset.values('id', 'name')
+            })
+
+class ChartDataAPIView(APIView):
+    WEEK_ENUM = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    MONTH_ENUM = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    def get(self, request, *args, **kwargs):
+        chart_type = request.query_params.get('chart_type')
+        data_type = request.query_params.get('data_type')
+        cursor = connections['read'].cursor()
+
+        result = [[], []]
+
+        if chart_type == 'order':
+            if data_type == 'weekly':
+                cursor.execute("""
+                    select extract(isodow from date)::integer - 1 as weekday, count
+                    from (
+                        select date::date, count(1)
+                        from advertisement_order
+                        where date >= now() - interval '7 days' and state != 'draft'
+                        group by date::date
+                    ) A
+                """)
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+                
+            elif data_type == 'monthly':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(day from date)::integer, count
+                    from (
+                        select date::date, count(1)
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by date::date
+                    ) A
+                """, ['%s-%s-01'%(today.year, today.month)])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'yearly':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, count(1)
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'lifetime':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, count(1)
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+        elif chart_type == 'revenue':
+            if data_type == 'weekly':
+                cursor.execute("""
+                    select extract(isodow from date)::integer - 1 as weekday, amount
+                    from (
+                        select date::date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= now() - interval '7 days' and state != 'draft'
+                        group by date::date
+                    ) A
+                """)
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+                
+            elif data_type == 'monthly':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(day from date)::integer, amount
+                    from (
+                        select date::date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by date::date
+                    ) A
+                """, ['%s-%s-01'%(today.year, today.month)])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'yearly':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, amount
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'lifetime':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, amount
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s and state != 'draft'
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+        return Response({
+            'labels': result[0],
+            'dataset': result[1],
+        })
+
+    def dictfetchall(self, cursor):
+        return {
+            row[0]: row[1] for row in cursor.fetchall()
+        }
+
+    def get_weekly_data(self, query_data):
+        print "query data", query_data
+        start_date = datetime.now() - timedelta(days=7)
+        labels = []
+        dataset = []
+
+        for i in range(7):
+            weekday = (start_date + timedelta(days=i+1)).weekday()
+            print "weekday", weekday
+            labels.append(self.WEEK_ENUM[weekday])
+            dataset.append(query_data.get(weekday, 0))
+        
+        return labels, dataset
+
+    def get_monthly_data(self, query_data):
+        print "query data", query_data
+        today = datetime.now()
+        start_date = datetime.strptime('01-%s-%s'%(today.month, today.year), '%d-%m-%Y')
+        day_diff = (today - start_date).days + 1
+        print "day_diff", day_diff
+        labels = []
+        dataset = []
+
+        for day in range(1, day_diff+1):
+            labels.append(day)
+            dataset.append(query_data.get(day, 0))
+        
+        return labels, dataset
+
+    def get_yearly_data(self, query_data):
+        print "query data", query_data
+        today = datetime.now() 
+        labels = []
+        dataset = []
+
+        for month in range(today.month):
+            print "month", month
+            labels.append(self.MONTH_ENUM[month])
+            dataset.append(query_data.get(month+1, 0))
+        
+        return labels, dataset
+
+
+class ChangePasswordAPIView(UpdateAPIView):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
+    serializer_class = ChangePasswordSerializer
+
+    def get_object(self):
+        return self.request.user

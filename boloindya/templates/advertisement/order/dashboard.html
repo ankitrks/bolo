@@ -1,0 +1,1166 @@
+{% extends 'advertisement/base_new_layout.html' %}
+
+{% load static %}
+
+{% block css %}
+    <style>
+        .home-navbar{
+            position: fixed;
+            background-color: #121111;
+            border-radius: 24px;
+            top: 40px;
+            left: 20px;
+            width: 90px;
+            color: white;
+            height: 70%;
+            padding: 35px
+        }
+
+        .page-title{
+            font-size: 50px;
+        }
+
+        .greeting-div{
+            background: #F5F5F7;
+            border-radius: 14px;
+            height: 160px;
+        }
+
+        .pointer{
+            cursor: pointer;
+        }
+
+        .verticle-center{
+            min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+            display: flex;
+            align-items: center;
+        }
+
+        .header-row{
+            height: 200px;
+            margin-top: 40px;
+        }
+
+        .container.main{
+            max-width: 90%;
+            margin-left: 9%;
+            margin-right: 1%;
+        }
+
+        .hello-figure{
+            margin-top: -32px;
+        }
+
+        .count-div{
+            background: #F5F5F7;
+            border-radius: 14px;
+            height: 80px;
+            width: 180px;
+        }
+
+        .count{
+            font-size: 30px;
+        }
+
+        .count-text{
+            font-size: 15px;
+        }
+
+        /* .modal-header .close{
+            background: #424242;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            margin: 1px;
+            padding-top: -5px;
+        } */
+
+        .search-icon{
+            background: #F5F5F7;
+            border-style: none;
+        }
+
+        .search-input{
+            background: #F5F5F7;
+            border-style: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .search-input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+            color: #9F9F9F;
+            opacity: 1; /* Firefox */
+            font-weight: 500;
+        }
+
+        #filterGroup{
+            width: 130px;
+            background: #F5F5F7;
+            border-style: none;
+            color: black;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+
+        .jsgrid-table{
+            font-family: Avenir;
+        }
+
+        .jsgrid-grid-header{
+            height: 40px;
+            font-size: 14px;
+            border-style: none;
+            background: white !important;
+            /* margin-bottom: -25px; */
+        }
+
+        .jsgrid-grid-body{
+            border-style: none;
+        }
+
+        .jsgrid-header-row>.jsgrid-header-cell {
+            background: white !important;
+            border-style: none;
+        }
+
+        .jsgrid-table .jsgrid-row, .jsgrid-table .jsgrid-alt-row{
+            height: 35px;
+            font-size: 13px;
+            font-weight: 500;
+            border-style: none;
+        }
+
+        .jsgrid-row>.jsgrid-cell{
+            background: #F5F5F7;
+        }
+
+        .jsgrid-alt-row>.jsgrid-cell{
+            background: white;
+            border-style: none;
+        }
+
+        .jsgrid-pager-container{
+            margin-top: 10px;
+            background: #F5F5F7;
+            color:black;
+            font-family: Avenir;
+            font-size: 11px;
+            margin-left:auto; 
+            margin-right:0;
+        }
+
+        .jsgrid-pager .jsgrid-pager-page, .jsgrid-pager-nav-button{
+            border: 1px solid black;
+            margin: 0px 3px;
+        }
+
+        .jsgrid-pager .jsgrid-pager-page a, .jsgrid-pager-nav-button a{
+            color:black;
+        }
+
+        .jsgrid-pager-current-page{
+            color: white;
+            background: black;
+        }
+
+        #fileTypeDiv .bootstrap-select, #recordCountDiv .bootstrap-select, #orderDateTypeOption .bootstrap-select, #revenueDateTypeOption .bootstrap-select{
+            width: 108px;
+            height: 15px;
+            margin-top: -12px;
+            background: #F5F5F7;
+        }
+
+        #fileTypeDiv .filter-option-inner-inner, #recordCountDiv .filter-option-inner-inner, #orderDateTypeOption .filter-option-inner-inner, #revenueDateTypeOption .filter-option-inner-inner{
+            font-family: Avenir;
+            font-size: 12px;
+            color: black;
+            padding-left: 6px;
+        }
+
+        #orderDateTypeOption .filter-option-inner-inner, #revenueDateTypeOption .filter-option-inner-inner{
+            font-weight: 600;
+        }
+
+        .bootstrap-select>.dropdown-toggle.bs-placeholder, .bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover{
+            background: #F5F5F7;
+        }
+
+        .dropdown-menu{
+            padding: 0px;
+            font-family: Avenir;
+            font-size: 12px;
+            font-weight: 600;
+            color: black;
+            background: #F5F5F7;
+        }
+
+        .dropdown-menu .dropdown-item:hover, .dropdown-menu .dropdown-item.active.selected{
+            color: white;
+            background: black;
+        }
+
+        .recordCountIcon{
+            background: #F5F5F7;
+        }
+
+        .modal-content{
+            color: white;
+            background: #121111;
+            margin-top: 40%;
+            border-radius: 10px;
+        }
+
+        .modal-footer, .modal-header{
+            border: none;
+        }
+
+        .modal-body{
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+        #productNameFilterModal .search-input, #productNameFilterModal .search-icon, #productNameFilterModal .productNameList{
+            background: black;
+            color: white
+        }
+
+        #productNameFilterModal .search-input::placeholder{
+            color: #9F9F9F;
+        }
+
+        #productNameFilterModal .productNameList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        }
+
+        #productNameFilterModal .modal-content{
+            width: 700px;
+        }
+
+        .modal-footer{
+            text-align: center!important;
+        }
+
+        .apply-button{
+            width: 228px;
+            height: 43px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-size: 18px;
+            padding-top: 9px;
+        }
+
+        .daterangepicker{
+            background: #121111;
+            color: white;
+            position: fixed;
+            top: 100px;
+            left: 300px;
+            font-family: Avenir;
+        }
+
+        .daterangepicker .calendar-table{
+            background: black;
+            border: none;
+        }
+
+        .daterangepicker td.start-date.active, .daterangepicker td.end-date.active, .daterangepicker td.start-date:hover, .daterangepicker td.end-date:hover{
+            border-radius: 50% !important;
+            background: #10A5F9 !important;
+            color: white !important;
+
+        }
+        .daterangepicker td.in-range.available {
+            color: #A9D3AB;
+            background: black;
+        }
+
+        .daterangepicker td.off{
+            color: #3C3844;
+            background: black;
+        }
+
+        .daterangepicker td.available{
+            color: #7A7585;;
+        }
+
+        .daterangepicker .drp-buttons{
+            border: none;
+        }
+
+        .daterangepicker .applyBtn{
+            width: 228px;
+            height: 30px;
+            background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+            border-radius: 5px;
+            font-family: Avenir;
+            font-size: 14px;
+            padding-top: 4px;
+        }
+
+        .daterangepicker .cancelBtn{
+            background: #272727;
+            border-radius: 5px;
+            /* width: 228px; */
+            height: 30px;
+            color: #818181;
+        }
+
+        .modalClose{
+            background: #3C3844;
+            border-radius: 50%;
+            height: 30px;
+            width: 30px;
+            /* margin-top: 0px; */
+            /* margin-right: 10px; */
+            padding: 4px 7px;
+            text-shadow: none;
+        }
+
+        .close{
+            text-shadow: none;
+        }
+
+
+        #orderAmountFilterModal .modal-content{
+            width: 800px;
+            height: 250px;
+        }
+
+        #orderAmountFilterModal .ui-slider-horizontal{
+            height: 3px;
+            border-radius: 3px;
+        }
+
+        #orderAmountFilterModal .ui-widget-header{
+            background: #0270BE;
+            height: 3px;
+            margin-top: -1px;
+        }
+
+        #orderAmountFilterModal .ui-slider .ui-slider-handle {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+        }
+
+        #orderAmountFilterModal #price-slider-range{
+            margin-top: 30px;
+        }
+
+        #amountMinLabel, #amountMaxLabel{
+            font-size: 20px;
+        }
+
+        #amountSliderInput{
+            border:0; 
+            color: white; 
+            background: #121111;
+            font-weight: bold
+        }
+
+        .cancel-button{
+            background: #272727;
+            border-radius: 5px;
+            width: 228px;
+            height: 43px;
+            color: #818181;
+            font-family: Avenir;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 20px;
+            padding-top: 8px;
+        }
+
+        #signoutModal .modal-content{
+            width: 584px;
+            height: 161px;
+        }
+
+        #signoutModal .apply-button{
+            width: 228px;
+            height: 43px;
+        }
+
+        #exportOrder{
+            margin-right: -5px;
+            height: 31px;
+            margin-top: 5px;
+            padding: 4px;
+        }
+
+        #stockIcon{
+            padding: 9px;
+            margin-top: 4px;
+            margin-right: -4px;
+        }
+
+        .popover-header, .popover-body{
+            background: #121111;
+            color: #FFFFFF;
+            font-family: Avenir;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .popover-header{
+            border-bottom: 1px solid #7A7585
+        }
+
+        .popover-body:hover{
+            color: #10A5F9;
+        }
+
+        .bs-popover-right>.arrow::after{
+            background: #121111;
+            border-right-color: #121111;
+        }
+
+        #changePasswordModal .modal-content{
+            width: 700px;
+        }
+
+        #changePasswordModal input{
+            background: #121111;
+            border: 1px solid #FFFFFF;
+            font-size: 14px;
+            height: 40px;
+            color: #FFFFFF;
+        }
+
+        #changePasswordModal input::placeholder{
+            color: #FFFFFF;
+            opacity: 0.4;
+        }
+
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <div class="container home-navbar">
+        <div class="row my-4 pointer">
+            <div class="col">
+                <img src="{% static '/img/brand-dashboard/home-icon.svg' %}" >
+            </div>
+        </div>
+        <div class="row my-4 pointer" id="setting">
+            <div class="col">
+                <img src="{% static '/img/brand-dashboard/setting-icon.svg' %}" >
+            </div>
+        </div>
+        <div class="row pointer align-text-bottom" style="position: absolute; bottom: 40px;">
+            <div class="col align-self-end" data-toggle="modal" data-target="#signoutModal">
+                <img src="{% static '/img/brand-dashboard/logout-icon.svg' %}" >
+            </div>
+        </div>
+        <span id="changePasswordModalOpenner" data-toggle="modal" data-target="#changePasswordModal" style="display: none;"></span>
+
+    </div>
+    <div class="container main">
+        <div class="row verticle-center header-row">
+            <div class="col-7">
+                <div class="page-title">
+                    Brand Partner Dashboard
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="row greeting-div">
+                    <div class="col greeting-message my-5 pl-5">
+                        <div class="row">
+                            <h2>Hello {% if user.st.name %}{{ user.st.name }}{% else %}{{ user.username }}{% endif %}!</h2>
+                        </div>
+                        <div class="row avenir-font">
+                            It's good to see you again
+                        </div>
+                    </div>
+                    <div class="col hello-figure">
+                        <img src="{% static '/img/brand-dashboard/hello-figure.svg' %}" >
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2 " id="lifetimeOrder">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 count value-count text-center">
+                        -
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
+                        Lifetime Orders
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" id="uniqueOrder">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 count value-count text-center" >
+                        -
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
+                        Unique Orders
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" id="monthOrder">
+                <div class="row count-div">
+                    <div class="col-6 pt-3 count value-count text-center" >
+                        -
+                    </div>
+                    <div class="col-6 pt-3 avenir-font count-text text-center">
+                        Month's Orders
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-5 mr-4">
+                <div class="row justify-content-between">
+                    <div class="col-4" style="font-size: 20px;">
+                        Orders
+                    </div>
+                    <div class="col-4 text-right" id="orderDateTypeOption">
+                        <select name="" id="orderChartPeriod" class="selectpicker">
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="lifetime">Lifetime</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <canvas id="orderChart"></canvas>
+                </div>
+                
+            </div>
+            <div class="col-5 mx-4">
+                <div class="row justify-content-between">
+                    <div class="col-4" style="font-size: 20px;">
+                        Revenue
+                    </div>
+                    <div class="col-4 text-right" id="revenueDateTypeOption">
+                        <select name="" id="revenueChartPeriod" class="selectpicker">
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="lifetime">Lifetime</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <canvas id="RevenueChart"></canvas>
+                </div>
+                
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <div class="row justify-content-between">
+                    <div class="col-3">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon.svg' %}" ></div>
+                            </div>
+                            <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail" name="q" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="row">
+                            <div class="col">
+                                <div class="btn-group avenir-font" role="group" aria-label="Button group with nested dropdown">
+                                    <div class="btn-group" role="group">
+                                        <button id="filterGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <img src="{% static '/img/brand-dashboard/filter-icon.svg' %}" class="pr-3">Filter
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="filterGroup">
+                                            <a class="dropdown-item" href="#" id="productNameFilter" data-toggle="modal" data-target="#productNameFilterModal">Product Name</a>
+                                            <a class="dropdown-item" href="#" id="orderDateFilter" >Order Date</a>
+                                            <a class="dropdown-item" href="#" id="orderAmountFilter" data-toggle="modal" data-target="#orderAmountFilterModal">Order Amount</a>
+                                        </div>
+                                        <input type="hidden" name="orderDateInput">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col" id="fileTypeDiv">
+                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
+                                <select name="fileType" id="" class="selectpicker">
+                                    <option value="">File Type</option>
+                                    <option value="csv">CSV</option>
+                                </select>
+                            </div>
+                            <div class="col" id="recordCountDiv">
+                                <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
+                                <select name="recordsCount" id="pageSize" class="selectpicker">
+                                    <option value="10">10 Records</option>
+                                    <option value="20">20 Records</option>
+                                    <option value="50">50 Records</option>
+                                    <option value="100">100 Records</option>
+                                    <option value="500">500 Records</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row" id="userOrderTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="productNameFilterModal" tabindex="-1" role="dialog" aria-labelledby="productNameFilterModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productNameFilterModalLabel">Product Name</h5>
+                    <div class="modalClose">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                </div>
+                <div class="modal-body">
+                    <!-- <div class="modal-title sort-asc">Sort A->Z</div> -->
+                    <!-- <div class="modal-title sort-desc">Sort Z->A</div> -->
+                    <div class="form-check sort-asc ">
+                        <input class="form-check-input " type="radio" name="productSortOrder"  value="asc" id="productAscCheckbox" style="display: none;">
+                        <label class="form-check-label modal-title pointer" for="productAscCheckbox" >
+                            Sort A->Z
+                        </label>
+                    </div>
+                    <div class="form-check sort-desc">
+                        <input class="form-check-input " type="radio" name="productSortOrder"  value="desc" id="productDescCheckbox" style="display: none;">
+                        <label class="form-check-label modal-title pointer"  for="productDescCheckbox">
+                            Sort Z->A
+                        </label>
+                    </div>
+                    <div class="row avenir-font">
+                        <div class="input-group m-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                            </div>
+                            <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail">
+                        </div>
+                    </div>
+                    <div class="row avenir-font">
+                        <div class="col productNameList">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button pointer">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderAmountFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderAmountFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
+                    <div class="modalClose">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <input type="text" id="amountSliderInput" readonly class="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" id="amountMinLabel"></div>
+                        <div class="col text-right" id="amountMaxLabel"></div>
+                    </div>
+                    <div id="price-slider-range"></div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button pointer">Apply</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="signoutModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="">Are you sure you want to Signout?</h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button pointer">Signout</span>
+                    <span class="cancel-button pointer" data-dismiss="modal" aria-label="Close">Cancel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="orderAmountFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Change Password</h5>
+                    <div class="modalClose">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col" >
+                            <small>Enter current Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="password" class="form-control avenir-font" name="old_password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" >
+                            <small>Enter New Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="new_password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" >
+                            <small>Confirm Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="confirm_new_password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button pointer" >Submit</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordChangeMessageModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title message " id="" ></h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button pointer" data-dismiss="modal" aria-label="Close">Ok</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script>
+        let createChart = function(chartName, canvas, labels, dataset){
+            return new Chart(canvas, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartName,
+                        backgroundColor: 'rgb(0, 0, 0)',
+                        borderColor: 'rgb(0, 0, 0)',
+                        data: dataset,
+                        fill: false,
+                    }],
+
+                },
+
+                // Configuration options go here
+                options: {}
+            });
+        }
+
+
+        let paymentStatusFilter = [];
+        let orderStatusList = [
+            { name: "Order Placed", value: 'order_placed' },
+            { name: "Shipped", value: 'shipped' },
+            { name: "Returned", value: 'returned' },
+            { name: "Out of Stock", value: 'out_of_stock' },
+            { name: "Delivered", value: 'delivered' }
+        ]
+
+        let getExtraFilterData = function(){
+            let filter = {}
+            let q = $('[name="q"]').val()
+            if(q)
+                filter['q'] = q
+            filter['payment_status'] = paymentStatusFilter.join(',')
+            filter['date'] = $('input[name="orderDateInput"]').val()
+            filter['amount_range'] = $("#amountSliderInput").val()
+
+            if($('[name=productSortOrder]:checked').val())
+                filter['product_sort'] = $('[name=productSortOrder]:checked').val()
+
+            productIdList = []
+            $.each($('#productNameFilterModal .productNameList input[type=checkbox]:checked'), function(i, item){
+                productIdList.push($(this).val())
+            })
+
+            if(productIdList.length > 0)
+                filter['product_ids'] = productIdList.join(',')
+
+            return filter
+        }
+
+        $("#userOrderTable").jsGrid({
+            width: "100%",
+            height: "450px",
+
+            inserting: false,
+            editing: false,
+            sorting: false,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            filtering: false,
+            pagerFormat: "{first} {pages} {last}",
+            pageButtonCount: 3,
+            pageSize: $("#pageSize").val(),
+            fields: [
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false,
+                    itemTemplate: function(value, _){
+                        let index = 0;
+                        $.each(this._grid.data, function(i, item){
+                            if(item.id == value){
+                                index = i;
+                                return false
+                            }
+                        })
+                        return index + 1
+                    }
+                },
+                { title: "Name", name: "shipping_address.name", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Phone", name: "shipping_address.mobile", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Email", name: "shipping_address.email", type: "text", width: 60, align: "center", filtering: false},
+                { title: "Shipping Address", itemTemplate: function(_, item){
+                        return item.shipping_address.address1 + ', ' + item.shipping_address.address2
+                    }
+                },
+                { title: "Order Date", name: "date", type: "text", width: 60, align: "center", css: "daterange-field"},
+                { title: "Amount", name: "amount", type: "number", align: "center", width: 40, css: 'range-field'},
+                { title: "Product Name", name: "lines.0.product.product_title", type: "text", align: "center", filtering: false},
+                { title: "Actions", name: "state", type: "text", width: 60, align: "center", 
+                    itemTemplate: function(value, item){
+                        let html = `<select class="order-status" data-id=${ item.id }>`;
+                        $.each(orderStatusList, function(i, item){
+                            if(value == item.value)
+                                html += `<option value="${ item.value }" selected>${ item.name }</option>`
+                            else
+                                html += `<option value="${ item.value }" >${ item.name }</option>`
+                        })
+
+                        html += '</select>'
+                        return html
+                },
+            }],
+            controller: {
+                loadData: function(filter) {
+                    filter['page'] = filter['pageIndex']
+                    filter['page_size'] = $("#pageSize").val()
+
+                    filter = Object.assign(filter, getExtraFilterData())
+                    console.log("filter", filter)
+
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/ad/jarvis/order/",
+                        data: filter,
+                        headers: headers
+                    });
+                },
+                
+            },
+            onDataLoaded: function(gridInstance){
+                
+            }
+        });
+
+        let grid = $("#userOrderTable").data("JSGrid");
+
+
+        let addDateFilter = function(){
+            $('input[name="orderDateInput"]').daterangepicker({
+                    opens: 'center',
+                    locale: {
+                        format: 'DD-MM-YYYY'
+                    }
+                }, function(start, end, label) {
+                    
+                    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
+            $('input[name="orderDateInput"]').on('show.daterangepicker', function(ev, picker) {
+                // $('.daterangepicker').css({'top': '50%', 'left': '50%'})
+            });
+            $('input[name="orderDateInput"]').on('apply.daterangepicker', function(ev, picker) {
+                grid.reset();
+            });
+            $('#orderDateFilter').click(function(){
+                $('input[name="orderDateInput"]').click()
+            })
+            $('input[name="orderDateInput"]').val('')
+        }
+
+        let updateDashboardCount = function(){
+            $.ajax('/api/v1/ad/dashboard-counts', {
+                method: 'GET',
+                success: function(response){
+                    $("#lifetimeOrder").find('.value-count').text(response.lifetime_order)
+                    $("#uniqueOrder").find('.value-count').text(response.unique_order)
+                    $("#monthOrder").find('.value-count').text(response.month_order)
+
+                }
+            })
+        }
+
+        let addAmountFilterData = function(){
+            $.ajax('/api/v1/ad/filter-data/?type=amount', {
+                method: 'GET',
+                success: function(response){
+                    console.log("respoe", response)
+                    $( "#price-slider-range" ).slider({
+                    range: true,
+                    min: response.min,
+                    max: response.max,
+                    values: [ response.min, response.max],
+                    slide: function( event, ui ) {
+                        $( "#amountSliderInput" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                    }
+                    });
+                    $( "#amountSliderInput" ).val(response.min + " - " + response.max );
+                    $( "#amountMinLabel" ).text(response.min)
+                    $( "#amountMaxLabel" ).text(response.max)
+                }
+            })
+        }
+
+        let addProductFilterData = function(brandId, sort){
+            let data = {
+                'type': 'product'
+            }
+
+            data['name'] = $('#productNameFilterModal .search-input').val()
+
+            if(brandId)
+                data['brand_id'] = brandId
+
+            if(sort)
+                data['sort'] = sort
+
+            $.ajax('/api/v1/ad/filter-data/?' + $.param(data), {
+                method: 'GET',
+                success: function(response){
+                    let productList = $('#productNameFilterModal .productNameList')
+                    productList.html('')
+                    $.each(response.results, function(i, item){
+                        productList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                            <label class="form-check-label">${ item.name }</label>
+                        </div></div>`)
+                    })
+                }
+            })
+        }
+
+        let changePassword = function(){
+            $.ajax('/api/v1/ad/change-password/', {
+                method: 'PATCH',
+                data: {
+                    'old_password': $('[name=old_password]').val(),
+                    'new_password': $('[name=new_password]').val(),
+                    'confirm_new_password': $('[name=confirm_new_password]').val(),
+                },
+                success: function(response){
+                    console.log("response", response)
+                    $('#changePasswordModal .close').click()
+                    $('#passwordChangeMessageModal .message').text('Password changed successfully')
+                    $('#passwordChangeMessageModal').modal({show: true})
+                },
+                error: function(error){
+                    console.log("error", error)
+                    $('#passwordChangeMessageModal .message').text(error.responseJSON[0])
+                    $('#passwordChangeMessageModal').modal({show: true})
+                },
+                headers: headers
+            })
+        }
+
+        $(document).ready(function(){
+            updateDashboardCount()
+            addDateFilter()
+            addAmountFilterData()
+            addProductFilterData()
+            $('#setting').popover({
+                html: true,
+                container: 'body',
+                content: `<span id="changePassword" class="pointer">Change Password</span>`,
+            })
+
+            $('body').on('click', function (e) {
+                document.querySelectorAll('.popover').forEach(function(item, i){
+                    console.log($(item).hasClass('show'), item, e.target, e.target.closest('.popover'), e.target.closest('#setting'))
+                    if($(item).hasClass('show') && item != e.target && item != e.target.closest('.popover') && document.querySelector('#setting') != e.target.closest('#setting')){
+                        $('#setting').popover('hide')
+                        console.log('hide')
+                    }
+                })
+            });
+
+            var orderChart = createChart(
+                                'Orders',
+                                document.getElementById('orderChart').getContext('2d'),
+                                [],
+                                []
+                            );
+            var revenueChart = createChart(
+                                'Revenue',
+                                document.getElementById('RevenueChart').getContext('2d'),
+                                [],
+                                []
+                            );
+
+            $(document).on('keyup', '[name=q]', function(){
+                grid.reset()
+            })
+
+            $(document).on('click', '#orderAmountFilterModal .apply-button', function(){
+                $('#orderAmountFilterModal').find('.close').click()
+                grid.reset()
+            })
+
+            $(document).on('keyup', '#productNameFilterModal .search-input', function(){
+                addProductFilterData(null, null)
+            })
+
+            // $(document).on('click', '#productNameFilterModal .sort-asc', function(){
+            //     // addProductFilterData(null, 'asc')
+            //     // grid.reset()
+            //     console.log("here")
+            //     $('#productNameFilterModal .close').click()
+            // })
+
+            // $(document).on('click', '#productNameFilterModal .sort-desc', function(){
+            //     // addProductFilterData(null, 'desc')
+            //     // grid.reset()
+            //     console.log("here2222")
+            //     $('#productNameFilterModal .close').click()
+            // })
+
+            $(document).on('change', '[name=productSortOrder]', function(){
+                grid.reset()
+                $('#productNameFilterModal .close').click()
+            })
+
+
+            $(document).on('click', '#productNameFilterModal .apply-button', function(){
+                $('#productNameFilterModal').find('.close').click()
+                grid.reset()
+            })
+
+            $(document).on('click', '#exportOrder', function(){
+                let fileType = $('select[name=fileType]').val();
+                let params = {}
+
+                if(fileType)
+                    params['format'] = fileType
+                
+                params = Object.assign(params, getExtraFilterData())
+
+                window.open('/report/ad/order/download?' + $.param(params), '_self')
+            });
+
+            $(document).on('change', '#pageSize', function(){
+                grid.reset()
+            })
+
+            $(document).on('change', '.order-status', function(){
+                let orderId = $(this).attr('data-id');
+                $.ajax({
+                        type: "PATCH",
+                        url: "/api/v1/ad/jarvis/order/" + orderId + '/',
+                        data: {
+                            'state': $(this).val()
+                        },
+                        headers: headers,
+                        success: function(response){
+                            console.log("response", response)
+                            // grid.reset()
+                        }
+                    });
+
+            })
+
+            $(document).on('change', '#orderChartPeriod', function(){
+                $.ajax({
+                    type: "GET",
+                    url: "/api/v1/ad/chart-data/?chart_type=order&data_type=" + $(this).val(),
+                    headers: headers,
+                    success: function(response){
+                        console.log("response", response)
+                        orderChart.data.labels = response.labels
+                        orderChart.data.datasets[0].data = response.dataset
+                        orderChart.update()
+                    }
+                });
+            })
+
+            $(document).on('change', '#revenueChartPeriod', function(){
+                $.ajax({
+                    type: "GET",
+                    url: "/api/v1/ad/chart-data/?chart_type=revenue&data_type=" + $(this).val(),
+                    headers: headers,
+                    success: function(response){
+                        console.log("response", response)
+                        revenueChart.data.labels = response.labels
+                        revenueChart.data.datasets[0].data = response.dataset
+                        revenueChart.update()
+                    }
+                });
+            })
+
+            $("#orderChartPeriod" ).trigger("change");
+            $("#revenueChartPeriod" ).trigger("change");
+
+            $(document).on('click', '#signoutModal .apply-button', function(){
+                window.location = '/ad/logout/'
+            })
+
+            $(document).on('click', '#changePassword', function(){
+                $('#changePasswordModalOpenner').click()
+            })
+            
+            $(document).on('click', '#changePasswordModal .apply-button', function(){
+                changePassword()
+            })
+        })
+
+    </script>
+{% endblock js %}

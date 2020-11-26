@@ -510,6 +510,12 @@ class DatabaseRecordCount(models.Model):
     query = models.TextField()
     count = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    last_updated = models.DateTimeField(_('Last Updated'), auto_now=True, auto_now_add=False)
+    update_time = models.PositiveIntegerField(_('Update Time'), default=60)
 
     def __unicode__(self):
         return '%s = %s'%(self.name, self.count)
+
+    @staticmethod
+    def get_value(name):
+        return DatabaseRecordCount.objects.get(name=name).count

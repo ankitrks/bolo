@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 from rest_framework import serializers
 
@@ -163,7 +164,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ('id', 'shipping_address', 'lines', 'amount' ,'state', 'payment_status', 'date', 'user')
-        read_only_fields = ('id', 'state', 'payment_status', 'date', 'user')
+        read_only_fields = ('id', 'payment_status', 'date', 'user')
         depth = 1
 
     def get_date(self, instance):
@@ -190,6 +191,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order.amount += float(line['amount'])
 
         order.order_number = 'ORDER_%d'%order.id
+        order.state = 'draft'
         order.save()
         return order
 
@@ -197,19 +199,25 @@ class OrderSerializer(serializers.ModelSerializer):
         print "Instance", instance
         print "validated data", validated_data
 
-        address = instance.shipping_address
-        for attr, value in validated_data.pop('shipping_address').iteritems():
-            setattr(address, attr, value)
-        address.save()
+        if validated_data.get('shipping_address'):
+            address = instance.shipping_address
+            for attr, value in validated_data.pop('shipping_address').iteritems():
+                setattr(address, attr, value)
+            address.save()
 
-        line = instance.lines.all()[0]
-        for attr, value in validated_data.pop('lines')[0].iteritems():
-            setattr(line, attr, value)
-        line.amount = line.product.final_amount * line.quantity
-        line.save()
+        if validated_data.get('lines'):
+            line = instance.lines.all()[0]
+            for attr, value in validated_data.pop('lines')[0].iteritems():
+                setattr(line, attr, value)
+            line.amount = line.product.final_amount * line.quantity
+            line.save()
 
-        instance.amount = line.product.final_amount * line.quantity
-        instance.payment_gateway_order_id = None
+            instance.amount = line.product.final_amount * line.quantity
+            instance.payment_gateway_order_id = None
+
+        for attr, value in validated_data.iteritems():
+            setattr(instance, attr, value)
+
         instance.save()
         
         return instance
@@ -276,3 +284,25 @@ class OrderCreateSerializer(serializers.Serializer):
         # data['user'] = request.user.id
         # data['amount'] = Product.objects.filter(id__in=[product.get('product') for product in data['order_lines']]).aggregate(Sum('discounted_price')).get('discounted_price__sum')
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    def update(self, instance, validated_data):
+        print 'update', validated_data
+        if validated_data.get('new_password') != validated_data.get('confirm_new_password'):
+            raise serializers.ValidationError("Password are not same")
+
+        request = self._context.get('request')
+        
+        user = authenticate(request, username=request.user.username, password=validated_data.get('old_password'))
+
+        if not user:
+            raise serializers.ValidationError("Wrong Password")
+
+        user.set_password(validated_data.get('new_password'))
+        user.save()
+        login(request, user)
+
+        return validated_data

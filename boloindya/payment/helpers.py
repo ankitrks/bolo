@@ -124,7 +124,7 @@ def update_ad_order_payment_status(order_id, payment_status, transaction_id=None
             UPDATE advertisement_order
             SET 
                 payment_status = 'success',
-                state = 'pending_for_approval'
+                state = 'order_placed'
             WHERE payment_gateway_order_id = %s
             RETURNING id;
         """, [order_id])
