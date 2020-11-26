@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^product/onboard/admin/$', staff_member_required(product_management)),
     url(r'^edit/(?P<ad_id>\d+)$', staff_member_required( particular_ad)),
     url(r'^$', staff_member_required( AdTemplateView.as_view())),
-    url(r'^order/$', staff_member_required( OrderTemplateView.as_view())),
+    url(r'^order/$', staff_member_required( OrderTemplateView.as_view(), login_url='/ad/login/')),
     url(r'^product/$', staff_member_required( ProductTemplateView.as_view())),
     url(r'^login/$', OrderDashboardLogin.as_view()),
     url(r'^logout/$', OrderDashboardLogout.as_view()),

@@ -779,8 +779,8 @@ class OrderDashboardLogin(LoginView):
     #     else:
 
 class OrderDashboardLogout(LogoutView):
-    template_name = 'advertisement/order/login.html'
-    success_url = '/ad/login/'
+    # template_name = 'advertisement/order/login.html'
+    next_page = '/ad/login/'
 
 class OrderPasswordResetView(PasswordResetView):
     template_name = 'advertisement/order/reset-password.html'

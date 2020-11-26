@@ -261,7 +261,9 @@ ORDER_STATE_CHOICES = (
     ('shipped', 'Shipped'),
     ('out_of_stock', 'Out of Stock'),
     ('returned', 'Returned'),
-    ('delivered', 'Delivered')
+    ('delivered', 'Delivered'),
+    ('pending_for_approval', 'Pending for Approval'), 
+    ('accepted_by_vender', 'Accepted by vendor')
 )
 
 ORDER_PAYMENT_CHOICES = (
