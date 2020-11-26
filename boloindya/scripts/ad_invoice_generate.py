@@ -65,6 +65,8 @@ class AdInvoiceGenerator:
 				response = self.create_pdf(invoice_number, product_unit_mrp, product_unit_tax, net_amount_payble, username, product_title, address, product_qty, product_unit_discount)
 				print("done")
 				response['email'] = user_email
+				if order.user.st.name:
+					username = order.user.st.name
 				response['username'] = username
 				response['invoice_number'] = invoice_number
 				response['product_title'] = product_title
