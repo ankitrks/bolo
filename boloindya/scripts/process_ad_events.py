@@ -41,7 +41,7 @@ def process_ad_event(Model, event, keys):
             max_id = int(item.get('id'))
 
     if not max_id == 0:
-        Model.objects.bulk_create(event_list)
+        Model.objects.bulk_create(item_list)
         update_last_processed_id('ad:%s:last_processed_id'%event, max_id)
 
 
