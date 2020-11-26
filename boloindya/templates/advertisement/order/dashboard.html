@@ -26,6 +26,10 @@
             height: 160px;
         }
 
+        .pointer{
+            cursor: pointer;
+        }
+
         .verticle-center{
             min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
             display: flex;
@@ -61,6 +65,15 @@
         .count-text{
             font-size: 15px;
         }
+
+        /* .modal-header .close{
+            background: #424242;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            margin: 1px;
+            padding-top: -5px;
+        } */
 
         .search-icon{
             background: #F5F5F7;
@@ -195,6 +208,7 @@
             color: white;
             background: #121111;
             margin-top: 50%;
+            border-radius: 10px;
         }
 
         .modal-footer, .modal-header{
@@ -218,6 +232,8 @@
         #productNameFilterModal .productNameList{
             margin: 2px 20px;
             padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
         }
 
         #productNameFilterModal .modal-content{
@@ -294,6 +310,22 @@
             color: #818181;
         }
 
+        .modalClose{
+            background: #3C3844;
+            border-radius: 50%;
+            height: 30px;
+            width: 30px;
+            /* margin-top: 0px; */
+            /* margin-right: 10px; */
+            padding: 4px 7px;
+            text-shadow: none;
+        }
+
+        .close{
+            text-shadow: none;
+        }
+
+
         #orderAmountFilterModal .modal-content{
             width: 800px;
             height: 250px;
@@ -358,6 +390,7 @@
             margin-right: -5px;
             height: 31px;
             margin-top: 5px;
+            padding: 4px;
         }
 
         #stockIcon{
@@ -410,17 +443,17 @@
 
 {% block content %}
     <div class="container home-navbar">
-        <div class="row my-4">
+        <div class="row my-4 pointer">
             <div class="col">
                 <img src="{% static '/img/brand-dashboard/home-icon.svg' %}" >
             </div>
         </div>
-        <div class="row my-4" id="setting">
+        <div class="row my-4 pointer" id="setting">
             <div class="col">
                 <img src="{% static '/img/brand-dashboard/setting-icon.svg' %}" >
             </div>
         </div>
-        <div class="row" style="margin-top: 380px;">
+        <div class="row pointer align-text-bottom" style="position: absolute; bottom: 40px;">
             <div class="col align-self-end" data-toggle="modal" data-target="#signoutModal">
                 <img src="{% static '/img/brand-dashboard/logout-icon.svg' %}" >
             </div>
@@ -553,7 +586,7 @@
                                 </div>
                             </div>
                             <div class="col" id="fileTypeDiv">
-                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon" id="exportOrder">
+                                <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
                                 <select name="fileType" id="" class="selectpicker">
                                     <option value="">File Type</option>
                                     <option value="csv">CSV</option>
@@ -584,22 +617,25 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="productNameFilterModalLabel">Product Name</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <div class="modalClose">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
                 </div>
                 <div class="modal-body">
                     <!-- <div class="modal-title sort-asc">Sort A->Z</div> -->
                     <!-- <div class="modal-title sort-desc">Sort Z->A</div> -->
-                    <div class="form-check sort-asc">
+                    <div class="form-check sort-asc ">
                         <input class="form-check-input " type="radio" name="productSortOrder"  value="asc" id="productAscCheckbox" style="display: none;">
-                        <label class="form-check-label modal-title" for="productAscCheckbox" >
+                        <label class="form-check-label modal-title pointer" for="productAscCheckbox" >
                             Sort A->Z
                         </label>
                     </div>
                     <div class="form-check sort-desc">
                         <input class="form-check-input " type="radio" name="productSortOrder"  value="desc" id="productDescCheckbox" style="display: none;">
-                        <label class="form-check-label modal-title"  for="productDescCheckbox">
+                        <label class="form-check-label modal-title pointer"  for="productDescCheckbox">
                             Sort Z->A
                         </label>
                     </div>
@@ -617,7 +653,7 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button">Apply</span>
+                    <span class="apply-button pointer">Apply</span>
                 </div>
             </div>
         </div>
@@ -628,9 +664,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
+                    <div class="modalClose">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <div class="row text-center">
@@ -645,7 +683,7 @@
                     <div id="price-slider-range"></div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button">Apply</span>
+                    <span class="apply-button pointer">Apply</span>
                 </div>
             </div>
         </div>
@@ -658,8 +696,8 @@
                     <h5 class="modal-title" id="">Are you sure you want to Signout?</h5>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button">Signout</span>
-                    <span class="cancel-button" data-dismiss="modal" aria-label="Close">Cancel</span>
+                    <span class="apply-button pointer">Signout</span>
+                    <span class="cancel-button pointer" data-dismiss="modal" aria-label="Close">Cancel</span>
                 </div>
             </div>
         </div>
@@ -670,9 +708,11 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="orderAmountFilterModalLabel">Change Password</h5>
+                    <div class="modalClose">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -713,7 +753,7 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button" >Submit</span>
+                    <span class="apply-button pointer" >Submit</span>
                 </div>
             </div>
         </div>
@@ -726,7 +766,7 @@
                     <h5 class="modal-title message " id="" ></h5>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button" data-dismiss="modal" aria-label="Close">Ok</span>
+                    <span class="apply-button pointer" data-dismiss="modal" aria-label="Close">Ok</span>
                 </div>
             </div>
         </div>
@@ -761,7 +801,6 @@
 
         let paymentStatusFilter = [];
         let orderStatusList = [
-            { name: "Draft", value: 'draft' },
             { name: "Order Placed", value: 'order_placed' },
             { name: "Shipped", value: 'shipped' },
             { name: "Returned", value: 'returned' },
@@ -982,8 +1021,18 @@
             $('#setting').popover({
                 html: true,
                 container: 'body',
-                content: `<span id="changePassword">Change Password</span>`,
+                content: `<span id="changePassword" class="pointer">Change Password</span>`,
             })
+
+            // $('body').on('click', function (e) {
+            //     document.querySelectorAll('.popover').forEach(function(item, i){
+            //         console.log($(item).hasClass('show'), item, e.target, e.target.closest('.popover'))
+            //         if($(item).hasClass('show') && item != e.target && item != e.target.closest('.popover')){
+            //             $(item).hide()
+            //             console.log('hide')
+            //         }
+            //     })
+            // });
 
             var orderChart = createChart(
                                 'Orders',
@@ -1011,17 +1060,25 @@
                 addProductFilterData(null, null)
             })
 
-            $(document).on('click', '#productNameFilterModal .sort-asc', function(){
-                // addProductFilterData(null, 'asc')
+            // $(document).on('click', '#productNameFilterModal .sort-asc', function(){
+            //     // addProductFilterData(null, 'asc')
+            //     // grid.reset()
+            //     console.log("here")
+            //     $('#productNameFilterModal .close').click()
+            // })
+
+            // $(document).on('click', '#productNameFilterModal .sort-desc', function(){
+            //     // addProductFilterData(null, 'desc')
+            //     // grid.reset()
+            //     console.log("here2222")
+            //     $('#productNameFilterModal .close').click()
+            // })
+
+            $(document).on('change', '[name=productSortOrder]', function(){
                 grid.reset()
                 $('#productNameFilterModal .close').click()
             })
 
-            $(document).on('click', '#productNameFilterModal .sort-desc', function(){
-                // addProductFilterData(null, 'desc')
-                grid.reset()
-                $('#productNameFilterModal .close').click()
-            })
 
             $(document).on('click', '#productNameFilterModal .apply-button', function(){
                 $('#productNameFilterModal').find('.close').click()
