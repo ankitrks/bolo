@@ -1,7 +1,7 @@
 # # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from multiprocessing import Process, Pool, Manager, Lock
 
 from django.shortcuts import render
@@ -13,7 +13,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
 from django.db import connections
 
 
-from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -32,7 +32,7 @@ from advertisement.utils import query_fetch_data, convert_to_dict_format, filter
 from advertisement.models import (Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent,
                                     Seen, Skipped, Clicked, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
-                                        OrderCreateSerializer, OrderLineSerializer)
+                                        OrderCreateSerializer, OrderLineSerializer, ChangePasswordSerializer)
 
 
 
@@ -108,7 +108,7 @@ class JarvisOrderViewset(ModelViewSet):
     authentication_classes = (SessionAuthentication,)
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = self.queryset.exclude(state='draft')
         q = self.request.query_params.get('q')
         page_size = self.request.query_params.get('page_size')
         order_date = self.request.query_params.get('date')
@@ -116,6 +116,7 @@ class JarvisOrderViewset(ModelViewSet):
         payment_status = self.request.query_params.get('payment_status')
         amount_range = self.request.query_params.get('amount_range')
         product_ids = self.request.query_params.get('product_ids')
+        product_sort = self.request.query_params.get('product_sort')
 
         if q:
             queryset = queryset.filter(Q(shipping_address__name__icontains=q) | Q(shipping_address__mobile__icontains=q) | 
@@ -142,7 +143,15 @@ class JarvisOrderViewset(ModelViewSet):
         if page_size:
             self.pagination_class.page_size = int(page_size)
 
-        return queryset.order_by('id')
+        if product_sort:
+            if product_sort == 'asc':
+                queryset = queryset.order_by('lines__product_id__name')
+            elif product_sort == 'desc':
+                queryset = queryset.order_by('-lines__product_id__name')
+        else:
+            queryset.order_by('-id')
+
+        return queryset 
 
 class JarvisProductViewset(ModelViewSet):
     queryset = Product.objects.all()
@@ -727,11 +736,9 @@ class DashBoardCountAPIView(APIView):
         processes = []
 
         for args in query_list:
-            print "creating process"
             self.get_count(*args)
             # processes.append(Process(target=self.get_count, args=args))
 
-        print "processes", processes
         # for p in processes:
         #     p.start()
 
@@ -740,13 +747,10 @@ class DashBoardCountAPIView(APIView):
         #     p.join()
 
         # print "prcessed joinede"
-        print "returnong response"
         return Response({args[0]: args[2].value  for args in query_list})
 
     def get_count(self, key, query, val_container):
-        print "getting count "
         val_container.value = query.count()
-        print "writing done"
 
 class AdTemplateView(TemplateView):
     template_name = 'advertisement/ad/index.html'
@@ -778,8 +782,13 @@ class OrderDashboardLogout(LogoutView):
     template_name = 'advertisement/order/login.html'
     success_url = '/ad/login/'
 
-class ResetPasswordView(PasswordResetView):
-    template_name = 'advertisement/order/reset_password.html'
+class OrderPasswordResetView(PasswordResetView):
+    template_name = 'advertisement/order/reset-password.html'
+    success_url = '/ad/login/'
+
+
+class OrderPasswordResetMailView(PasswordResetView):
+    template_name = 'advertisement/order/login.html'
     success_url = '/ad/login/'
 
 
@@ -816,52 +825,177 @@ class FilterDataAPIView(APIView):
             })
 
 class ChartDataAPIView(APIView):
+    WEEK_ENUM = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    MONTH_ENUM = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
     def get(self, request, *args, **kwargs):
         chart_type = request.query_params.get('chart_type')
         data_type = request.query_params.get('data_type')
         cursor = connections['read'].cursor()
 
+        result = [[], []]
+
         if chart_type == 'order':
             if data_type == 'weekly':
-                return Response({
-                    'dataset': [3, 5, 6, 1, 4, 3, 0],
-                    'labels': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-                })
+                cursor.execute("""
+                    select extract(isodow from date)::integer - 1 as weekday, count
+                    from (
+                        select date::date, count(1)
+                        from advertisement_order
+                        where date >= now() - interval '7 days'
+                        group by date::date
+                    ) A
+                """)
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+                
             elif data_type == 'monthly':
-                return Response({
-                    'dataset': [3, 5, 6, 1, 4, 3, 0, 3, 5, 6, 1, 4, 3, 0, 3, 5, 6, 1, 4, 3, 0,3, 5, 6, 1, 4, 3, 0, 3, 5],
-                    'labels': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
-                })
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(day from date)::integer, count
+                    from (
+                        select date::date, count(1)
+                        from advertisement_order
+                        where date >= %s
+                        group by date::date
+                    ) A
+                """, ['%s-%s-01'%(today.year, today.month)])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
+
             elif data_type == 'yearly':
-                return Response({
-                    'dataset': [30, 50, 61, 121, 41, 13, 100, 113, 25, 67, 10],
-                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                })
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, count(1)
+                        from advertisement_order
+                        where date >= %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
             elif data_type == 'lifetime':
-                return Response({
-                    'dataset': [30, 50, 61, 121, 41, 13, 100, 113, 25, 67, 10],
-                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                })
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, count(1)
+                        from advertisement_order
+                        where date >= %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
 
         elif chart_type == 'revenue':
             if data_type == 'weekly':
-                return Response({
-                    'dataset': [4353, 1213, 5311, 2423, 1223, 1111, 4312],
-                    'labels': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-                })
+                cursor.execute("""
+                    select extract(isodow from date)::integer - 1 as weekday, amount
+                    from (
+                        select date::date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= now() - interval '7 days'
+                        group by date::date
+                    ) A
+                """)
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+                
             elif data_type == 'monthly':
-                return Response({
-                    'dataset': [3312, 1235, 1641, 1341, 3441, 1341, 1240, 3412, 1254, 3641, 1141, 4411, 3141, 1404, 1243, 1245, 6141, 1112, 4321, 3643, 2075, 3856, 5356, 6233, 1153, 4542, 3422, 2405, 2523, 5265],
-                    'labels': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24']
-                })
-            elif data_type == 'yearly':
-                return Response({
-                    'dataset': [34245, 51245, 64672, 81215, 43255, 34636, 56330, 74234, 63552, 62356, 62312],
-                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                })
-            elif data_type == 'lifetime':
-                return Response({
-                    'dataset': [34245, 51245, 64672, 81215, 43255, 34636, 56330, 74234, 63552, 62356, 62312],
-                    'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                })
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(day from date)::integer, amount
+                    from (
+                        select date::date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s
+                        group by date::date
+                    ) A
+                """, ['%s-%s-01'%(today.year, today.month)])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
 
+            elif data_type == 'yearly':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, amount
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'lifetime':
+                today = datetime.now()
+                cursor.execute("""
+                    select extract(month from date)::integer, amount
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(amount) as amount
+                        from advertisement_order
+                        where date >= %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, ['%s-01-01'%(today.year)])
+                result = self.get_yearly_data(self.dictfetchall(cursor))
+
+        return Response({
+            'labels': result[0],
+            'dataset': result[1],
+        })
+
+    def dictfetchall(self, cursor):
+        return {
+            row[0]: row[1] for row in cursor.fetchall()
+        }
+
+    def get_weekly_data(self, query_data):
+        print "query data", query_data
+        start_date = datetime.now() - timedelta(days=7)
+        labels = []
+        dataset = []
+
+        for i in range(7):
+            weekday = (start_date + timedelta(days=i+1)).weekday()
+            print "weekday", weekday
+            labels.append(self.WEEK_ENUM[weekday])
+            dataset.append(query_data.get(weekday, 0))
+        
+        return labels, dataset
+
+    def get_monthly_data(self, query_data):
+        print "query data", query_data
+        today = datetime.now()
+        start_date = datetime.strptime('01-%s-%s'%(today.month, today.year), '%d-%m-%Y')
+        day_diff = (today - start_date).days + 1
+        print "day_diff", day_diff
+        labels = []
+        dataset = []
+
+        for day in range(1, day_diff+1):
+            labels.append(day)
+            dataset.append(query_data.get(day, 0))
+        
+        return labels, dataset
+
+    def get_yearly_data(self, query_data):
+        print "query data", query_data
+        today = datetime.now() 
+        labels = []
+        dataset = []
+
+        for month in range(today.month):
+            print "month", month
+            labels.append(self.MONTH_ENUM[month])
+            dataset.append(query_data.get(month+1, 0))
+        
+        return labels, dataset
+
+
+class ChangePasswordAPIView(UpdateAPIView):
+    permission_classes = (IsAdminUser,)
+    authentication_classes = (SessionAuthentication,)
+    serializer_class = ChangePasswordSerializer
+
+    def get_object(self):
+        return self.request.user

@@ -97,7 +97,7 @@ class AdOrderDownload(DownloadView):
         query = """
             select 
                 o.id, order_number, to_char(o.created_at, 'DD-MM-YYYY HH:MI:SS') as order_date, brand.name as brand_name, product.name as product_name, line.quantity as quantity,
-                o.amount as order_amount, (tax.percentage/100.0 * o.amount ) + o.amount as paid_amount, o.payment_status, o.state, u.id as user_id,
+                o.amount as order_amount, (tax.percentage/100.0 * o.amount ) + o.amount as paid_amount, o.payment_status, o.state, 
                 address.name as customer_name, address.email as customer_email, address.mobile as customer_mobile, 
                 concat(address.address1, ', ', address.address2, ', ', city.name, ', ', st.name, ' - ', address.pincode)  as customer_address
             from advertisement_order o

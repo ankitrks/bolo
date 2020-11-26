@@ -78,6 +78,10 @@
             height: 45px;
             margin-top: 5px;
         }
+
+        .modal-content{
+            margin-top: 50%;
+        }
     </style>
     
 {% endblock css %}
@@ -147,13 +151,20 @@
                 <div class="modal-header">
                 </div>
                 <div class="modal-body text-center">
-                    Please enter email ID to reset your password
-                    <div class="input-group">
-                        <input type="text" class="form-control avenir-font" name="forgot-password-input" placeholder="Type here....">
-                    </div>
+                    <form id="forgotPasswordForm">
+                        {% csrf_token %}
+                        Please enter email ID to reset your password
+                        <div class="input-group">
+                            <input type="text" class="form-control avenir-font" name="forgot-password-input" placeholder="Type here....">
+                        </div>
+                    </form>
+                    
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button text-center" data-toggle="modal" data-target="#forgotPasswordSuccessModal" data-dismiss="modal" aria-label="Close">Ok</span>
+                    <span  class="apply-button text-center"  onclick="submitForgotPasswordForm()">
+                        Ok
+                    </span>
+                    <span id="successMessageOpenner" data-toggle="modal" data-target="#forgotPasswordSuccessModal" style="display: none;" data-dismiss="modal" aria-label="Close"></span>
                 </div>
             </div>
         </div>
@@ -174,3 +185,26 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block js %}
+    <script>
+        var submitForgotPasswordForm = function(){
+            $.ajax('/ad/send-reset-password-mail/', {
+                method: 'POST',
+                data: {
+                    'email': $('[name=forgot-password-input]').val(),
+                },
+                headers: headers,
+                success: function(response){
+                    console.log("response", response)
+                    $("#successMessageOpenner").click()
+                }
+            })
+        }
+        $(document).ready(function(){
+            
+            
+        })
+    </script>
+
+{% endblock js %}

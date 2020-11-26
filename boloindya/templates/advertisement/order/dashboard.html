@@ -194,6 +194,7 @@
         .modal-content{
             color: white;
             background: #121111;
+            margin-top: 50%;
         }
 
         .modal-footer, .modal-header{
@@ -387,6 +388,23 @@
             border-right-color: #121111;
         }
 
+        #changePasswordModal .modal-content{
+            width: 700px;
+        }
+
+        #changePasswordModal input{
+            background: #121111;
+            border: 1px solid #FFFFFF;
+            font-size: 14px;
+            height: 40px;
+            color: #FFFFFF;
+        }
+
+        #changePasswordModal input::placeholder{
+            color: #FFFFFF;
+            opacity: 0.4;
+        }
+
     </style>
 {% endblock css %}
 
@@ -407,6 +425,8 @@
                 <img src="{% static '/img/brand-dashboard/logout-icon.svg' %}" >
             </div>
         </div>
+        <span id="changePasswordModalOpenner" data-toggle="modal" data-target="#changePasswordModal" style="display: none;"></span>
+
     </div>
     <div class="container main">
         <div class="row verticle-center header-row">
@@ -521,7 +541,7 @@
                                 <div class="btn-group avenir-font" role="group" aria-label="Button group with nested dropdown">
                                     <div class="btn-group" role="group">
                                         <button id="filterGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <img src="{% static '/img/brand-dashboard/filter-icon.svg' %}" class="pr-4">Filter
+                                            <img src="{% static '/img/brand-dashboard/filter-icon.svg' %}" class="pr-3">Filter
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="filterGroup">
                                             <a class="dropdown-item" href="#" id="productNameFilter" data-toggle="modal" data-target="#productNameFilterModal">Product Name</a>
@@ -569,8 +589,20 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-title sort-asc">Sort A->Z</div>
-                    <div class="modal-title sort-desc">Sort Z->A</div>
+                    <!-- <div class="modal-title sort-asc">Sort A->Z</div> -->
+                    <!-- <div class="modal-title sort-desc">Sort Z->A</div> -->
+                    <div class="form-check sort-asc">
+                        <input class="form-check-input " type="radio" name="productSortOrder"  value="asc" id="productAscCheckbox" style="display: none;">
+                        <label class="form-check-label modal-title" for="productAscCheckbox" >
+                            Sort A->Z
+                        </label>
+                    </div>
+                    <div class="form-check sort-desc">
+                        <input class="form-check-input " type="radio" name="productSortOrder"  value="desc" id="productDescCheckbox" style="display: none;">
+                        <label class="form-check-label modal-title"  for="productDescCheckbox">
+                            Sort Z->A
+                        </label>
+                    </div>
                     <div class="row avenir-font">
                         <div class="input-group m-3">
                             <div class="input-group-prepend">
@@ -637,25 +669,64 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
+                    <h5 class="modal-title" id="orderAmountFilterModalLabel">Change Password</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row text-center">
+                    <div class="row">
+                        <div class="col" >
+                            <small>Enter current Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
                         <div class="col">
-                            <input type="text" id="amountSliderInput" readonly class="">
+                            <div class="input-group">
+                                <input type="password" class="form-control avenir-font" name="old_password" placeholder="Type here....">
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col" id="amountMinLabel"></div>
-                        <div class="col text-right" id="amountMaxLabel"></div>
+                        <div class="col" >
+                            <small>Enter New Password</small>
+                        </div>
                     </div>
-                    <div id="price-slider-range"></div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="new_password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col" >
+                            <small>Confirm Password</small>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <input type="text" class="form-control avenir-font" name="confirm_new_password" placeholder="Type here....">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button">Apply</span>
+                    <span class="apply-button" >Submit</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="passwordChangeMessageModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title message " id="" ></h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <span class="apply-button" data-dismiss="modal" aria-label="Close">Ok</span>
                 </div>
             </div>
         </div>
@@ -706,6 +777,9 @@
             filter['payment_status'] = paymentStatusFilter.join(',')
             filter['date'] = $('input[name="orderDateInput"]').val()
             filter['amount_range'] = $("#amountSliderInput").val()
+
+            if($('[name=productSortOrder]:checked').val())
+                filter['product_sort'] = $('[name=productSortOrder]:checked').val()
 
             productIdList = []
             $.each($('#productNameFilterModal .productNameList input[type=checkbox]:checked'), function(i, item){
@@ -793,7 +867,6 @@
 
         let grid = $("#userOrderTable").data("JSGrid");
 
-        
 
         let addDateFilter = function(){
             $('input[name="orderDateInput"]').daterangepicker({
@@ -878,15 +951,38 @@
             })
         }
 
+        let changePassword = function(){
+            $.ajax('/api/v1/ad/change-password/', {
+                method: 'PATCH',
+                data: {
+                    'old_password': $('[name=old_password]').val(),
+                    'new_password': $('[name=new_password]').val(),
+                    'confirm_new_password': $('[name=confirm_new_password]').val(),
+                },
+                success: function(response){
+                    console.log("response", response)
+                    $('#changePasswordModal .close').click()
+                    $('#passwordChangeMessageModal .message').text('Password changed successfully')
+                    $('#passwordChangeMessageModal').modal({show: true})
+                },
+                error: function(error){
+                    console.log("error", error)
+                    $('#passwordChangeMessageModal .message').text(error.responseJSON[0])
+                    $('#passwordChangeMessageModal').modal({show: true})
+                },
+                headers: headers
+            })
+        }
+
         $(document).ready(function(){
             updateDashboardCount()
             addDateFilter()
             addAmountFilterData()
             addProductFilterData()
             $('#setting').popover({
-                title: "User Access",
                 html: true,
-                content: `<span data-toggle="modal" data-target="#changePasswordModal">Change Password</span>`
+                container: 'body',
+                content: `<span id="changePassword">Change Password</span>`,
             })
 
             var orderChart = createChart(
@@ -916,11 +1012,15 @@
             })
 
             $(document).on('click', '#productNameFilterModal .sort-asc', function(){
-                addProductFilterData(null, 'asc')
+                // addProductFilterData(null, 'asc')
+                grid.reset()
+                $('#productNameFilterModal .close').click()
             })
 
             $(document).on('click', '#productNameFilterModal .sort-desc', function(){
-                addProductFilterData(null, 'desc')
+                // addProductFilterData(null, 'desc')
+                grid.reset()
+                $('#productNameFilterModal .close').click()
             })
 
             $(document).on('click', '#productNameFilterModal .apply-button', function(){
@@ -996,6 +1096,13 @@
                 window.location = '/ad/logout/'
             })
 
+            $(document).on('click', '#changePassword', function(){
+                $('#changePasswordModalOpenner').click()
+            })
+            
+            $(document).on('click', '#changePasswordModal .apply-button', function(){
+                changePassword()
+            })
         })
 
     </script>

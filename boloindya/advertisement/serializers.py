@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 from rest_framework import serializers
 
@@ -189,7 +190,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order.amount += float(line['amount'])
 
         order.order_number = 'ORDER_%d'%order.id
-        order.state = 'order_placed'
+        order.state = 'draft'
         order.save()
         return order
 
@@ -282,3 +283,25 @@ class OrderCreateSerializer(serializers.Serializer):
         # data['user'] = request.user.id
         # data['amount'] = Product.objects.filter(id__in=[product.get('product') for product in data['order_lines']]).aggregate(Sum('discounted_price')).get('discounted_price__sum')
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    def update(self, instance, validated_data):
+        print 'update', validated_data
+        if validated_data.get('new_password') != validated_data.get('confirm_new_password'):
+            raise serializers.ValidationError("Password are not same")
+
+        request = self._context.get('request')
+        
+        user = authenticate(request, username=request.user.username, password=validated_data.get('old_password'))
+
+        if not user:
+            raise serializers.ValidationError("Wrong Password")
+
+        user.set_password(validated_data.get('new_password'))
+        user.save()
+        login(request, user)
+
+        return validated_data
