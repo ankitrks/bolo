@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.postgres.search import  SearchVectorField
 
 from dynamodb_api import create as dynamodb_create
 
@@ -286,7 +287,8 @@ class Order(RecordTimeStamp):
     payment_gateway_order_id = models.CharField(max_length=30, null=True, blank=True)
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=20, null=True, blank=True)
     order_number = models.CharField(max_length=30, null=True, blank=True)
-    # paid_amount = models.FloatField(null=True, blank=True)
+    paid_amount = models.FloatField(null=True, blank=True)
+    body_text = SearchVectorField(null=True, blank=True)
 
     objects = PermissionManager()
 
