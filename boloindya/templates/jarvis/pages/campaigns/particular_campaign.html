@@ -64,7 +64,39 @@ li:hover{
 .form_group_1{
     margin-top:100px;
 }
+.multiselect {
+  width: 200px;
+}
 
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+}
 </style>
 {% endblock styles %}
 {% block content %}
@@ -192,7 +224,22 @@ li:hover{
                 </ul>
             </div>
         </div>    
-
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Select Language: </label>
+            <div class="multiselect col-md-8">
+                <div class="selectBox" id="selectBox">
+                  <select>
+                    <option>Select an option</option>
+                  </select>
+                  <div class="overSelect"></div>
+                </div>
+                <div id="checkboxes">
+                    {% for lang in lang_options %}
+                        <input class="lang_options" name="lang_options" type="checkbox" id="lang_{{lang.id}}" value="{{lang.id}}" {% if lang.select%}checked{% endif %}>{{lang.value}}</br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
                 <button type="submit" class="btn btn-primary submit_from_button"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Save Changes </button>
@@ -204,6 +251,7 @@ li:hover{
                 <input type="checkbox" id="disable_campaign_cb" name="disable_campaign" value='true'>
         </div>
 
+        
         <div class="form-group video_elements">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
             <div class="col-md-8">
@@ -756,5 +804,33 @@ function addNewHashtag(){
 
 
 </script>
-
+<script>
+    $(document).ready( function () {
+        var expanded = false;
+        $("#selectBox").click(function () {
+          var checkboxes = document.getElementById("checkboxes");
+          if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+          } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+          }
+        })
+        $("#lang_0").click(function () {
+            if(!$('#lang_0').is(":checked")){
+                $('#lang_0').prop('checked', false);
+            }
+            else{
+                $("input[name='lang_options']:checkbox").prop('checked',false);
+                $('#lang_0').prop('checked', true);
+            }
+        });
+        $(".lang_options").click(function() {
+            if($(this).val()!=0){
+                $('#lang_0').prop('checked', false);
+            }
+        });
+    });
+</script>
 {% endblock center_js %}

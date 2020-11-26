@@ -237,10 +237,13 @@ def boloindya_upload_audio_file(request):
             {'topic_form':topic_form})
 
 @login_required
-def new_campaign_page(request):    
+def new_campaign_page(request):
     campaign_form = CampaignForm()
+    lang_options = []
+    for id_,value in language_options:
+        lang_options.append({'id':id_, 'value':value})
     return render(request,'jarvis/pages/campaigns/create_new_campaign.html',
-            {'add_campaign':campaign_form})
+            {'add_campaign':campaign_form, 'lang_options':lang_options})
 
 @login_required
 def video_management(request):
@@ -2825,7 +2828,7 @@ def add_campaign(request):
     campaign_id = request.POST.get('campaign_id', None)
     is_show_popup = request.POST.get('is_show_popup', None) == 'true'
     campaign_details = request.POST.get('campaign_details', None)
-
+    languages = request.POST.getlist('lang_options',None)
     if not upload_to_bucket:
         return HttpResponse(json.dumps({'message':'fail','reason':'bucket_missing'}),content_type="application/json")
     if not start_date_string or not end_date_string:
@@ -2837,7 +2840,8 @@ def add_campaign(request):
         return HttpResponse(json.dumps({'message':'fail','reason':'This is not a jpg/png file'}),content_type="application/json")
     if not hashtag_id or hashtag_id == -1:
         return HttpResponse(json.dumps({'message':'fail','reason':'Invalid Hashtag'}),content_type="application/json")
-
+    if not languages:
+        return HttpResponse(json.dumps({'message':'fail','reason':'Please select atleast one language'}),content_type="application/json")
     start_date = datetime.strptime(start_date_string, "%d-%m-%Y")
     end_date = datetime.strptime(end_date_string, "%d-%m-%Y")
     hashtag = TongueTwister.objects.filter(pk=hashtag_id)[0]
@@ -2867,7 +2871,8 @@ def add_campaign(request):
             return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
         else:
             campaign_dict['popup_img_url'] = popup_image_url
-
+    if languages:
+        campaign_dict['languages'] = languages
     if campaign_id:
         #If campaign ID is supplied, then it means it is an older campaign
         campaign_obj = Campaign.objects.get(pk=campaign_id) 
@@ -2959,7 +2964,14 @@ def campaigns_panel(request):
 @login_required
 def particular_campaign(request, campaign_id=None):
     campaign = Campaign.objects.get(pk=campaign_id)
-    return render(request,'jarvis/pages/campaigns/particular_campaign.html', {'campaign': campaign})
+    lang_options = []
+    campaign_languages = campaign.languages
+    for id_,value in language_options:
+        data = {'id':id_, 'value':value,'select': False}
+        if id_ in campaign_languages:
+            data['select'] = True
+        lang_options.append(data)
+    return render(request,'jarvis/pages/campaigns/particular_campaign.html', {'campaign': campaign,'lang_options':lang_options})
 
 
 @api_view(['POST'])

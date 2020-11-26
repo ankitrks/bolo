@@ -5385,7 +5385,8 @@ def get_campaigns(request):
         today = datetime.today()
         data = get_redis('campaign_data')
         if not data:
-            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today).order_by('-active_from')
+            language_options = ['0']+[request.user.st.language]
+            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today, languages__overlap=language_options).order_by('-active_from')
             serializer_camp = CampaignSerializer(all_camps, many=True)
             data = serializer_camp.data
             set_redis('campaign_data', data, True, 900)
