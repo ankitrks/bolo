@@ -1621,3 +1621,7 @@ def delete_video(request):
 
     except Exception as e:
         return JsonResponse({'message': str(e.message)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+def event_redirect_view(request, event_id):
+    return HttpResponsePermanentRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya&event=%s'%event_id)

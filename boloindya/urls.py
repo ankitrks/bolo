@@ -116,6 +116,7 @@ urlpatterns = [
     url(r'^api/v2/', include('drf_spirit.api_urls_v2')),
     url(r'^ad/', include(advertisement.urls)),
     url(r'^report/', include(report.urls)),
+    url(r'^events/(?P<event_id>\d+)/$', forum.topic.views.event_redirect_view),
 ]
 
 urlpatterns += i18n_patterns(
