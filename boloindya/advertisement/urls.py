@@ -3,7 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from .views import AdevertisementCallView, brand_onboard_form, ad_creation_form, product_onboard_form, search_fields_for_advertisement, brand_management, product_management, particular_ad
 from .views import (OrderPaymentRedirectView, OrderTemplateView, AdTemplateView, ProductTemplateView, OrderDashboardLogin, 
-                    OrderDashboardLogout, OrderPasswordResetMailView, OrderPasswordResetView)
+                    OrderDashboardLogout, OrderPasswordResetMailView, OrderPasswordResetConfirmView)
 
 urlpatterns = [
     url(r'^brand/onboard/$', staff_member_required(brand_onboard_form)),
@@ -19,6 +19,6 @@ urlpatterns = [
     url(r'^product/$', staff_member_required( ProductTemplateView.as_view())),
     url(r'^login/$', OrderDashboardLogin.as_view()),
     url(r'^logout/$', OrderDashboardLogout.as_view()),
-    url(r'^reset-password/$', OrderPasswordResetView.as_view()),
+    url(r'^reset-password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', OrderPasswordResetConfirmView.as_view()),
     url(r'^send-reset-password-mail/$', OrderPasswordResetMailView.as_view()) 
 ]

@@ -207,7 +207,7 @@
         .modal-content{
             color: white;
             background: #121111;
-            margin-top: 50%;
+            margin-top: 40%;
             border-radius: 10px;
         }
 
@@ -1024,15 +1024,15 @@
                 content: `<span id="changePassword" class="pointer">Change Password</span>`,
             })
 
-            // $('body').on('click', function (e) {
-            //     document.querySelectorAll('.popover').forEach(function(item, i){
-            //         console.log($(item).hasClass('show'), item, e.target, e.target.closest('.popover'))
-            //         if($(item).hasClass('show') && item != e.target && item != e.target.closest('.popover')){
-            //             $(item).hide()
-            //             console.log('hide')
-            //         }
-            //     })
-            // });
+            $('body').on('click', function (e) {
+                document.querySelectorAll('.popover').forEach(function(item, i){
+                    console.log($(item).hasClass('show'), item, e.target, e.target.closest('.popover'), e.target.closest('#setting'))
+                    if($(item).hasClass('show') && item != e.target && item != e.target.closest('.popover') && document.querySelector('#setting') != e.target.closest('#setting')){
+                        $('#setting').popover('hide')
+                        console.log('hide')
+                    }
+                })
+            });
 
             var orderChart = createChart(
                                 'Orders',

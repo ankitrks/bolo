@@ -9,8 +9,9 @@ from django.db.models import Sum, Q
 from django.test import Client
 from django.views.generic import RedirectView, TemplateView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
 from django.db import connections
+from django.db.models.functions import Lower
 
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, UpdateAPIView
@@ -145,9 +146,9 @@ class JarvisOrderViewset(ModelViewSet):
 
         if product_sort:
             if product_sort == 'asc':
-                queryset = queryset.order_by('lines__product_id__name')
+                queryset = queryset.order_by(Lower('lines__product_id__name'))
             elif product_sort == 'desc':
-                queryset = queryset.order_by('-lines__product_id__name')
+                queryset = queryset.order_by(Lower('lines__product_id__name').desc())
         else:
             queryset.order_by('-id')
 
@@ -782,14 +783,15 @@ class OrderDashboardLogout(LogoutView):
     # template_name = 'advertisement/order/login.html'
     next_page = '/ad/login/'
 
-class OrderPasswordResetView(PasswordResetView):
-    template_name = 'advertisement/order/reset-password.html'
-    success_url = '/ad/login/'
+class OrderPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'advertisement/order/reset_password.html'
+    success_url = '/ad/login/?password_changed=success'
 
 
 class OrderPasswordResetMailView(PasswordResetView):
     template_name = 'advertisement/order/login.html'
-    success_url = '/ad/login/'
+    success_url = '/ad/login/?reset_password=success'
+    email_template_name = 'advertisement/order/password_reset_email.html'
 
 
 class FilterDataAPIView(APIView):
@@ -842,7 +844,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select date::date, count(1)
                         from advertisement_order
-                        where date >= now() - interval '7 days'
+                        where date >= now() - interval '7 days' and state != 'draft'
                         group by date::date
                     ) A
                 """)
@@ -855,7 +857,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select date::date, count(1)
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by date::date
                     ) A
                 """, ['%s-%s-01'%(today.year, today.month)])
@@ -868,7 +870,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select DATE_TRUNC('month', date) as date, count(1)
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by DATE_TRUNC('month', date)
                     ) A
                 """, ['%s-01-01'%(today.year)])
@@ -881,7 +883,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select DATE_TRUNC('month', date) as date, count(1)
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by DATE_TRUNC('month', date)
                     ) A
                 """, ['%s-01-01'%(today.year)])
@@ -894,7 +896,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select date::date, sum(amount) as amount
                         from advertisement_order
-                        where date >= now() - interval '7 days'
+                        where date >= now() - interval '7 days' and state != 'draft'
                         group by date::date
                     ) A
                 """)
@@ -907,7 +909,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select date::date, sum(amount) as amount
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by date::date
                     ) A
                 """, ['%s-%s-01'%(today.year, today.month)])
@@ -920,7 +922,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select DATE_TRUNC('month', date) as date, sum(amount) as amount
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by DATE_TRUNC('month', date)
                     ) A
                 """, ['%s-01-01'%(today.year)])
@@ -933,7 +935,7 @@ class ChartDataAPIView(APIView):
                     from (
                         select DATE_TRUNC('month', date) as date, sum(amount) as amount
                         from advertisement_order
-                        where date >= %s
+                        where date >= %s and state != 'draft'
                         group by DATE_TRUNC('month', date)
                     ) A
                 """, ['%s-01-01'%(today.year)])

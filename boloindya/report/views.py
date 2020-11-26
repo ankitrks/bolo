@@ -96,8 +96,8 @@ class AdOrderDownload(DownloadView):
     def get_query_with_params(self):
         query = """
             select 
-                o.id, order_number, to_char(o.created_at, 'DD-MM-YYYY HH:MI:SS') as order_date, brand.name as brand_name, product.name as product_name, line.quantity as quantity,
-                o.amount as order_amount, (tax.percentage/100.0 * o.amount ) + o.amount as paid_amount, o.payment_status, o.state, 
+                ROW_NUMBER() OVER (ORDER BY o.id desc) as "S No", to_char(o.created_at, 'DD-MM-YYYY HH:MI:SS') as order_date, product.name as product_name, line.quantity as quantity,
+                (tax.percentage/100.0 * o.amount ) + o.amount as paid_amount, o.payment_status, o.state, 
                 address.name as customer_name, address.email as customer_email, address.mobile as customer_mobile, 
                 concat(address.address1, ', ', address.address2, ', ', city.name, ', ', st.name, ' - ', address.pincode)  as customer_address
             from advertisement_order o
@@ -111,7 +111,7 @@ class AdOrderDownload(DownloadView):
             left join advertisement_address address on address.id = o.shipping_address_id
             left join advertisement_state st on st.id = address.state_id
             left join advertisement_city city on city.id = address.city_id
-            where true 
+            where  o.state != 'draft' 
         """
         params = []
 
@@ -136,6 +136,6 @@ class AdOrderDownload(DownloadView):
             params.append(datetime.strptime(end_date, '%d-%m-%Y'))
 
 
-        query +=  " order by o.created_at"
+        query +=  " order by o.id desc"
 
         return query, params
