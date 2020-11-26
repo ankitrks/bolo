@@ -766,9 +766,9 @@ class DashBoardCountAPIView(APIView):
             ('shop_now_click', Clicked.objects.filter(cta='shop_now'), Value('i', 0, lock=lock)),
             ('brand_onboarded', Brand.objects.filter(is_active=True), Value('i', 0, lock=lock)),
             ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock)),
-            ('lifetime_order', Order.objects.all(), Value('i', 0, lock=lock)),
-            ('unique_order', Order.objects.all().distinct('user_id'), Value('i', 0, lock=lock)),
-            ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)), Value('i', 0, lock=lock)),
+            ('lifetime_order', Order.objects.exclude(state='draft'), Value('i', 0, lock=lock)),
+            ('unique_order', Order.objects.exclude(state='draft').distinct('user_id'), Value('i', 0, lock=lock)),
+            ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)).exclude(state='draft'), Value('i', 0, lock=lock)),
             ('onboarded_brands', Brand.objects.all(), Value('i', 0, lock=lock)),
             ('unique_products', Product.objects.all(), Value('i', 0, lock=lock)),
         )
@@ -830,6 +830,7 @@ class OrderPasswordResetConfirmView(PasswordResetConfirmView):
 class OrderPasswordResetMailView(PasswordResetView):
     template_name = 'advertisement/order/login.html'
     success_url = '/ad/login/?reset_password=success'
+    html_email_template_name = 'advertisement/order/password_reset_email.html'
     email_template_name = 'advertisement/order/password_reset_email.html'
 
 

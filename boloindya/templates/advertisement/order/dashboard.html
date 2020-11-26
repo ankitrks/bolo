@@ -8,7 +8,7 @@
             position: fixed;
             background-color: #121111;
             border-radius: 24px;
-            top: 40px;
+            top: 50px;
             left: 20px;
             width: 90px;
             color: white;
@@ -257,9 +257,9 @@
         .daterangepicker{
             background: #121111;
             color: white;
-            position: fixed;
-            top: 100px;
-            left: 300px;
+            position: fixed !important;
+            top: 200px !important;
+            left: 35% !important;
             font-family: Avenir;
         }
 
@@ -438,11 +438,24 @@
             opacity: 0.4;
         }
 
+        #dateFilterModal .modal-content{
+            width: 0px !important; 
+            height: 0px !important;
+        }
+
+        .logo{
+            position: fixed;
+            left: 20px;
+            top: 5px;
+        }
     </style>
 {% endblock css %}
 
 {% block content %}
     <div class="container home-navbar">
+        <div class="logo">
+            <img src="{% static '/img/brand-dashboard/logo.png' %}" alt="">
+        </div>
         <div class="row my-4 pointer">
             <div class="col">
                 <img src="{% static '/img/brand-dashboard/home-icon.svg' %}" >
@@ -766,7 +779,22 @@
                     <h5 class="modal-title message " id="" ></h5>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button pointer" data-dismiss="modal" aria-label="Close">Ok</span>
+                    <span class="apply-button pointer" data-dismiss="modal" aria-label="Close">OK</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="dateFilterModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header justify-content-center">
+                    <h5 class="modal-title message " id="" ></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="display: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer justify-content-center">
                 </div>
             </div>
         </div>
@@ -918,7 +946,10 @@
                     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
             });
             $('input[name="orderDateInput"]').on('show.daterangepicker', function(ev, picker) {
-                // $('.daterangepicker').css({'top': '50%', 'left': '50%'})
+                $("#dateFilterModal").modal({show: true})
+            });
+            $('input[name="orderDateInput"]').on('hide.daterangepicker', function(ev, picker) {
+                $("#dateFilterModal .close").click()
             });
             $('input[name="orderDateInput"]').on('apply.daterangepicker', function(ev, picker) {
                 grid.reset();

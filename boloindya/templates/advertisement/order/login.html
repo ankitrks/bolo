@@ -72,6 +72,7 @@
             font-size: 20px;
             color: #FFFFFF;
             padding-top: 7px;
+            cursor: pointer;
         }
 
         #forgotPasswordModal [name=forgot-password-input]{
@@ -82,12 +83,30 @@
         .modal-content{
             margin-top: 50%;
         }
+
+        .errorList li{
+            list-style: none;
+            color: brown;
+        }
+
+        .errorList ul{
+            padding: 0px;
+        }
+
+        .logo{
+            position: fixed;
+            left: 20px;
+            top: 5px;
+        }
     </style>
     
 {% endblock css %}
 
 {% block content %}
     <div class="container" >
+        <div class="logo">
+            <img src="{% static '/img/brand-dashboard/logo.png' %}" alt="">
+        </div>
         <form class="" action="" method="POST">
             {% csrf_token %}
             <div class="row " >
@@ -126,9 +145,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-5">
+                    <div class="row mb-1">
                         <div class="col text-right">
                             <a href="#"><span class=" avenir-font forgot-password-link" data-toggle="modal" data-target="#forgotPasswordModal">Forgot Password</span></a>
+                        </div>
+                    </div>
+                    <div class="row errorList">
+                        <div class="col text-left">
+                            {{ form.non_field_errors }}
                         </div>
                     </div>
                     <div class="row">
@@ -141,7 +165,8 @@
                 </div>
             </div>
         </form>
-        {{ form.errors }}
+
+        
     </div>
 
 
@@ -161,7 +186,7 @@
                     </div>
                     <div class="modal-footer justify-content-center">
                         <span  class="apply-button text-center"  onclick="submitForgotPasswordForm()">
-                            Ok
+                            OK
                         </span>
                         <span id="successMessageOpenner" data-toggle="modal" data-target="#forgotPasswordSuccessModal" style="display: none;" data-dismiss="modal" aria-label="Close"></span>
                     </div>
@@ -179,7 +204,7 @@
                     Reset password link has been successfully sent to your email ID
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">Ok</span>
+                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">OK</span>
                 </div>
             </div>
         </div>
@@ -194,7 +219,7 @@
                     Password Reset successfully
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">Ok</span>
+                    <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">OK</span>
                 </div>
             </div>
         </div>
