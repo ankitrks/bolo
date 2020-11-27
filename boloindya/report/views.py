@@ -135,6 +135,11 @@ class AdOrderDownload(DownloadView):
             params.append(datetime.strptime(start_date, '%d-%m-%Y'))
             params.append(datetime.strptime(end_date, '%d-%m-%Y'))
 
+        if self.request.GET.get('q'):
+            query += " and (address.name ilike %s or address.mobile ilike %s or address.email ilike %s ) "
+            params.append('%' + self.request.GET.get('q') + '%')
+            params.append('%' + self.request.GET.get('q') + '%')
+            params.append('%' + self.request.GET.get('q') + '%')
 
         query +=  " order by o.id desc"
 

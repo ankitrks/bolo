@@ -164,6 +164,12 @@
             background: black;
         }
 
+        .jsgrid-table .jsgrid-cell{
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         #fileTypeDiv .bootstrap-select, #recordCountDiv .bootstrap-select, #orderDateTypeOption .bootstrap-select, #revenueDateTypeOption .bootstrap-select{
             width: 108px;
             height: 15px;
@@ -202,6 +208,15 @@
 
         .recordCountIcon{
             background: #F5F5F7;
+        }
+
+        .modal-backdrop.show {
+            opacity: 0 !important;
+        }
+
+        .modal{
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);  
         }
 
         .modal-content{

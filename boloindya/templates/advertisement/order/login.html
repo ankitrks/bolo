@@ -86,7 +86,6 @@
 
         .errorList li{
             list-style: none;
-            color: brown;
         }
 
         .errorList ul{
@@ -98,6 +97,20 @@
             left: 20px;
             top: 5px;
         }
+
+        button{
+            border: none;
+        }
+
+        .modal-backdrop.show {
+            opacity: 0 !important;
+        }
+
+        .modal{
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);  
+        }
+        
     </style>
     
 {% endblock css %}
@@ -148,11 +161,6 @@
                     <div class="row mb-1">
                         <div class="col text-right">
                             <a href="#"><span class=" avenir-font forgot-password-link" data-toggle="modal" data-target="#forgotPasswordModal">Forgot Password</span></a>
-                        </div>
-                    </div>
-                    <div class="row errorList">
-                        <div class="col text-left">
-                            {{ form.non_field_errors }}
                         </div>
                     </div>
                     <div class="row">
@@ -224,6 +232,28 @@
             </div>
         </div>
     </div>
+
+    {% if form.errors %}
+        <div class="modal fade" id="wrongUsernamePasswordMessage" tabindex="-1" role="dialog" aria-labelledby aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    </div>
+                    <div class="modal-body text-center errorList">
+                        {% if form.non_field_errors %}
+                            {{ form.non_field_errors }}
+                        {% elif form.errors %}
+                            {{ form.errors }}
+                        {% endif %}
+                        
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <span class="apply-button text-center" data-dismiss="modal" aria-label="Close">OK</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content %}
 
 {% block js %}
@@ -242,18 +272,48 @@
             //     }
             // })
         }
+
+        function removeParam(key, sourceURL) {
+            var rtn = sourceURL.split("?")[0],
+                param,
+                params_arr = [],
+                queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+            if (queryString !== "") {
+                params_arr = queryString.split("&");
+                for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+                    param = params_arr[i].split("=")[0];
+                    if (param === key) {
+                        params_arr.splice(i, 1);
+                    }
+                }
+                rtn = rtn + "?" + params_arr.join("&");
+            }
+            return rtn;
+        }
+
+
         $(document).ready(function(){
             var url = new URL(window.location.href);
             if(url.searchParams.get("reset_password") == 'success'){
                 $("#successMessageOpenner").click()
+                window.history.pushState({}, document.title, "/ad/login/");
             }
 
             if(url.searchParams.get("password_changed") == 'success'){
                 $("#resetPasswordSuccessModal").modal({show: true})
+                window.history.pushState({}, document.title, "/ad/login/");
             }
             
             
         })
     </script>
+
+    {% if form.errors %}
+        <script>
+            $(document).ready(function(){
+                $("#wrongUsernamePasswordMessage").modal({show: true})
+            })
+        </script>
+    {% endif %}
 
 {% endblock js %}
