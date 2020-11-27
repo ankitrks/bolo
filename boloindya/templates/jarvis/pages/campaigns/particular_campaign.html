@@ -820,10 +820,13 @@ function addNewHashtag(){
         $("#lang_0").click(function () {
             if(!$('#lang_0').is(":checked")){
                 $('#lang_0').prop('checked', false);
+                 $("input[name='lang_options']:checkbox").prop('disabled', false);
             }
             else{
                 $("input[name='lang_options']:checkbox").prop('checked',false);
+                $("input[name='lang_options']:checkbox").prop('disabled', true);
                 $('#lang_0').prop('checked', true);
+                $('#lang_0').prop('disabled', false);
             }
         });
         $(".lang_options").click(function() {
