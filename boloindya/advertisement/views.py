@@ -34,7 +34,7 @@ from advertisement.models import (Ad, ProductReview, Order, Product, Address, Or
                                     Seen, Skipped, Clicked, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer, ChangePasswordSerializer)
-
+from drf_spirit.utils import language_options
 
 
 class AdDetailAPIView(RetrieveAPIView):
@@ -406,7 +406,10 @@ def ad_creation_form(request):
                     cta_options_values.append({'id':value1, 'value':value2})
             for value1, value2 in ad_type_options:
                 ad_type_options_values.append({'id':value1, 'value':value2})
-            return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values,'cta_options': cta_options_values})
+            lang_options = []
+            for id_,value in language_options:
+                lang_options.append({'id':id_, 'value':value})
+            return render(request,'advertisement/ad/new_ad_form.html', {'ad_type_options':ad_type_options_values,'cta_options': cta_options_values, 'lang_options': lang_options})
         elif request.method == 'POST':
             try:
                 print(request.POST)
@@ -433,6 +436,7 @@ def ad_creation_form(request):
                 playstore_link = request.POST.get('playstore_link', None)
                 website_link = request.POST.get('website_link', None)
                 ad_id = request.POST.get('ad_id', None)
+                languages = request.POST.getlist('lang_options',None)
                 ad_folder_key = request.POST.get('folder_prefix','from_upload_panel/advertisement/ad/')
                 if all(freq=='' for freq in scrolls):
                     return HttpResponse(json.dumps({'message':'fail','reason':'No Frequnecy scroll provided'}),content_type="application/json")
@@ -452,6 +456,9 @@ def ad_creation_form(request):
                 if mrp and discount and float(mrp)<float(discount):
                     return HttpResponse(json.dumps({'message':'fail','reason':'Discount can not be more than mrp'}),content_type="application/json")
 
+                if not languages:
+                    return HttpResponse(json.dumps({'message':'fail','reason':'Please select atleast one language'}),content_type="application/json")
+
                 start_date = datetime.strptime(start_date, "%m/%d/%Y %I:%M %p")
                 is_draft = True if is_draft=='true' else False
                 state = None
@@ -462,6 +469,9 @@ def ad_creation_form(request):
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
                 ad_dict['ad_type'] = ad_type
+                if languages:
+                    ad_dict['languages'] = languages
+
                 if end_date:
                     ad_dict['end_time'] = datetime.strptime(end_date, "%m/%d/%Y %I:%M %p")
                 else:
@@ -672,7 +682,14 @@ def particular_ad(request, ad_id=None):
         product_desc = ""
         if ad.product:
             product_desc = ad.product.description.replace("\r"," ").replace("\n"," ")
-        return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'desc': product_desc})
+        lang_options = []
+        ad_languages = ad.languages
+        for id_,value in language_options:
+            data = {'id':id_, 'value':value,'select': False}
+            if id_ in ad_languages:
+                data['select'] = True
+            lang_options.append(data)
+        return render(request,'advertisement/ad/particular_ad.html', {'ad': ad, 'ad_type_options':ad_type_options_values,'cta_options': cta_options_values,'desc': product_desc, 'lang_options':lang_options})
     else:
         return JsonResponse({'error':'User Not Authorised','message':'fail' }, status=status.HTTP_200_OK)
 
