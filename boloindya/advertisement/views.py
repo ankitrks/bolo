@@ -232,7 +232,7 @@ class OrderCreateAPIView(APIView):
         request_meta = request.META
 
         """ Saving Address """
-        address_data = filter_data_from_dict(['name', 'mobile', 'address1', 'address2', 'address3', 'city_id', 'state_id', 'pincode'], request.data)
+        address_data = filter_data_from_dict(['name', 'mobile', 'address1', 'address2', 'address3', 'city_id', 'state_id', 'pincode', 'email'], request.data)
         address_data['state'] = address_data.pop('state_id', '')
         address_data['city'] = address_data.pop('city_id', '')
         # address = client.post('/api/v1/ad/address/', address_data, HTTP_AUTHORIZATION=request_meta.get('HTTP_AUTHORIZATION')).json()
