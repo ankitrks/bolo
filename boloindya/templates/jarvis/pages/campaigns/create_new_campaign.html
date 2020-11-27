@@ -66,6 +66,40 @@ ul li {
   animation: spin 2s linear infinite;
 }
 
+.multiselect {
+  width: 200px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+}
+
 </style>
 {% endblock styles %}
 {% block content %}
@@ -142,8 +176,23 @@ ul li {
                 <div class="col-md-8" style="background-color: #fff; border: thin; min-height: 50px" id="campaign_details" contenteditable="true">
             </div>
             </div>
-        </div>        
-
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Select Language: </label>
+            <div class="multiselect col-md-8">
+                <div class="selectBox" id="selectBox">
+                  <select>
+                    <option>Select an option</option>
+                  </select>
+                  <div class="overSelect"></div>
+                </div>
+                <div id="checkboxes">
+                    {% for lang in lang_options %}
+                        <input class="lang_options" name="lang_options" type="checkbox" id="lang_{{lang.id}}" value="{{lang.id}}">{{lang.value}}</br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         <div class="form-group video_elements">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Bucket</label>
             <div class="col-md-8">
@@ -287,7 +336,11 @@ function upload(event) {
         var data = new FormData($('#upload').get(0));
         var csrfmiddlewaretoken = $('[name="csrfmiddlewaretoken"]').val();
         var all_data = []
-
+        var lang_options_data = []
+        $("input:checkbox[name=lang_options]:checked").each(function(){
+            lang_options_data.push($(this).val());
+        });
+        // data.append('lang_options', lang_options_data)
         data.append('hashtag_id', hashtag_id);
         data.append('is_show_popup', $("#popup_checkbox").is(':checked'));
         data.append('campaign_details', $("#campaign_details").html());
@@ -433,5 +486,36 @@ $('#create').click(upload);
     }
 
 </script>
-
+<script>
+    $(document).ready( function () {
+        var expanded = false;
+        $("#selectBox").click(function () {
+            var checkboxes = document.getElementById("checkboxes");
+          if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+          } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+          }
+        })
+        $("#lang_0").click(function () {
+            if(!$('#lang_0').is(":checked")){
+                $('#lang_0').prop('checked', false);
+                 $("input[name='lang_options']:checkbox").prop('disabled', false);
+            }
+            else{
+                $("input[name='lang_options']:checkbox").prop('checked',false);
+                $("input[name='lang_options']:checkbox").prop('disabled', true);
+                $('#lang_0').prop('checked', true);
+                $('#lang_0').prop('disabled', false);
+            }
+        });
+        $(".lang_options").click(function() {
+            if($(this).val()!=0){
+                $('#lang_0').prop('checked', false);
+            }
+        });
+    });
+</script>
 {% endblock center_js %}
