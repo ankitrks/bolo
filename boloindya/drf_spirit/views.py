@@ -5664,14 +5664,20 @@ popular_video_byte_view = PopularVideoBytes.as_view()
 follow_post_view = GetFollowPost
 
 def get_popular_video_bytes_load_test(request):
-    user = User.objects.get(id=random_instance.randint(1, 140000))
+    user_id_index = random_instance.randint(0, int(redis_cli.get('user:count'))-1)
+    user_id = redis_cli.lrange('user:id:list', user_id_index, user_id_index)[0]
+    user = User.objects.get(id=user_id)
+
     request = factory.get('/api/v2/get_popular_video_bytes/?language_id=%s&page=1'%str(random_instance.randint(1, 11)))
     force_authenticate(request, user=user)
     return popular_video_byte_view(request)
 
 
 def get_follow_post_load_test(request):
-    user = User.objects.get(id=random_instance.randint(1, 140000))
+    user_id_index = random_instance.randint(0, int(redis_cli.get('user:count'))-1)
+    user_id = redis_cli.lrange('user:id:list', user_id_index, user_id_index)[0]
+    user = User.objects.get(id=user_id)
+
     request = factory.get('/api/v1/get_follow_post/?language_id=%s&page=1'%str(random_instance.randint(1, 11)))
     force_authenticate(request, user=user)
     return follow_post_view(request)
