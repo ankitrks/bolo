@@ -76,7 +76,11 @@ def run():
         elif ad.get('frequency_type') == 'variable':
             ad_sequence_dict.setdefault(str(ad.get('scroll')), []).append(ad)
     for id_, value in language_options:
-        lang_specific_ad_sequence_dict = {k:v for k,v in ad_sequence_dict.items() if id_ in v[0]['languages']}
+        lang_specific_ad_sequence_dict = {}
+        for key,value in ad_sequence_dict.items():
+            lang_specific_data = list(filter(lambda x: id_ in x['languages'], value))
+            if lang_specific_data:
+                lang_specific_ad_sequence_dict[key] = lang_specific_data
         set_redis('ad:pool:lang:%s'%id_, lang_specific_ad_sequence_dict, False)
     save_ad_data_in_redis_in_parallel([ad.get('id') for ad in result])
     print json.dumps(ad_sequence_dict, indent=3)
