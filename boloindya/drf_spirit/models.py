@@ -454,7 +454,7 @@ class Campaign(RecordTimeStamp):
     winners = models.ManyToManyField('Winner', verbose_name=_("winner"), \
             related_name="m2mwinner_campaign",blank=True)
     next_campaign_hashtag = models.ForeignKey('forum_topic.TongueTwister', verbose_name=_("NextCampaignHashTag"), related_name="campaign_next_hashtag",null=True,blank=True)
-    languages = ArrayField(models.CharField(max_length=200), blank=True, default=list('0'))
+    languages = ArrayField(models.CharField(max_length=200), null=True, blank=True, default=list('0'))
 
 class Winner(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='winner_user')
