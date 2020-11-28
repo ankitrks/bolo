@@ -560,3 +560,22 @@ def get_audio_list():
     except Exception as e:
         print e
         return []
+
+def get_campaigns_data_from_redis(language_id):
+    from drf_spirit.models import Campaign
+    from drf_spirit.serializers import CampaignSerializer
+    from datetime import datetime
+    today = datetime.today()
+    try:
+        key = "campaign:lang:%s"%language_id
+        campaign_data  = get_redis(key)
+        if not campaign_data:
+            language_options = ['0']+[language_id]
+            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today, languages__overlap=language_options).order_by('-active_from')
+            serializer_camp = CampaignSerializer(all_camps, many=True)
+            campaign_data = serializer_camp.data
+            set_redis(key, campaign_data, True, 900)
+        return campaign_data
+    except Exception as e:
+        print(e)
+        return []

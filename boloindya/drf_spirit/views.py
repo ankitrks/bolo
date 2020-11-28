@@ -48,7 +48,7 @@ from .models import UserJarvisDump, UserLogStatistics, UserFeedback, Campaign, W
 from .permissions import IsOwnerOrReadOnly
 from .utils import get_weight, add_bolo_score, shorcountertopic, calculate_encashable_details, state_language, language_options,short_time,\
     solr_object_to_db_object, solr_userprofile_object_to_db_object,get_paginated_data ,shortcounterprofile, get_ranked_topics,\
-    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list, get_only_active_topic
+    set_android_logs_info, set_sync_dump_info, get_language_specific_audio_list, get_audio_list, get_only_active_topic, get_campaigns_data_from_redis
 
 from forum.userkyc.models import UserKYC, KYCBasicInfo, KYCDocumentType, KYCDocument, AdditionalInfo, BankDetail
 from forum.payment.models import PaymentCycle,EncashableDetail,PaymentInfo
@@ -5382,14 +5382,7 @@ from redis_utils import *
 @api_view(['POST'])
 def get_campaigns(request):
     try:
-        today = datetime.today()
-        data = get_redis('campaign_data')
-        if not data:
-            language_options = ['0']+[request.user.st.language]
-            all_camps = Campaign.objects.filter(is_active=True, active_from__lte=today, active_till__gte=today, languages__overlap=language_options).order_by('-active_from')
-            serializer_camp = CampaignSerializer(all_camps, many=True)
-            data = serializer_camp.data
-            set_redis('campaign_data', data, True, 900)
+        data = get_campaigns_data_from_redis(request.user.st.language)
         return JsonResponse({'status': 'success','message':data}, status=status.HTTP_201_CREATED)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
