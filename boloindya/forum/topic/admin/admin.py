@@ -581,11 +581,19 @@ class JonOpeningAdmin(admin.ModelAdmin):
 class JobRequestAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'mobile')
 
+class TongueTwisterForm(forms.ModelForm):
+    languages = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
+                                          choices=language_options)
+    class Meta:
+        fields = ('__all__')
+        model = TongueTwister
+
 class TongueTwisterAdmin(admin.ModelAdmin):
-    list_display = ('hash_tag', 'is_blocked', 'is_popular', 'order', 'popular_date')
-    list_editable = ('is_blocked', 'is_popular', 'order', 'popular_date')
+    list_display = ('hash_tag', 'is_blocked', 'is_popular', 'order', 'popular_date', 'languages')
+    list_editable = ('is_blocked', 'is_popular', 'order', 'popular_date', 'languages')
     list_filter = ('is_blocked', 'is_popular', )
     search_fields = ('hash_tag',)
+    form = TongueTwisterForm
 
 class RankingWeightAdmin(admin.ModelAdmin):
     list_display = ('features','weight',)
