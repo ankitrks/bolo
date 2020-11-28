@@ -28,7 +28,7 @@ from diff_model import ModelDiffMixin
 from redis_utils import *
 from django.db.models.signals import post_save, post_delete
 from forum.topic.queryset import LastModifiedQueryset
-
+from django.contrib.postgres.fields import ArrayField
 
 
 post_update = Signal()
@@ -665,6 +665,7 @@ class TongueTwister(models.Model):
     is_popular = models.BooleanField(default=False, db_index=True)
     popular_date = models.DateTimeField(_("Popular Date"),null=True,blank=True, db_index=True)
     order = models.IntegerField(verbose_name=_('order'), default = 0)
+    languages = ArrayField(models.CharField(max_length=200), null=True, blank=True, default=list('0'))
 
     def __unicode__(self):
         if self.hash_tag:
