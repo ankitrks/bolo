@@ -718,9 +718,8 @@ class GetAdForUserAPIView(APIView):
     def get(self, request, *args, **kwargs):
         params = request.query_params
         user_ad = {}
-        ad_pool = get_redis('ad:pool')
+        ad_pool = dict(get_redis('ad:pool:lang:%s'%params.get('language_id')).items()+get_redis("ad:pool:lang:0").items())
         skipped_ad_list = redis_cli_read_only.lrange('ad:user:%s:skip'%params.get('user_id'), 0, -1)
-
         if not ad_pool:
             return Response({'results': {}})
 

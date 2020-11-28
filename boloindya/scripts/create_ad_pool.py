@@ -16,6 +16,7 @@ from advertisement.models import Ad
 from advertisement.serializers import AdSerializer
 from advertisement.utils import filter_data_from_dict
 from drf_spirit.models import SystemParameter
+from drf_spirit.utils import language_options
 
 
 def save_ad_data_in_redis(ad):
@@ -56,7 +57,7 @@ def run():
     #Ad.objects.filter(end_time__lte=now).exclude(state__in=['completed'], is_deleted=True).update(state='completed')
 
     cursor.execute("""
-        SELECT ad.title, ad.id, ad.frequency_type, freq.sequence, freq.scroll
+        SELECT ad.title, ad.id, ad.frequency_type, ad.languages, freq.sequence, freq.scroll
         FROM advertisement_ad ad
         INNER JOIN advertisement_frequency freq on freq.ad_id = ad.id
         WHERE  state = 'ongoing' and not is_deleted
@@ -74,7 +75,8 @@ def run():
 
         elif ad.get('frequency_type') == 'variable':
             ad_sequence_dict.setdefault(str(ad.get('scroll')), []).append(ad)
-
-    set_redis('ad:pool', ad_sequence_dict, False)
+    for id_, value in language_options:
+        lang_specific_ad_sequence_dict = {k:v for k,v in ad_sequence_dict.items() if id_ in v[0]['languages']}
+        set_redis('ad:pool:lang:%s'%id_, lang_specific_ad_sequence_dict, False)
     save_ad_data_in_redis_in_parallel([ad.get('id') for ad in result])
     print json.dumps(ad_sequence_dict, indent=3)

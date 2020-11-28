@@ -4554,11 +4554,12 @@ def convert_to_dict_format(item):
 
     return _dict
 
-def get_ad_to_display(user_id, extra_data):
+def get_ad_to_display(user_id, extra_data, language_id):
     from rest_framework.test import APIClient
     c = APIClient()
     params_list = ['%s=%s'%(key, val) for key, val in extra_data.iteritems()]
     params_list.append('user_id=%s'%user_id)
+    params_list.append('language_id=%s'%language_id)
     return c.get('/api/v1/ad/for-user?%s'%('&'.join(params_list),)).json().get('results')
 
 
@@ -4768,7 +4769,7 @@ class PopularVideoBytesV2(PopularVideoBytes):
         language_id = request.GET.get('language_id', 1)
         page_number = int(request.GET.get('page',1))
 
-        ad_list = get_ad_to_display(request.user.id, request.GET)
+        ad_list = get_ad_to_display(request.user.id, request.GET, request.user.st.language)
         ad_infused_popular_posts = self.infuse_ads(ad_list, get_video_bytes_and_its_related_data(
                                         self.get_tranding_topic_data(request.user.id, language_id, page_number),
                                         request.GET.get('last_updated', None)
