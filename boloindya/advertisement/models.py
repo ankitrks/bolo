@@ -207,7 +207,7 @@ class Ad(RecordTimeStamp):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_ads')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True, related_name='modify_ads')
     is_deleted = models.BooleanField(default=False)
-    languages = ArrayField(models.CharField(max_length=200), blank=True, default=list('0'))
+    languages = ArrayField(models.CharField(max_length=200), null = True, blank=True, default=list('0'))
 
     def __str__(self):
         return str(self.id)
