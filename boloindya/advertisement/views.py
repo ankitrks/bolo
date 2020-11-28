@@ -718,9 +718,20 @@ class GetAdForUserAPIView(APIView):
     def get(self, request, *args, **kwargs):
         params = request.query_params
         user_ad = {}
-        ad_pool = get_redis('ad:pool')
-        skipped_ad_list = redis_cli_read_only.lrange('ad:user:%s:skip'%params.get('user_id'), 0, -1)
+        ad_pool = {}
+        all_lang_data = get_redis("ad:pool:lang:0")
+        user_lang_data = get_redis('ad:pool:lang:%s'%params.get('language_id'))
+        for key in set(all_lang_data.keys() + user_lang_data.keys()):
+            try:
+                ad_pool.setdefault(key,[]).extend(all_lang_data[key])   
+            except KeyError:
+                pass
 
+            try:
+                ad_pool.setdefault(key,[]).extend(user_lang_data[key])    
+            except KeyError:
+                pass
+        skipped_ad_list = redis_cli_read_only.lrange('ad:user:%s:skip'%params.get('user_id'), 0, -1)
         if not ad_pool:
             return Response({'results': {}})
 
@@ -728,7 +739,7 @@ class GetAdForUserAPIView(APIView):
             new_ad_list = []
 
             for ad in items:
-                if str(ad.get('id'))  not in skipped_ad_list:
+                if str(ad.get('id')) not in skipped_ad_list:
                     new_ad_list.append(ad)
 
             ad_pool[key] = new_ad_list
