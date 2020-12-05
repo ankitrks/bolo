@@ -252,6 +252,11 @@ class PubSubPopularSerializer(ModelSerializer):
     class Meta:
         model = Topic
         fields = ('id', 'language_id')
+
+class MusicAlbumSerializer(ModelSerializer):
+  class Meta:
+    model = MusicAlbum
+    fields = '__all__'
         
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
@@ -275,6 +280,7 @@ class TopicSerializerwithComment(ModelSerializer):
     whatsapp_share_count = SerializerMethodField()
     other_share_count = SerializerMethodField()
     total_share_count = SerializerMethodField()
+    music = MusicAlbumSerializer()
 
     def __init__(self, *args, **kwargs):
         super(TopicSerializerwithComment, self).__init__(*args, **kwargs)
@@ -1307,7 +1313,3 @@ class CampaignSerializer(ModelSerializer):
         model = Campaign
         fields = ('banner_img_url', 'hashtag_name', 'is_active', 'active_from', 'active_till', 'is_winner_declared', 'winners', 'next_campaign_name', 'show_popup_on_app', 'banner_img_url', 'popup_img_url', 'details')
 
-class MusicAlbumSerializer(ModelSerializer):
-  class Meta:
-    model = MusicAlbum
-    fields = '__all__'

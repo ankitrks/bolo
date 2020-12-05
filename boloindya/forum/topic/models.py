@@ -195,6 +195,9 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     profanity_collage_url = models.TextField(_("profanity collage url"), blank = True, null = True)
     is_sticky = models.BooleanField(default=False)
 
+    music = models.ForeignKey('drf_spirit.MusicAlbum', blank=True, null=True, related_name='videos')
+    is_audio_extracted = models.NullBooleanField(_('Is Audio Extracted'), blank=True, null=True, default=False, db_index=True)
+
     def __unicode__(self):
         return self.title
 
@@ -1170,5 +1173,3 @@ class TongueTwisterCounter(RecordTimeStamp):
 class VideoDelete(RecordTimeStamp):
     user =  models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"),editable=False,null=True,blank=True)
     video = models.ForeignKey(Topic, null=True, blank=True)
-
-
