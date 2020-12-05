@@ -21,7 +21,7 @@ s3_client = boto3.client('s3')
 
 def run_command(video):
     try:
-        if not video.get('question_video'):# or video.get('music_id'):
+        if not video.get('question_video') or video.get('music_id'):
             return
 
         
@@ -31,9 +31,8 @@ def run_command(video):
         audio_file_path = '/tmp/audio/%s'%(audio_file)
 
         
-        # os.system('wget "%s" -O %s'%(video.get('question_video'), video_file_path))
-
-        # os.system('ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path))
+        os.system('wget "%s" -O %s'%(video.get('question_video'), video_file_path))
+        os.system('ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path))
 
         response = s3_client.upload_file(audio_file_path, BUCKET, audio_file, ExtraArgs={'ACL': 'public-read'})
         s3_file_location = '/from_upload_panel/audio/' + audio_file
@@ -54,7 +53,6 @@ def run_command(video):
 
 
 def process_video_in_parallel(video_list):
-    print "video list", video_list
     if not video_list:
         return 
 

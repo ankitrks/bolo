@@ -37,6 +37,11 @@ class CategoryLiteSerializer(ModelSerializer):
         fields = ('id','title', 'slug', 'color','hindi_title','tamil_title','telgu_title')
 
 
+class MusicAlbumSerializer(ModelSerializer):
+  class Meta:
+    model = MusicAlbum
+    fields = '__all__'
+
 class TongueTwisterSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
@@ -94,6 +99,8 @@ class TongueTwisterWithVideoByteSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
     topics = SerializerMethodField()
+    music = MusicAlbumSerializer()
+
     class Meta:
         model = TongueTwister
         fields = '__all__'
@@ -253,10 +260,6 @@ class PubSubPopularSerializer(ModelSerializer):
         model = Topic
         fields = ('id', 'language_id')
 
-class MusicAlbumSerializer(ModelSerializer):
-  class Meta:
-    model = MusicAlbum
-    fields = '__all__'
         
 class TopicSerializerwithComment(ModelSerializer):
     user = SerializerMethodField()
