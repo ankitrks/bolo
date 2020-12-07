@@ -74,7 +74,7 @@ class TopicChangeList(ChangeList):
         newrelic.agent.set_transaction_name("/Admin/Topic/GET", "Admin Panel")
 
         self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'playtime', 'imp_count',\
-            'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
+            'topic_like_count', 'likes_count', 'topic_share_count', 'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_removed', \
                 'is_moderated','is_boosted','boosted_till')
