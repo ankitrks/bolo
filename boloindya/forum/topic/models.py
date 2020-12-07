@@ -124,12 +124,12 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     total_share_count = models.PositiveIntegerField(_("Total Share count"), default=0,db_index=True)# self plus comment
     share_count = models.PositiveIntegerField(_("Share count"), default=0,db_index=True)# only topic share
     imp_count = models.PositiveIntegerField(_("views"), default=0,db_index=True)
-    topic_like_count = models.PositiveIntegerField(_("Topic Like"), default=0,db_index=True)
+    topic_like_count = models.PositiveIntegerField(_("Likes"), default=0,db_index=True)
     topic_share_count = models.PositiveIntegerField(_("Topic Share"), default=0,db_index=True)
     # share_user = models.ForeignKey(settings.AUTH_USER_MODEL,null=True,blank=True, related_name='share_topic_user')
     # shared_post = models.ForeignKey('self', blank = True, null = True, related_name='user_shared_post')
     is_vb = models.BooleanField(_("Is Video Bytes"), default=False)
-    likes_count = models.PositiveIntegerField(_("Likes count"), default=0,db_index=True)
+    likes_count = models.PositiveIntegerField(_("Likes(Comb.)"), default=0,db_index=True)
     is_monetized = models.BooleanField(_("monetized"), default=False)
     is_moderated = models.BooleanField(_("moderated"), default=False)
     last_moderated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, editable=False)

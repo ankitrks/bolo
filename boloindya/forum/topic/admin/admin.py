@@ -74,7 +74,7 @@ class TopicChangeList(ChangeList):
         newrelic.agent.set_transaction_name("/Admin/Topic/GET", "Admin Panel")
 
         self.list_display = ('vb_list', 'id', 'title', 'name', 'duration', 'show_thumbnail', 'language_id', 'playtime', 'imp_count',\
-            'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
+            'topic_like_count', 'likes_count', 'topic_share_count', 'date', 'is_moderated', 'is_removed', 'is_pubsub_popular_push', 'is_boosted', 'boosted_till', 'm2mcategory') #is_popular
         self.list_display_links = ['id']
         self.list_editable = ('title', 'language_id', 'm2mcategory', 'is_pubsub_popular_push', 'is_removed', \
                 'is_moderated','is_boosted','boosted_till')
@@ -318,7 +318,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     def show_thumbnail(self, obj):
         if obj.question_image:
             return """<div style="background: url('""" + obj.question_image + """');width: 100%;
-                    height: 56px;background-size: 100%;"></div>"""
+                    height: 56px;background-size: 100%;"></div>
+                    <a href=\"""" + obj.question_image + """\" download target="_blank">
+                        <img class='thumbnail-download' src="/static/img/icons/download.webp">
+                    </a>"""
         return '<div style="width: 30px;height: 30px;"></div>'
     show_thumbnail.allow_tags = True
     show_thumbnail.short_description = "IMG"
