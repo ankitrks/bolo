@@ -655,23 +655,6 @@
                 jQuery.each( jQuery('.field-name'), function(i, each_field){
                     let user = new User(each_field);
                 });
-
-                jQuery.each(jQuery('.field-show_thumbnail'), function(i, field){
-                    jQuery(field).append(`<div ><img class='thumbnail-download' src="/static/img/icons/download.webp"></div>`);
-                })
-
-                jQuery(document).on('click', '.thumbnail-download', function(){
-                    let imageSrc = jQuery(this).parents('.field-show_thumbnail').find('div').eq(0).css('background')
-                    var pattern = /url.+\"\)/g;
-                    var result = imageSrc.match(pattern)[0].replace('url("', '').replace('")', '');
-                    var a = $("<a>")
-                            .attr("href", result)
-                            .attr("download", result.split('/')[result.split('/').length-1])
-                            .appendTo("body");
-
-                        a[0].click();
-                        a.remove();
-                })
             })
         })(jQuery);
 

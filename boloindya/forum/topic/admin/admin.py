@@ -318,7 +318,10 @@ class TopicAdmin(admin.ModelAdmin): # to enable import/export, use "ImportExport
     def show_thumbnail(self, obj):
         if obj.question_image:
             return """<div style="background: url('""" + obj.question_image + """');width: 100%;
-                    height: 56px;background-size: 100%;"></div>"""
+                    height: 56px;background-size: 100%;"></div>
+                    <a href=\"""" + obj.question_image + """\" download target="_blank">
+                        <img class='thumbnail-download' src="/static/img/icons/download.webp">
+                    </a>"""
         return '<div style="width: 30px;height: 30px;"></div>'
     show_thumbnail.allow_tags = True
     show_thumbnail.short_description = "IMG"
