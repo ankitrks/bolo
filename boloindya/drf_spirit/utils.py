@@ -391,7 +391,7 @@ def get_only_active_topic(sqs,page_size,page=None, topic = None):
     except EmptyPage:       # If page is out of range (e.g. 9999), deliver last page of results.
         paginated_data = []
 
-    if len(paginated_data.object_list) != 0:
+    if paginated_data and len(paginated_data.object_list) != 0:
         for each in paginated_data.object_list:
             if not each.object.is_removed:
                 topic.append(each.object)
