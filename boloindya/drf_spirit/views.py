@@ -5333,7 +5333,7 @@ def get_hash_discover_topics(request):
 def get_m3u8_of_ids(request):
     try:
         ids = request.GET.get('ids',None)
-        topics=Topic.objects.filter(pk__in=ids.split(','))
+        topics=Topic.objects.filter(pk__in=ids.split(','), question_video__isnull=False)
         return JsonResponse({'message': 'success', 'results':TopicsWithOnlyContent(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
