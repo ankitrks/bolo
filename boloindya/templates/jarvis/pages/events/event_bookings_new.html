@@ -103,7 +103,7 @@ ul li {
     $(document).ready( function () {
         var eventBookingTable = $('#event_bookings_table').DataTable({
           'processing': true,
-          'serverSide': true,
+          'serverSide': false,
           'lengthMenu': [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]],
           "pagingType": "full_numbers",
           'ajax': {
