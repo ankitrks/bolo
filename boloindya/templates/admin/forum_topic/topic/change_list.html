@@ -226,6 +226,15 @@
                 }
                 return diff;
             }
+
+            let breakColumnText = function(columnElement){
+                let columnHtml = ''
+                columnElement.text().split(' ').forEach(function(item, i){
+                    columnHtml += '<div>' + item + '</div>'
+                })
+                columnElement.html(columnHtml)
+            }
+
             $(document).ready(function() {
                 grappelli.initSearchbar();
                 grappelli.initFilter();
@@ -239,6 +248,12 @@
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
                 });
+
+                breakColumnText(jQuery('.column-likes_count a'))
+                breakColumnText(jQuery('.column-topic_share_count a'))
+                breakColumnText(jQuery('.column-is_boosted a'))
+                breakColumnText(jQuery('.column-boosted_till a'))
+
 
                 jQuery('.column-is_moderated').append('<input type="checkbox" class = "select_all" field=".field-is_moderated">')
                 jQuery('.column-is_removed').append('<input type="checkbox" class = "select_all" field=".field-is_removed">')
