@@ -69,10 +69,32 @@ class AggregateTopUsers:
         for temp_table in self.temp_tables:
             cr.execute(temp_table.get('create_query'))
 
-        for month in month_year_iter(1, 2020, 10, 2020):
+        today = datetime.now()
+        last_month = today.month - 1
+        last_year = today.year
+
+        print "last month", last_month, last_year
+
+        if last_month == 0:
+            last_month = 12
+            last_year = today.year - 1
+
+        print "last month", last_month, last_year
+
+        for month in month_year_iter(last_month, last_year, today.month, today.year):
+            print "month", month
             month_date = datetime.strptime(month, "%Y-%m-%d")
 
-            month_start = str(datetime.strptime("%s-%s-01"%(month_date.year, month_date.month-1), "%Y-%m-%d").date())
+            previous_month = month_date.month - 1
+            previous_year = month_date.year
+
+            print "previous month", previous_month, previous_year
+
+            if previous_month == 0:
+                previous_month = 12
+                previous_year = month_date.year - 1
+
+            month_start = str(datetime.strptime("%s-%s-01"%(previous_year, previous_month), "%Y-%m-%d").date())
             month_end = str((datetime.strptime("%s-%s-01"%(month_date.year, month_date.month), "%Y-%m-%d") - timedelta(days=1)).date())
 
             self.aggregate(cr, month_start, month_end)
