@@ -54,9 +54,17 @@ ul li {
     cursor: pointer;
     border-bottom: 1px solid black;
 }
+table.dataTable.nowrap td{
+  all: revert;
+}
 #response li:hover{
     background: #1989CD;
     color: white;
+}
+.px200 {
+  width: 200px;
+  max-width: 200px;
+  word-wrap: break-word;
 }
 </style>
 {% endblock styles %}
@@ -101,7 +109,8 @@ ul li {
 <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.print.min.js"></script>
 <script>
     $(document).ready( function () {
-        var eventBookingTable = $('#event_bookings_table').DataTable({
+        var eventBookingTable = $('#event_bookings_table').removeAttr('width').DataTable({
+          'fixedColumns': true,
           'processing': true,
           'serverSide': false,
           'lengthMenu': [[10, 15, 25, 50, -1], [10, 15, 25, 50, "All"]],
@@ -138,7 +147,7 @@ ul li {
               {'data': 'id'},
               {'data': 'creator_username', 'name':'creator_username'},
               {'data':'event_title', 'name':'event_title'},
-              {'data':'event_description', 'name':'event_description'},
+              {'data':'event_description', 'name':'event_description', 'className': 'px200'},
               {'data':'state', 'name':'state'},
               {'data':'payment_status', 'name':'payment_status'},
               {'data':'event_slot_start_time', 'name':'event_slot_start_time'},
