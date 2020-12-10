@@ -643,6 +643,12 @@ LOGGING = {
             'class':'logging.FileHandler',
             'filename': LOG_DIRS[0] + 'payment_transaction_info.log',
             'formatter':'verbose',
+        },
+        'script': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIRS[0] + 'scripts.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -668,6 +674,11 @@ LOGGING = {
         },
         'transaction_log': {
             'handlers': ['payment_transaction'],
+            'level': 'INFO',
+            'propagate': True
+        },
+        'script': {
+            'handlers': ['script'],
             'level': 'INFO',
             'propagate': True
         }

@@ -186,5 +186,6 @@ urlpatterns = [
     url(r'^test_api_response_time/$', test_api_response_time),
     url(r'^get_user_notification_count/', GetUserNotificationCount.as_view()),
     url(r'^upload_thumbnail/', UploadVideoThumbnail.as_view()),
-    url(r'^send_push_notification/', send_push_notification)
+    url(r'^send_push_notification/', send_push_notification),
+    url(r'^music/(?P<music_id>\d+)/videos/$', MusicVideoAPIView.as_view()),
 ]

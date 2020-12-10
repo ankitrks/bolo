@@ -38,7 +38,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -1867,7 +1867,6 @@ def createTopic(request):
     selected_lang   = request.POST.get('selected_language', '')
     location_array  = request.POST.get('location_array', None)
 
-
     if title:
         topic.title          = (title[0].upper()+title[1:]).strip()
     if request.POST.get('question_audio'):
@@ -1887,7 +1886,7 @@ def createTopic(request):
         if already_exist_topic:
             topic_json = TopicSerializerwithComment(already_exist_topic[0], context={'last_updated': timestamp_to_datetime(request.GET.get('last_updated',None)),'is_expand': request.GET.get('is_expand',True)}).data
             return JsonResponse({'message': 'Video Byte Created','topic':topic_json}, status=status.HTTP_201_CREATED)
-    
+
     try:
         if selected_lang:
             topic.language_id   = selected_lang
@@ -1903,6 +1902,12 @@ def createTopic(request):
             topic.vb_height = vb_height
             view_count = random.randint(1,5)
             topic.view_count = view_count
+            
+
+            if request.POST.get('music_id'):
+                topic.music_id = request.POST.get('music_id')
+                topic.is_audio_extracted = True
+
             topic.save()
             try:
                 provide_view_count(view_count,topic)
@@ -4592,15 +4597,17 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
                     p.country_code as user__userprofile__country_code, 
                     p.is_insight_fix as user__userprofile__is_insight_fix, 
                     p.user_id as user__userprofile__user, array_agg(distinct uc.category_id) as user__userprofile__sub_category,
-                    'video_byte' as type
+                    'video_byte' as type, music.id as music__id, music.title as music__title, music.author_name as music__author_name,
+                    music.image_path as music__image_path, music.s3_file_path as music__s3_file_path
             FROM forum_topic_topic t
                 LEFT JOIN forum_topic_topic_m2mcategory c on c.topic_id = t.id
                 LEFT JOIN forum_topic_topic_hash_tags h on h.topic_id = t.id
                 LEFT JOIN auth_user u on u.id = t.user_id
                 LEFT JOIN forum_user_userprofile p on p.user_id = t.user_id
                 LEFT JOIN forum_user_userprofile_sub_category uc on uc.userprofile_id = p.id
+                LEFT JOIN drf_spirit_musicalbum music on music.id = t.music_id
             WHERE t.id in %s
-            GROUP BY t.id, u.id, p.id
+            GROUP BY t.id, u.id, p.id, music.id
             ORDER BY t.vb_score DESC, t.id DESC
         """
 
@@ -4769,9 +4776,17 @@ class PopularVideoBytesV2(PopularVideoBytes):
         language_id = request.GET.get('language_id', 1)
         page_number = int(request.GET.get('page',1))
 
+        if page_number == 1:
+            stick_posts = list(Topic.objects.filter(is_sticky=True).values_list('id', flat=True))
+        else:
+            stick_posts = []
+
+        print "sticky posts", Topic.objects.filter(is_sticky=True).values_list('id', flat=True)
+
+
         ad_list = get_ad_to_display(request.user.id, request.GET, request.user.st.language)
         ad_infused_popular_posts = self.infuse_ads(ad_list, get_video_bytes_and_its_related_data(
-                                        self.get_tranding_topic_data(request.user.id, language_id, page_number),
+                                        self.get_tranding_topic_data(request.user.id, language_id, page_number) + stick_posts,
                                         request.GET.get('last_updated', None)
                                     ))
 
@@ -5682,3 +5697,16 @@ def get_follow_post_load_test(request):
     force_authenticate(request, user=user)
     return follow_post_view(request)
 
+
+class MusicVideoAPIView(ListAPIView):
+    serializer_class = TopicSerializerwithComment
+
+    def get_queryset(self):
+        return Topic.objects.filter(music_id=self.request.parser_context.get('kwargs', {}).get('music_id'))
+
+
+    def get_serializer_context(self):
+        context = super(MusicVideoAPIView, self).get_serializer_context()
+        context['is_expand'] = True
+        context['last_updated'] = False
+        return context
