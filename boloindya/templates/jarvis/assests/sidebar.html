@@ -90,6 +90,7 @@
         {% endif %}
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/management/user/'%}active{% endif %}"><a href="/jarvis/management/user/"><i class="fa fa-users"></i> <span>User Management</span></a></li>
+        <li class="{% if request.path in '/jarvis/top-users'%}active{% endif %}"><a href="/jarvis/top-users"><i class="fa fa-money"></i> <span>Top Users</span></a></li>
         {% endif %}
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/referral/'%}active{% endif %}"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i> <span>Referrals</span></a></li>
