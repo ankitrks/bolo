@@ -228,7 +228,7 @@ class UserListAPIView(ListAPIView):
     def get_queryset(self):
         q = self.request.query_params.get('term')
 
-        return self.queryset[:10] #.filter(username__istartswith=q)
+        return self.queryset.filter(username__istartswith=q)[:10]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
