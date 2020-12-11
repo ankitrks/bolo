@@ -61,7 +61,7 @@ class Beneficiary(models.Model):
     def verify(self):
         if self.payment_method == 'account_transfer':
             self.verification_txn_id = generate_order_id()
-            response = verify_beneficiary(self.verification_txn_id, beneficiaryAccount, beneficiaryIFSC)
+            response = verify_beneficiary(self.verification_txn_id, self.account_number, self.bank_ifsc)
 
             if response.get('status') in ('SUCCESS', 'ACCEPTED'):
                 self.verification_status = 'verified'
