@@ -114,7 +114,7 @@
                                     </tr>
                                     <tr>
                                         <td>Active</td>
-                                        <td><a id="is_active">{{ object.is_active }}<i class="fa fa-edit" style="margin-left: 3px"></i></a></td>
+                                        <td><a id="is_active"><span>{% if object.is_active %}Yes{% else %}No{% endif %}</span><i class="fa fa-edit" style="margin-left: 3px"></i></a></td>
                                     </tr>
                                     <tr>
                                         <td>Verification Status</td>
@@ -198,11 +198,22 @@
                 type: 'select', 
                 source: [{
                         value: true,
-                        text: 'True'
+                        text: 'Yes'
                     },{
                         value: false,
-                        text: 'False'
-                }]
+                        text: 'No'
+                }],
+                success: function(response, newValue){
+                    console.log(response, newValue)
+                    if(newValue == "true"){
+                        console.log('true', $('#is_active span'))
+                        $('#is_active span').html('Yes')
+                    }
+                    else{
+                        console.log('false', $('#is_active span'))
+                        $('#is_active span').html('No')
+                    }
+                }
             });
 
         });
@@ -277,16 +288,16 @@
     pageLoading: true,
     autoload: true,
     fields: [
-        { title: "ID", name: "id", type: "number", visible:false },
-        { title: "Created At", name: "created_at", type: "text", width: 90, editing: false },
-        { title: "Amount", name: "amount", type: "number", width: 50 },
-        { title: "Payment Day", name: "payment_date", type: "select", width: 50, 
+        { title: "ID", name: "id", type: "number", visible:false, align: 'center' },
+        { title: "Created At", name: "created_at", type: "text", width: 90, editing: false, align: 'center' },
+        { title: "Amount", name: "amount", type: "number", width: 50, align: 'center' },
+        { title: "Payment Day", name: "payment_date", type: "select", width: 50, align: 'center', 
             items: days_choices,
             valueField: "value",             // name of property of item to be used as value
             textField: "text", 
         },
-        { title: "Created By", name: "created_by_name", type: "text", width: 50 },
-        { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22 },
+        { title: "Created By", name: "created_by_name", type: "text", width: 50, align: 'center' },
+        { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22, align: 'center' },
         { type: "control" }
     ],
     controller: {
@@ -372,12 +383,12 @@
         pageLoading: true,
         autoload: true,
         fields: [
-            { title: "Amount", name: "amount", type: "number", width: 20 },
-            { title: "State", name: "state", type: "text", width: 30 },
-            { title: "PG State", name: "pg_state", type: "text", width: 40 },
-            { title: "Transaction ID", name: "transaction_id", type: "text", width: 40 },
-            { title: "Transaction Date", name: "transaction_date", type: "text", width: 50 },
-            { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
+            { title: "Transaction ID", name: "transaction_id", type: "text", width: 40, align: 'center' },
+            { title: "Transaction Date", name: "transaction_date", type: "text", width: 50, align: 'center'  },
+            { title: "Amount", name: "amount", type: "number", width: 20, align: 'center'  },
+            { title: "State", name: "pg_state", type: "text", width: 40, align: 'center' },
+            // { title: "State", name: "state", type: "text", width: 30, align: 'center'  },
+            // { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
         ],
         controller: {
             loadData: function(filter) {

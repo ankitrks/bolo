@@ -89,7 +89,20 @@ $("#beneficiaryTable").jsGrid({
         { title: "UPI", name: "upi", type: "text", width: 50, editing: false },
         { title: "Account Number", name: "account_number", type: "number", width: 50, editing: false},
         { title: "Bank IFSC", name: "bank_ifsc", type: "text", width: 50, editing: false },
-        { title: "Verification Status", name: "verification_status", type: "text", width: 50, editing: false },
+        { title: "Verification Status", name: "verification_status", type: "select", width: 50, editing: false,
+            items: [{
+                        text: 'Cooling Off', 
+                        value:'pending'
+                    },{
+                        text: 'Verified', 
+                        value:'verified'
+                    },{
+                        text: 'Failed',
+                        value:'failed'
+                    }],
+            valueField: "value",             // name of property of item to be used as value
+            textField: "text", 
+        },
         { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22 },
         { type: "control" }
     ],
@@ -164,6 +177,14 @@ $('#search-btn').click(function(){
                       'success'
                     )
                     $("#beneficiaryTable").data("JSGrid").reset();
+
+                    $('[name=name]').val('')
+                    $('[name=upi]').val('')
+                    $('[name=account_number]').val('')
+                    $('[name=confirm_account_number]').val('')
+                    $('[name=bank_ifsc]').val('')
+                    $('[name=paytm_number]').val('')
+                    $('[name=payment_method]').val('paytm_wallet').trigger('change')
                 },
                 error: function(error){
                     console.log(error)
@@ -229,5 +250,41 @@ $(document).ready(function(){
         })
     })
 });
+</script>
+
+<script>
+
+    $(document).ready(function(){
+        $('[name=upi]').parents('.form-group').hide()
+        $('[name=account_number]').parents('.form-group').hide()
+        $('[name=confirm_account_number]').parents('.form-group').hide()
+        $('[name=bank_ifsc]').parents('.form-group').hide()
+
+        $('[name=payment_method]').change(function(){
+            switch($(this).val()){
+                case "paytm_wallet":
+                    $('[name=upi]').parents('.form-group').hide()
+                    $('[name=account_number]').parents('.form-group').hide()
+                    $('[name=confirm_account_number]').parents('.form-group').hide()
+                    $('[name=bank_ifsc]').parents('.form-group').hide()
+                    $('[name=paytm_number]').parents('.form-group').show()
+                    break;
+                case "upi":
+                    $('[name=upi]').parents('.form-group').show()
+                    $('[name=account_number]').parents('.form-group').hide()
+                    $('[name=confirm_account_number]').parents('.form-group').hide()
+                    $('[name=bank_ifsc]').parents('.form-group').hide()
+                    $('[name=paytm_number]').parents('.form-group').hide()
+                    break;
+                case "account_transfer":
+                    $('[name=upi]').parents('.form-group').hide()
+                    $('[name=account_number]').parents('.form-group').show()
+                    $('[name=confirm_account_number]').parents('.form-group').show()
+                    $('[name=bank_ifsc]').parents('.form-group').show()
+                    $('[name=paytm_number]').parents('.form-group').hide()
+                    break;
+            }
+        })
+    })
 </script>
 {% endblock local_js %}

@@ -128,7 +128,7 @@ class AggregateTopUsers:
 
         cr.execute("""
             INSERT INTO temp_top_user_playtime(user_id, playtime)  
-                SELECT t.user_id AS user_id, sum(p.playtime) as playtime
+                SELECT t.user_id AS user_id, sum(p.playtime)/3600 as playtime
                 FROM forum_user_videoplaytime p
                 INNER JOIN forum_topic_topic t on p.video_id = t.id
                 WHERE p."timestamp" BETWEEN %s AND %s AND NOT t.is_removed

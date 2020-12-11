@@ -10,6 +10,7 @@ from django.db import connections
 from django.db.models import Q
 from django.views.generic import FormView
 from django.conf import settings
+from django.db.models.functions import Lower
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
@@ -84,10 +85,21 @@ class BeneficiaryViewSet(ModelViewSet):
 
     def get_queryset(self):
         q = self.request.query_params.get('q')
+        sort_field = self.request.query_params.get('sortField')
+        sort_order = self.request.query_params.get('sortOrder')
+
         if q:
             self.queryset = self.queryset.filter(Q(name__icontains=q) | Q(paytm_number=q) | Q(upi=q) | Q(account_number=q))
 
-        return self.queryset
+        order_by = []
+
+        if sort_field == 'verification_status':
+            order = '-' if sort_order == 'desc' else ''
+            order_by.append(order + 'verification_status')
+
+        order_by.append(Lower('name'))
+
+        return self.queryset.order_by(*order_by)
 
 class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
     template_name = "payment/partner/beneficiary/beneficiary_details.html" 
@@ -199,7 +211,7 @@ class OptVerificationView(FormView):
         otp = self.request.POST.get('otp')
         stored_otp = get_redis('payment:user:%s:otp'%self.request.user.id)
         if stored_otp and stored_otp.encode('UTF-8') == otp:
-            set_redis(settings.PAYMENT_SESSION_KEY%(self.request.user.id), True, True, settings.PAYMENT_SESSION_EXPIRE_TIME)
+            set_redis(settings.PAYMENT_SESSION_KEY%(self.request.user.id), True, True)
             log_message("OTP succesfully verified for user %s"%self.request.user)
             return super(OptVerificationView, self).form_valid(form)
 
