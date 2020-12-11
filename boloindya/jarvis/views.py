@@ -3727,7 +3727,7 @@ class TopUserListView(ListAPIView):
         query_params = self.request.query_params
         queryset = self.queryset
 
-        sort_field = '-video_count'
+        sort_field = '-like_count'
         
         if query_params.get('sortField'):
             sort_field = query_params.get('sortField')

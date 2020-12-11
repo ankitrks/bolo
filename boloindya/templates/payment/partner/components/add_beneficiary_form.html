@@ -11,13 +11,17 @@
                 <form role="form" id="beneficiaryForm">
                     <div class="card-body">
                         <div class="form-group">
+                            <label>BoloIndya ID</label>
+                            <input type="text" class="form-control" name="boloindya_user">
+                        </div>
+                        <div class="form-group">
                             <label>Name</label>
                             <input type="text" class="form-control" name="name">
                         </div>
                         <div class="form-group">
                             <label>Payment Method</label>
                             <select class="form-control" name="payment_method">
-                                <option value="paytm_wallet">Paytm Wallet</option>
+                                <option value="paytm_wallet" selected>Paytm Wallet</option>
                                 <option value="upi">UPI</option>
                                 <option value="account_transfer">Account Transfer</option>
                             </select>
@@ -26,7 +30,7 @@
                             <label>Beneficiary Type</label>
                             <select class="form-control" name="beneficiary_type">
                                 <option value="emp_salary">Employee Salary</option>
-                                <option value="creator_payout">Creator Payout</option>
+                                <option value="creator_payout" selected>Creator Payout</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -39,10 +43,14 @@
                         </div>
                         <div class="form-group">
                             <label>Account Number</label>
-                            <input type="text" class="form-control" name="account_number">
+                            <input type="password" class="form-control" name="account_number">
                         </div>
                         <div class="form-group">
-                            <label>Bank IFCS</label>
+                            <label>Confirm Account Number</label>
+                            <input type="text" class="form-control" name="confirm_account_number">
+                        </div>
+                        <div class="form-group">
+                            <label>Bank IFSC code</label>
                             <input type="text" class="form-control" name="bank_ifsc">
                         </div>
                     </div>

@@ -37,6 +37,7 @@ BENEFICIARY_TYPE_CHOICES = (
 class Beneficiary(models.Model):
     name = models.CharField(_("Name"), max_length=100)
     boloindya_id = models.IntegerField(_("BoloIndya ID"), blank=True, null=True)
+    boloindya_user = models.ForeignKey('auth.User', blank=True, null=True)
     payment_method = models.CharField(_("Payment Method"), choices=PAYMENT_METHOD_CHOICES, max_length=20)
     paytm_number = models.CharField(_("Paytm Number"), max_length=20, blank=True, null=True)
     upi = models.CharField(_("UPI"), max_length=50, null=True, blank=True)
@@ -45,6 +46,7 @@ class Beneficiary(models.Model):
     verification_status = models.CharField(_("Bank IFSC"), max_length=30, 
                                 choices=VERIFICATION_STATUS_CHOICES, default='pending')
     is_active = models.BooleanField(_("Is active"), default=True)
+    is_deleted = models.BooleanField(_("Is deleted"), default=False)
     verification_txn_id = models.CharField(_("Verification TXN ID"), max_length=30, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_beneficiary')
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True, auto_now=False)
@@ -128,5 +130,5 @@ class TopUser(models.Model):
     follower_count = models.IntegerField(_("Follower Count"), default=0)
     playtime = models.FloatField(_("Playtime Count"), default=0)
     view_count = models.IntegerField(_("View Count"), default=0)
-
+    like_count = models.IntegerField(_("Like Count"), default=0)
 
