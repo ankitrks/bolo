@@ -46,6 +46,7 @@ class Beneficiary(models.Model):
     verification_status = models.CharField(_("Bank IFSC"), max_length=30, 
                                 choices=VERIFICATION_STATUS_CHOICES, default='pending')
     is_active = models.BooleanField(_("Is active"), default=True)
+    is_deleted = models.BooleanField(_("Is deleted"), default=False)
     verification_txn_id = models.CharField(_("Verification TXN ID"), max_length=30, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_beneficiary')
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True, auto_now=False)

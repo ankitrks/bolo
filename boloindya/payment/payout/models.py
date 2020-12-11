@@ -1,10 +1,13 @@
 import jsonfield
+import json
 
 from simple_history.models import HistoricalRecords
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
+from payment.paytm_api import check_transaction_status
 
 
 PAYMENT_STATE_CHOICES = (
@@ -30,6 +33,7 @@ class ScheduledPayment(models.Model):
     payment_date = models.IntegerField(_("Payment Day"))
     modified_at = models.DateTimeField(_("Modified at"), null=True, blank=True)
     is_active = models.BooleanField(_("Is Active"), default=True)
+    is_deleted = models.BooleanField(_("Is deleted"), default=False)
     added_for_payment = models.BooleanField(_("Added for Payment"), default=False)
     history = HistoricalRecords()
 
@@ -48,6 +52,21 @@ class Transaction(models.Model):
         self.state = 'success'
         self.save()
 
+    def check_status(self):
+        response = check_transaction_status(self.transaction_id)
+
+        print "response", response
+
+        if response.get('status') == 'SUCCESS':
+            self.state = 'success'
+            self.pg_state = 'SUCCESS'
+
+        elif response.get('status') == 'FAILURE':
+            self.state = 'failed'
+            self.pg_state = 'FAILURE'
+
+        self.payment_gateway_response = json.dumps(response)
+        self.save()
 
 
 class TransactionState(models.Model):

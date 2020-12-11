@@ -98,3 +98,11 @@ def upi_transfer(orderId, upiId, amount):
 
 
 
+def check_transaction_status(transaction_id):
+    paytmParams = {
+        "orderId": transaction_id,
+    }
+    post_data = json.dumps(paytmParams)
+
+    return paytm_api_request('/payout-link/fetch', post_data,
+                        PaytmChecksum.generateSignature(post_data, MERCHANT_KEY))

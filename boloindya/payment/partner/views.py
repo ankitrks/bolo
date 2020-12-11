@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.views.generic import FormView
 from django.conf import settings
 from django.db.models.functions import Lower
+from django.contrib.auth.models import User
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView
@@ -26,7 +27,7 @@ from drf_spirit.views import generateOTP, send_sms
 from payment.utils import PageNumberPaginationRemastered, log_message
 from payment.permission import UserPaymentPermissionView, PaymentPermission
 from payment.partner.models import Beneficiary, TopUser
-from payment.partner.serializers import BeneficiarySerializer
+from payment.partner.serializers import BeneficiarySerializer, UserSerializer
 from payment.partner.forms import OTPForm
 
 
@@ -36,7 +37,7 @@ class BeneficiaryTemplateView(UserPaymentPermissionView, TemplateView):
 
 
 class BeneficiaryViewSet(ModelViewSet):
-    queryset = Beneficiary.objects.all()
+    queryset = Beneficiary.objects.filter(is_deleted=False)
     serializer_class = BeneficiarySerializer
     pagination_class = PageNumberPaginationRemastered
     permission_classes = (IsAuthenticated, PaymentPermission)
@@ -100,6 +101,10 @@ class BeneficiaryViewSet(ModelViewSet):
         order_by.append(Lower('name'))
 
         return self.queryset.order_by(*order_by)
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
 
 class BeneficiaryDetailTemplateView(UserPaymentPermissionView, DetailView):
     template_name = "payment/partner/beneficiary/beneficiary_details.html" 
@@ -215,3 +220,25 @@ class OptVerificationView(FormView):
             log_message("OTP succesfully verified for user %s"%self.request.user)
             return super(OptVerificationView, self).form_valid(form)
 
+
+class UserListAPIView(ListAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.filter(is_active=True)
+
+    def get_queryset(self):
+        q = self.request.query_params.get('term')
+
+        return self.queryset[:10] #.filter(username__istartswith=q)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            print 'data', list(serializer.data)
+            return Response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        print 'here ;;;;;;' 
+        return Response(serializer.data)

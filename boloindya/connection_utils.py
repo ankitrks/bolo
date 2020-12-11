@@ -42,8 +42,8 @@ class ConnectionHolder:
 
     def _get_redis(self):
         if not self._redis:
-            # self._redis = RedisCluster(startup_nodes=self.startup_nodes, decode_responses=True, skip_full_coverage_check=True)
-            self._redis = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+            self._redis = RedisCluster(startup_nodes=self.startup_nodes, decode_responses=True, skip_full_coverage_check=True)
+            # self._redis = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
         return self._redis
 
     def redis(self):
@@ -51,8 +51,8 @@ class ConnectionHolder:
 
     def _get_redis_read_only(self):
         if not self._redis_read_only:
-            # self._redis_read_only = RedisCluster(startup_nodes=self.startup_nodes, decode_responses=True, skip_full_coverage_check=True, readonly_mode=True)
-            self._redis_read_only = redis.StrictRedis(host=settings.REDIS_RO_HOST, port=settings.REDIS_RO_PORT, db=settings.REDIS_RO_DB)
+            self._redis_read_only = RedisCluster(startup_nodes=self.startup_nodes, decode_responses=True, skip_full_coverage_check=True, readonly_mode=True)
+            # self._redis_read_only = redis.StrictRedis(host=settings.REDIS_RO_HOST, port=settings.REDIS_RO_PORT, db=settings.REDIS_RO_DB)
         return self._redis_read_only
 
     def redis_read_only(self):

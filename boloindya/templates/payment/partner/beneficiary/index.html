@@ -2,6 +2,14 @@
 
 {% load static %}
 
+{% block local_css %}
+<style>
+    .ui-front {
+        z-index: 99999 !important;
+    }
+</style>
+{% endblock local_css %}
+
 {% block center_content %}
 
 
@@ -70,7 +78,7 @@ $("#beneficiaryTable").jsGrid({
     fields: [
         { title: "ID", name: "id", type: "number", visible:false },
         { title: "Name", name: "beneficiary_link", type: "text", width: 60, editing: false,},
-        { title: "BI ID", name: "boloindya_id", type: "number", width: 50 },
+        { title: "BI ID", name: "boloindya_user", type: "number", width: 50, editing: false, },
         { title: "Payment Method", name: "payment_method", type: "select", width: 50, editing: false,
             items: [{
                         text: 'Paytm Wallet', 
@@ -156,13 +164,36 @@ let grid = $("#beneficiaryTable").data("JSGrid");
 $('#search-btn').click(function(){
     grid.reset()
 });
+
+$('[name=q]').keyup(function(){
+    if($(this).val().length < 3)
+        return
+
+    grid.reset()
+});
+
+
 </script>
 <script  type="text/javascript">
     $(document).ready(function(){
         $('#save_beneficiary').on('click', function(){
             let data = $('#beneficiaryForm').serializeArray()
+
             let formData = {}
             $.each(data, (i, item) => {formData[item.name] = item.value})
+
+            console.log('form data', formData)
+
+            if(formData['account_number'] != formData['confirm_account_number']){
+                Swal.fire({
+                        title: 'Error!',
+                        text: "Account Number do not match",
+                        icon: 'error',
+                        confirmButtonText: 'Close'
+                    })
+                return false
+            }
+
             $.ajax('/api/v1/payment/beneficiary/', {
                 method: 'POST',
                 data: formData,
@@ -285,6 +316,37 @@ $(document).ready(function(){
                     break;
             }
         })
+
+        $('[name=boloindya_user]').keyup(function(){
+            let q = $(this).val();
+
+            // if(q.length < 3)
+            //     return
+
+            // $.ajax('/api/v1/payment/user/?q=' + q, {
+            //     method: 'GET',
+            //     success: function(response){
+            //         console.log(response)
+            //     }
+            // })
+        })
+
+        $('[name=boloindya_user]').autocomplete({
+            source: "/api/v1/payment/user/",
+            minLength: 3,
+            select: function( event, ui ) {
+                console.log(event, ui)
+
+                $('[name=name]').val(ui.item.name)
+                $('[name=boloindya_user]').val(ui.item.id)
+
+            }
+        }).autocomplete("instance")._renderItem = function( ul, item ) {
+            console.log('result', ul, item)
+            return $( "<li>" )
+                .append( "<div>" + item.name + "-" + item.id + "</div>" )
+                .appendTo( ul );
+        };
     })
 </script>
 {% endblock local_js %}

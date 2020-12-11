@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
@@ -19,14 +20,24 @@ class BeneficiarySerializer(serializers.ModelSerializer):
         return '<a href="'+reverse('payment:beneficiary-view', kwargs={'pk': instance.id})+'">' + instance.name + '</a>'
 
     def validate(self, data):
-        print "self", self.partial
+        print "self", data
         if self.partial:
             return data 
 
-        if data.get('payment_method') == 'account_transfer' and (not data.get('bank_ifsc') or not data.get('bank_ifsc')):
-            raise serializers.ValidationError("Bank IFSC is also required")
+        if data.get('payment_method') == 'account_transfer':
+            if not data.get('bank_ifsc'):
+                raise serializers.ValidationError("Bank IFSC code is also required")
 
-            response = verify_beneficiary(generate_order_id(), data.get('bank_ifsc'), data.get('bank_ifsc'))
+            if not data.get('account_number'):
+                raise serializers.ValidationError("Account Number is required")
+
+            print "here"
+
+            # if data.get('account_number') != data.get('confirm_account_number'):
+            #     raise serializers.ValidationError("Account number do not match")
+
+            response = verify_beneficiary(generate_order_id(), data.get('account_number'), data.get('bank_ifsc'))
+            print "response", response
 
             if not response.get('status') in ['SUCCESS', 'ACCEPTED']:
                 raise serializers.ValidationError("Bank Account detail not correct!!")
@@ -41,3 +52,14 @@ class TopUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = TopUser
         fields = '__all__'
+
+class UserSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    value = serializers.IntegerField(source='id')
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'name', 'value')
+
+    def get_name(self, instance):
+        return instance.st.name
