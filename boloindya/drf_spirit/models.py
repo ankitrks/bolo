@@ -499,6 +499,21 @@ class MusicAlbum(models.Model):
         ordering = ['order_no']
 
 
+class MusicReport(models.Model):
+    text = models.CharField(_("Text"), max_length=200)
+    is_active = models.BooleanField(_("Is Active"), default=True)
+
+    def __unicode__(self):
+        return self.text
+
+
+class UserMusicReport(models.Model):
+    created_at = models.DateTimeField(_("Created At"), auto_now_add=True, auto_now=False)
+    reporter = models.ForeignKey('auth.User', related_name='music_reports')
+    music = models.ForeignKey('drf_spirit.MusicAlbum', related_name='reports') 
+    report = models.ForeignKey('drf_spirit.MusicReport', related_name='reports')
+
+
 class SystemParameter(models.Model):
     name = models.CharField(max_length=200)
     value = models.TextField()
@@ -521,3 +536,4 @@ class DatabaseRecordCount(models.Model):
     @staticmethod
     def get_value(name):
         return DatabaseRecordCount.objects.get(name=name).count
+
