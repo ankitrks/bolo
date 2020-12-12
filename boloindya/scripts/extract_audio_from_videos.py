@@ -15,6 +15,7 @@ logger = logging.getLogger('script')
 from django.conf import settings
 from forum.topic.models import Topic
 from drf_spirit.models import MusicAlbum
+from tasks import strip_tags
 
 BUCKET = 'testread'
 s3_client = boto3.client('s3', aws_access_key_id=settings.BOLOINDYA_AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.BOLOINDYA_AWS_SECRET_ACCESS_KEY)
@@ -45,7 +46,7 @@ def run_command(video):
         music = MusicAlbum.objects.create(**{
             'image_path': video.get('thumbnail'),
             'order_no': 15,
-            'title': video.get('title'),
+            'title': strip_tags(video.get('title')),
             'language_id': video.get('language_id'),
             'author_name': video.get('user__st__name', video.get('user__username')),
             's3_file_path': s3_url,
