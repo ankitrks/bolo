@@ -21,8 +21,8 @@ s3_client = boto3.client('s3')
 
 def run_command(video):
     try:
-        # if not video.get('question_video') or video.get('music_id'):
-        #     return
+        if not video.get('question_video') or video.get('music_id'):
+            return
 
         
         video_file = video.get('question_video').split("/")[-1]
@@ -31,16 +31,16 @@ def run_command(video):
         audio_file_path = '/tmp/audio/%s'%(audio_file)
         s3_file_location = 'from_upload_panel/audio/' + audio_file
         
-        print "audio_file", audio_file
+        # print "audio_file", audio_file
 
-        print 'wget "%s" -O %s'%(video.get('question_video'), video_file_path)
+        # print 'wget "%s" -O %s'%(video.get('question_video'), video_file_path)
         os.system('wget "%s" -O %s'%(video.get('question_video'), video_file_path))
-        print 'ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path)
+        # print 'ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path)
         os.system('ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path))
 
         response = s3_client.upload_file(audio_file_path, BUCKET, s3_file_location, ExtraArgs={'ACL': 'public-read'})
         
-        print "s3 file location", s3_file_location
+        # print "s3 file location", s3_file_location
         s3_url = "https://%s.s3.amazonaws.com/%s"%(BUCKET, s3_file_location)
         music = MusicAlbum.objects.create(**{
             'image_path': video.get('thumbnail'),
@@ -72,7 +72,5 @@ def process_video_in_parallel(video_list):
 
 def run(*args):
     os.system("mkdir /tmp/audio")
-    # process_video_in_parallel(Topic.objects.filter(is_audio_extracted=False).values('id', 'question_video', 'title', 'language_id', 'user__username',\
-    #                             'user__st__name', 'thumbnail', 'music_id'))
-    process_video_in_parallel(Topic.objects.filter(id__in=[12]).values('id', 'question_video', 'title', 'language_id', 'user__username',\
-                                 'user__st__name', 'thumbnail', 'music_id'))
+    process_video_in_parallel(Topic.objects.filter(is_audio_extracted=False).values('id', 'question_video', 'title', 'language_id', 'user__username',\
+                                'user__st__name', 'thumbnail', 'music_id'))
