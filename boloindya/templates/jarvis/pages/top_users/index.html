@@ -5,6 +5,28 @@
 {% block styles %}
     <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid.min.css" %}' />
     <link type="text/css" rel="stylesheet" href='{% static "AdminLTE/plugins/jsgrid/jsgrid-theme.min.css" %}' />
+
+    <style>
+        .jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
+        
+
+    </style>
 {% endblock styles %}
 
 {% block content %}
@@ -92,14 +114,16 @@ $("#topUserTable").jsGrid({
     inserting: false,
     editing: false,
     sorting: true,
+    // sortcolumn: 'like_count',
+    // sortdirection: 'desc',
     paging: true,
     pageLoading: true,
     autoload: true,
     fields: [
-        { title: "", name: "id", type: "html", width: 10, align: 'center' },
-        { title: "Month", name: "agg_month", type: "text", width: 80, align: 'center' },
-        { title: "Name", name: "name", type: "text", width: 120, align: 'center' },
-        { title: "BI ID", name: "boloindya_id", type: "number", width: 50, align: 'center' },
+        { title: "", name: "id", type: "html", width: 10, align: 'center', sorting: false },
+        { title: "Month", name: "agg_month", type: "text", width: 80, align: 'center', sorting: false },
+        { title: "Name", name: "name", type: "text", width: 120, align: 'center', sorting: false },
+        { title: "BI ID", name: "boloindya_id", type: "number", width: 50, align: 'center', sorting: false },
         { title: "Video", name: "video_count", type: "number", width: 50, align: 'center' },
         { title: "Like", name: "like_count", type: "number", width: 50, align: 'center' },
         { title: "Playtime", name: "playtime", type: "number", width: 50, align: 'center' },

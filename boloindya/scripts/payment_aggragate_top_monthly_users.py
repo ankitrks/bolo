@@ -165,11 +165,11 @@ class AggregateTopUsers:
 
         print("Temp table filled")
 
-        print("Deleting old entries for month", month_start)
-        cr.execute("""
-            DELETE partner_topuser
-            WHERE agg_month = %s
-        """, [month_start + ' 00:00:00'])
+        # print("Deleting old entries for month", month_start)
+        # cr.execute("""
+        #     DELETE partner_topuser
+        #     WHERE agg_month = %s
+        # """, [month_start + ' 00:00:00'])
         
         cr.execute("""
             INSERT INTO partner_topuser(agg_month, boloindya_id, name, username, video_count, follower_count, playtime, view_count, like_count)

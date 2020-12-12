@@ -7,6 +7,24 @@
     .ui-front {
         z-index: 99999 !important;
     }
+
+    .jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
 </style>
 {% endblock local_css %}
 
@@ -76,10 +94,10 @@ $("#beneficiaryTable").jsGrid({
     autoload: true,
     pageSize: 15,
     fields: [
-        { title: "ID", name: "id", type: "number", visible:false },
-        { title: "Name", name: "beneficiary_link", type: "text", width: 60, editing: false,},
-        { title: "BI ID", name: "boloindya_user", type: "number", width: 50, editing: false, },
-        { title: "Payment Method", name: "payment_method", type: "select", width: 50, editing: false,
+        { title: "ID", name: "id", type: "number", visible:false, sorting: false },
+        { title: "Name", name: "beneficiary_link", type: "text", width: 60, editing: false, sorting: false},
+        { title: "BI ID", name: "boloindya_user", type: "number", width: 50, editing: false, sorting: false },
+        { title: "Payment Method", name: "payment_method", type: "select", width: 50, editing: false, sorting: false,
             items: [{
                         text: 'Paytm Wallet', 
                         value:'paytm_wallet'
@@ -93,10 +111,10 @@ $("#beneficiaryTable").jsGrid({
             valueField: "value",             // name of property of item to be used as value
             textField: "text", 
         },
-        { title: "PayTM Number", name: "paytm_number", type: "text", width: 75, editing: false },
-        { title: "UPI", name: "upi", type: "text", width: 50, editing: false },
-        { title: "Account Number", name: "account_number", type: "number", width: 50, editing: false},
-        { title: "Bank IFSC", name: "bank_ifsc", type: "text", width: 50, editing: false },
+        { title: "PayTM Number", name: "paytm_number", type: "text", width: 75, editing: false, sorting: false },
+        { title: "UPI", name: "upi", type: "text", width: 50, editing: false, sorting: false },
+        { title: "Account Number", name: "account_number", type: "number", width: 50, editing: false, sorting: false},
+        { title: "Bank IFSC", name: "bank_ifsc", type: "text", width: 50, editing: false, sorting: false },
         { title: "Verification Status", name: "verification_status", type: "select", width: 50, editing: false,
             items: [{
                         text: 'Cooling Off', 
@@ -111,7 +129,7 @@ $("#beneficiaryTable").jsGrid({
             valueField: "value",             // name of property of item to be used as value
             textField: "text", 
         },
-        { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22 },
+        { title: "Active", type: "checkbox", name: "is_active", sorting: false, width:22, sorting: false },
         { type: "control" }
     ],
     controller: {
