@@ -38,7 +38,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -5710,3 +5710,26 @@ class MusicVideoAPIView(ListAPIView):
         context['is_expand'] = True
         context['last_updated'] = False
         return context
+
+class MusicReportListAPIView(ListAPIView):
+    serializer_class = MusicReportSerializer
+    queryset = MusicReport.objects.filter(is_active=True)
+
+from copy import deepcopy
+
+class MusicReportCreateAPIView(CreateAPIView):
+    serializer_class = UserMusicReportSerializer
+    # queryset = UserMusicReport.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = deepcopy(request.data)
+        data['reporter'] = request.user.id
+        data['music'] = request.parser_context.get('kwargs', {}).get('music_id')
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

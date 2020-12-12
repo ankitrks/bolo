@@ -7,7 +7,7 @@ from forum.category.models import Category,CategoryViewCounter
 from forum.comment.models import Comment
 from forum.user.models import UserProfile,AppVersion, ReferralCodeUsed, VideoCompleteRate,Contact
 from .relations import PresentableSlugRelatedField
-from .models import SingUpOTP, Campaign, Winner, MusicAlbum
+from .models import SingUpOTP, Campaign, Winner, MusicAlbum, MusicReport, UserMusicReport
 from .utils import shortnaturaltime,shortcounterprofile,shorcountertopic,get_ranked_topics
 from django.conf import settings
 import re
@@ -41,6 +41,19 @@ class MusicAlbumSerializer(ModelSerializer):
   class Meta:
     model = MusicAlbum
     fields = '__all__'
+
+
+class MusicReportSerializer(ModelSerializer):
+    class Meta:
+        model = MusicReport
+        fields = '__all__'
+
+
+class UserMusicReportSerializer(ModelSerializer):
+    class Meta:
+        model = UserMusicReport
+        fields = ('reporter', 'music', 'report')
+
 
 class TongueTwisterSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
