@@ -99,7 +99,7 @@ class TongueTwisterWithVideoByteSerializer(ModelSerializer):
     total_videos_count = SerializerMethodField()
     total_views = SerializerMethodField()
     topics = SerializerMethodField()
-    music = MusicAlbumSerializer()
+    # music = MusicAlbumSerializer()
 
     class Meta:
         model = TongueTwister
@@ -953,6 +953,7 @@ class CategoryVideoByteSerializer(ModelSerializer):
     whatsapp_share_count = SerializerMethodField()
     other_share_count = SerializerMethodField()
     total_share_count = SerializerMethodField()
+    music = MusicAlbumSerializer()
 
     def __init__(self, *args, **kwargs):
         super(CategoryVideoByteSerializer, self).__init__(*args, **kwargs)
