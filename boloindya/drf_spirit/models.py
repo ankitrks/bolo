@@ -493,6 +493,8 @@ class MusicAlbum(models.Model):
     language_id = models.CharField(_("language"), choices=language_options, blank = True, null = True, max_length=10, default='1')
     order_no = models.PositiveIntegerField(_("order_no"), default = 0)
     last_modified = models.DateTimeField(_("last_modified"),auto_now=True, auto_now_add=False,blank=False, null=False)
+    is_extracted_audio = models.BooleanField(_("Is Extracted Audio"), default=False)
+
     def __unicode__(self):
        return str(self.title)+', '+str(self.author_name)
     class Meta:
