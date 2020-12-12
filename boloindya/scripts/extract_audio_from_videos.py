@@ -52,6 +52,7 @@ def run_command(video):
             'is_extracted_audio': True,
         })
         Topic.objects.filter(id=video.get('id')).update(music_id=music.id, is_audio_extracted=True)
+        os.remove(audio_file_path)
         return True
     except Exception as e:
         logger.info("Error while extracting audio from video: %s"%str(e))
