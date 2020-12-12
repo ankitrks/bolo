@@ -537,7 +537,7 @@ def get_language_specific_audio_list(language_id, page_no):
     audio_list = get_redis(key)
     if not audio_list:
         items_per_page = settings.REST_FRAMEWORK['PAGE_SIZE']
-        query = MusicAlbum.objects.filter(language_id=language_id)
+        query = MusicAlbum.objects.filter(language_id=language_id, is_extracted_audio=False)
         paginator = Paginator(query, items_per_page)
         try:
             music_album = paginator.page(page_no)
