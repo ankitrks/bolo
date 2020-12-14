@@ -345,7 +345,7 @@ class CTA(models.Model):
 
 class AdEventAbstract(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s')
-    ad = models.ForeignKey(Brand, related_name='%(class)s', on_delete=models.CASCADE)
+    ad = models.ForeignKey(Ad, related_name='%(class)s', on_delete=models.CASCADE)
 
     class Meta:
         abstract = True

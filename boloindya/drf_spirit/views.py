@@ -4656,6 +4656,9 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
         item['user__userprofile__own_vb_view_count'] = shorcountertopic(userprofile_counter['view_count'])
         item['user__userprofile__vb_count'] = shortcounterprofile(userprofile_counter['video_count'])
 
+        if not item.get('music', {}).get('id'):
+            item['music'] = None
+
         converted_list.append(convert_to_dict_format(item))
 
     return converted_list
@@ -5711,6 +5714,31 @@ class MusicVideoAPIView(ListAPIView):
         context['is_expand'] = True
         context['last_updated'] = False
         return context
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+class MusicCreateAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
+    authentication_classes = (JWTAuthentication,)
+
+    def post(self, request, *args, **kwargs):
+        print "data", request.data
+        topic = Topic.objects.get(id=request.data.get('topic_id'))
+        music = MusicAlbum.objects.create(**{
+            'image_path': topic.user.st.profile_pic or 'https://boloindyapp-prod.s3.amazonaws.com/public/thumbnail/music-default.png',
+            'order_no': 15,
+            'title': topic.title,
+            'language_id': topic.language_id,
+            'author_name': topic.user.username,
+            's3_file_path': request.data.get('s3_url'),
+            'is_extracted_audio': True,
+        })
+        topic.music_id = music.id
+        topic.is_audio_extracted = True
+        topic.save()
+
+        return Response({"success": True}, status=200)
 
 class MusicReportListAPIView(ListAPIView):
     serializer_class = MusicReportSerializer
