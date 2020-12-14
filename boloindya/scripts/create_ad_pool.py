@@ -47,7 +47,7 @@ def dictfetchall(cursor):
 def run():
     cursor = connections['default'].cursor()
     ad_sequence_dict = {}
-    max_scroll = 20
+    max_scroll = 100
     now = datetime.now()
 
     #Ad.objects.filter(start_time__lte=now, end_time__gte=now)\
