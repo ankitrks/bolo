@@ -4655,6 +4655,9 @@ def get_video_bytes_and_its_related_data(id_list, last_updated=None):
         item['user__userprofile__own_vb_view_count'] = shorcountertopic(userprofile_counter['view_count'])
         item['user__userprofile__vb_count'] = shortcounterprofile(userprofile_counter['video_count'])
 
+        if not item.get('music', {}).get('id'):
+            item['music'] = None
+
         converted_list.append(convert_to_dict_format(item))
 
     return converted_list

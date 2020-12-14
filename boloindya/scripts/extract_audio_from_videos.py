@@ -44,11 +44,11 @@ def run_command(video):
         # print "s3 file location", s3_file_location
         s3_url = "https://%s.s3.amazonaws.com/%s"%(BUCKET, s3_file_location)
         music = MusicAlbum.objects.create(**{
-            'image_path': video.get('thumbnail'),
+            'image_path': video.get('user__st__profile_pic', 'https://boloindyapp-prod.s3.amazonaws.com/public/thumbnail/music-default.png'),
             'order_no': 15,
             'title': strip_tags(video.get('title')),
             'language_id': video.get('language_id'),
-            'author_name': video.get('user__st__name', video.get('user__username')),
+            'author_name': video.get('user__username'),
             's3_file_path': s3_url,
             'is_extracted_audio': True,
         })
@@ -75,4 +75,4 @@ def process_video_in_parallel(video_list):
 def run(*args):
     os.system("mkdir /tmp/audio")
     process_video_in_parallel(Topic.objects.filter(is_audio_extracted=False).values('id', 'question_video', 'title', 'language_id', 'user__username',\
-                                'user__st__name', 'thumbnail', 'music_id'))
+                                'user__st__name', 'user__st__profile_pic', 'music_id'))
