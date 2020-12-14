@@ -6,7 +6,7 @@ from forum.category.models import Category,CategoryViewCounter
 from import_export.admin import ImportExportModelAdmin,ExportMixin
 from import_export import resources
 from rangefilter.filter import DateRangeFilter, DateTimeRangeFilter
-from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics, DatabaseRecordCount
+from .models import UserFollowUnfollowDetails, UserVideoTypeDetails, MusicAlbum, VideoDetails, UserEntryPoint, UserViewedFollowersFollowing, UserInterest, VideoSharedDetails, UserSearch, UserLogStatistics, DatabaseRecordCount, MusicReport, UserMusicReport
 from django.contrib.auth.models import User
 # from django.db.models import Count, Q
 from forum.topic.models import VBseen
@@ -84,7 +84,7 @@ class WeightAdmin(admin.ModelAdmin):
 admin.site.register(Weight, WeightAdmin)
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'date_joined', 'email', 'get_name', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
+    list_display = ('username', 'date_joined', 'email', 'get_name', 'get_mobile_no', 'is_active', 'get_language', 'get_bolo_score', 'get_follow_count', \
         'get_vb_count', 'get_is_popular', 'get_is_superstar', 'get_is_business')
     list_editable = ('is_active', )
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
@@ -132,6 +132,13 @@ class UserAdmin(admin.ModelAdmin):
         return '<img src="/static/admin/img/icon-no.svg" alt="False">'
     get_is_business.short_description = 'Business?'
     get_is_business.allow_tags = True
+
+    def get_mobile_no(self, obj):
+        if obj.st.mobile_no:
+            return obj.st.mobile_no
+
+    get_mobile_no.short_description = 'Mobile'
+    get_mobile_no.allow_tags = True
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -340,5 +347,7 @@ admin.site.register(Contact)
 admin.site.register(Campaign, CampaignAdmin)
 admin.site.register(Winner, WinnerAdmin)
 admin.site.register(DatabaseRecordCount)
+admin.site.register(MusicReport)
+admin.site.register(UserMusicReport)
 
 

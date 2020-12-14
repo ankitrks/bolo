@@ -70,6 +70,7 @@ from booking.models import Event, EventBooking
 from drf_spirit.views import get_tokens_for_user
 from booking.serializers import EventBookingSerializer
 import pandas as pd
+import copy
 
 def get_bucket_details(bucket_name=None):
     bucket_credentials = {}
@@ -2859,6 +2860,12 @@ def add_campaign(request):
         campaign_dict['show_popup_on_app'] = False
 
     if banner_image_file:
+        #size check
+        check_banner_image_file = copy.deepcopy(banner_image_file)
+        with Image.open(check_banner_image_file) as img:
+            width, height = img.size
+            if width!=553 or height!=210:
+                return HttpResponse(json.dumps({'message':'fail','reason':'Banner size should be 553*210'}),content_type="application/json")
         banner_image_url = upload_image(upload_to_bucket, banner_image_file, banner_image_upload_folder_name)
         if not banner_image_url:
             return HttpResponse(json.dumps({'message':'fail','reason':'Image File already exist'}),content_type="application/json")
@@ -3720,7 +3727,7 @@ class TopUserListView(ListAPIView):
         query_params = self.request.query_params
         queryset = self.queryset
 
-        sort_field = '-video_count'
+        sort_field = '-like_count'
         
         if query_params.get('sortField'):
             sort_field = query_params.get('sortField')

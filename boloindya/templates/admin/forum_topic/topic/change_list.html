@@ -71,6 +71,11 @@
         .icon-delete-video{width: 16px; height: 16px}
         .icon-delete-comment{width: 14px; height: 14px}
         .user-action{margin: 1px 3px;}
+        .thumbnail-download{
+            height: 18px;
+            width: 18px;
+            cursor: pointer;
+        }
     </style>
 {% endblock %}
 
@@ -221,6 +226,15 @@
                 }
                 return diff;
             }
+
+            let breakColumnText = function(columnElement){
+                let columnHtml = ''
+                columnElement.text().split(' ').forEach(function(item, i){
+                    columnHtml += '<div>' + item + '</div>'
+                })
+                columnElement.html(columnHtml)
+            }
+
             $(document).ready(function() {
                 grappelli.initSearchbar();
                 grappelli.initFilter();
@@ -234,6 +248,12 @@
                     e.preventDefault();
                     showRelatedObjectLookupPopup(this);
                 });
+
+                breakColumnText(jQuery('.column-likes_count a'))
+                breakColumnText(jQuery('.column-topic_share_count a'))
+                breakColumnText(jQuery('.column-is_boosted a'))
+                breakColumnText(jQuery('.column-boosted_till a'))
+
 
                 jQuery('.column-is_moderated').append('<input type="checkbox" class = "select_all" field=".field-is_moderated">')
                 jQuery('.column-is_removed').append('<input type="checkbox" class = "select_all" field=".field-is_removed">')

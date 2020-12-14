@@ -61,6 +61,15 @@ class AggregateTopUsers:
                    PRIMARY KEY(user_id)
                 )
             """
+    },{
+        'name': 'temp_top_user_like_count',
+        'create_query': """
+                CREATE TABLE IF NOT EXISTS temp_top_user_like_count(
+                   user_id integer,
+                   like_count integer,
+                   PRIMARY KEY(user_id)
+                )
+            """
     }]
 
     def start(self):
@@ -69,10 +78,32 @@ class AggregateTopUsers:
         for temp_table in self.temp_tables:
             cr.execute(temp_table.get('create_query'))
 
-        for month in month_year_iter(1, 2020, 10, 2020):
+        today = datetime.now()
+        last_month = today.month - 1
+        last_year = today.year
+
+        print "last month", last_month, last_year
+
+        if last_month == 0:
+            last_month = 12
+            last_year = today.year - 1
+
+        print "last month", last_month, last_year
+
+        for month in month_year_iter(last_month, last_year, today.month, today.year):
+            print "month", month
             month_date = datetime.strptime(month, "%Y-%m-%d")
 
-            month_start = str(datetime.strptime("%s-%s-01"%(month_date.year, month_date.month-1), "%Y-%m-%d").date())
+            previous_month = month_date.month - 1
+            previous_year = month_date.year
+
+            print "previous month", previous_month, previous_year
+
+            if previous_month == 0:
+                previous_month = 12
+                previous_year = month_date.year - 1
+
+            month_start = str(datetime.strptime("%s-%s-01"%(previous_year, previous_month), "%Y-%m-%d").date())
             month_end = str((datetime.strptime("%s-%s-01"%(month_date.year, month_date.month), "%Y-%m-%d") - timedelta(days=1)).date())
 
             self.aggregate(cr, month_start, month_end)
@@ -85,6 +116,7 @@ class AggregateTopUsers:
         cr.execute("DELETE FROM temp_top_user_follower_count")
         cr.execute("DELETE FROM temp_top_user_playtime")
         cr.execute("DELETE FROM temp_top_user_view_count")
+        cr.execute("DELETE FROM temp_top_user_like_count")
 
         print("Temp DB cleared")
 
@@ -106,7 +138,7 @@ class AggregateTopUsers:
 
         cr.execute("""
             INSERT INTO temp_top_user_playtime(user_id, playtime)  
-                SELECT t.user_id AS user_id, sum(p.playtime) as playtime
+                SELECT t.user_id AS user_id, sum(p.playtime)/3600 as playtime
                 FROM forum_user_videoplaytime p
                 INNER JOIN forum_topic_topic t on p.video_id = t.id
                 WHERE p."timestamp" BETWEEN %s AND %s AND NOT t.is_removed
@@ -122,18 +154,35 @@ class AggregateTopUsers:
                 GROUP BY t.user_id
         """, [month_start, month_end])
 
+        cr.execute("""
+            INSERT INTO temp_top_user_like_count(user_id, view_count)  
+                SELECT t.user_id AS user_id, count(*)
+                FROM forum_topic_like l
+                INNER JOIN forum_topic_topic t on l.topic_id = t.id
+                WHERE l.created_at BETWEEN %s AND %s AND NOT t.is_removed AND l.like
+                GROUP BY t.user_id
+        """, [month_start, month_end])
+
         print("Temp table filled")
+
+        # print("Deleting old entries for month", month_start)
+        # cr.execute("""
+        #     DELETE partner_topuser
+        #     WHERE agg_month = %s
+        # """, [month_start + ' 00:00:00'])
         
         cr.execute("""
-            INSERT INTO partner_topuser(agg_month, boloindya_id, name, username, video_count, follower_count, playtime, view_count)
+            INSERT INTO partner_topuser(agg_month, boloindya_id, name, username, video_count, follower_count, playtime, view_count, like_count)
             SELECT A.agg_month::date as agg_month, A.boloindya_id, COALESCE(p.name, p.slug, '') as name, 
-                COALESCE(p.slug, '') as username, A.video_count, A.follower_count, A.playtime, A.view_count FROM (
-                    SELECT %s as agg_month, COALESCE(vc.user_id, fc.user_id, pt.user_id, vic.user_id) as boloindya_id, COALESCE(video_count, 0) as video_count, 
-                        COALESCE(follower_count, 0) as follower_count, COALESCE(playtime, 0) as playtime, COALESCE(view_count, 0) as view_count
+                COALESCE(p.slug, '') as username, A.video_count, A.follower_count, A.playtime, A.view_count, A.like_count FROM (
+                    SELECT %s as agg_month, COALESCE(vc.user_id, fc.user_id, pt.user_id, vic.user_id, lk.user_id) as boloindya_id, COALESCE(video_count, 0) as video_count, 
+                        COALESCE(follower_count, 0) as follower_count, COALESCE(playtime, 0) as playtime, COALESCE(view_count, 0) as view_count,
+                        COALESCE(like_count, 0) as like_count
                     FROM temp_top_user_video_count vc
                     FULL OUTER JOIN temp_top_user_follower_count fc on fc.user_id = vc.user_id
                     FULL OUTER JOIN temp_top_user_playtime pt on pt.user_id = vc.user_id and pt.user_id = fc.user_id 
                     FULL OUTER JOIN temp_top_user_view_count vic on vic.user_id = vc.user_id and vic.user_id = pt.user_id and vic.user_id = fc.user_id 
+                    FULL OUTER JOIN temp_top_user_like_count lk on lk.user_id = vic.user.id and lk.user_id = vc.user_id and lk.user_id = pt.user_id and lk.user_id = fc.user_id 
                 ) A
             LEFT JOIN forum_user_userprofile p on p.user_id = A.boloindya_id
         """, [month_start + ' 00:00:00'])
@@ -144,7 +193,7 @@ class AggregateTopUsers:
         cr.execute("DELETE FROM temp_top_user_follower_count")
         cr.execute("DELETE FROM temp_top_user_playtime")
         cr.execute("DELETE FROM temp_top_user_view_count")
-    
+        cr.execute("DELETE FROM temp_top_user_like_count")
 
 def run():
     AggregateTopUsers().start()

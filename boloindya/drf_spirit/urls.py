@@ -189,4 +189,6 @@ urlpatterns = [
     url(r'^send_push_notification/', send_push_notification),
     url(r'^music/(?P<music_id>\d+)/videos/$', MusicVideoAPIView.as_view()),
     url(r'^music/$', MusicCreateAPIView.as_view())
+    url(r'^music/report/$', MusicReportListAPIView.as_view()),
+    url(r'^music/(?P<music_id>\d+)/report/$', MusicReportCreateAPIView.as_view()),
 ]

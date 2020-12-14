@@ -90,6 +90,34 @@
         {% endif %}
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/management/user/'%}active{% endif %}"><a href="/jarvis/management/user/"><i class="fa fa-users"></i> <span>User Management</span></a></li>
+        <li class="{% if request.path in '/jarvis/top-users'%}active{% endif %}"><a href="/jarvis/top-users"><i class="fa fa-money"></i> <span>Top Users</span></a></li>
+        {% endif %}
+
+        {% if user|is_user_in_group:"payment_user" %}
+        <li class="active treeview menu-open">
+          <a href="#">
+            <i class="fa fa-dashboard"></i> <span>Partners</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'payment:beneficiary' %}"><i class="fa fa-circle-o"></i>Beneficiary</a></li>
+          </ul>
+        </li>
+        <li class="active treeview menu-open">
+          <a href="#">
+            <i class="fa fa-pie-chart"></i>
+            <span>Payouts</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'payment:scheduled_payments' %}"><i class="fa fa-circle-o"></i>All Scheduled Payments</a></li>
+            <li><a href="{% url 'payment:all_payments' %}"><i class="fa fa-circle-o"></i>All Transactions</a></li>
+          </ul>
+        </li>
         {% endif %}
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/referral/'%}active{% endif %}"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i> <span>Referrals</span></a></li>

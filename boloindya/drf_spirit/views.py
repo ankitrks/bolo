@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
 import os
 import ast
 import copy
@@ -38,7 +38,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, CreateAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -1255,7 +1255,8 @@ def upload_media(media_file, key="media/"):
         filenameNext= media_file_name.split('.')
         final_filename = str(urlify(filenameNext[0]))+"_"+ str(ts).replace(".", "")+"."+str(filenameNext[1])
         client.put_object(Bucket=settings.BOLOINDYA_AWS_IN_BUCKET_NAME, Key=key + final_filename, Body=media_file, ACL='public-read')
-        filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + '/'+ key + final_filename
+        # filepath = 'https://s3.ap-south-1.amazonaws.com/' + settings.BOLOINDYA_AWS_IN_BUCKET_NAME + '/'+ key + final_filename
+        filepath = 'https://'+settings.BOLOINDYA_AWS_IN_BUCKET_NAME +'.s3.ap-south-1.amazonaws.com/' + key + final_filename
         return filepath
     except Exception as e:
         print(e)
@@ -5351,7 +5352,7 @@ def get_hash_discover_topics(request):
 def get_m3u8_of_ids(request):
     try:
         ids = request.GET.get('ids',None)
-        topics=Topic.objects.filter(pk__in=ids.split(','))
+        topics=Topic.objects.filter(pk__in=ids.split(','), question_video__isnull=False)
         return JsonResponse({'message': 'success', 'results':TopicsWithOnlyContent(topics, many=True).data}, status=status.HTTP_200_OK)
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
@@ -5738,3 +5739,26 @@ class MusicCreateAPIView(APIView):
         topic.save()
 
         return Response({"success": True}, status=200)
+
+class MusicReportListAPIView(ListAPIView):
+    serializer_class = MusicReportSerializer
+    queryset = MusicReport.objects.filter(is_active=True)
+
+from copy import deepcopy
+
+class MusicReportCreateAPIView(CreateAPIView):
+    serializer_class = UserMusicReportSerializer
+    # queryset = UserMusicReport.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = deepcopy(request.data)
+        data['reporter'] = request.user.id
+        data['music'] = request.parser_context.get('kwargs', {}).get('music_id')
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

@@ -33,13 +33,13 @@ $("#transactionTable").jsGrid({
     pageLoading: true,
     autoload: true,
     fields: [
-        { title: "Beneficiary", name: "beneficiary_name", type: "text", width: 50},
-        { title: "Amount", name: "amount", type: "number", width: 20 },
-        { title: "State", name: "state", type: "text", width: 30 },
-        { title: "PG State", name: "pg_state", type: "text", width: 40 },
-        { title: "Transaction ID", name: "transaction_id", type: "text", width: 40 },
-        { title: "Transaction Date", name: "transaction_date", type: "text", width: 50 },
-        { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
+        { title: "Beneficiary", name: "beneficiary_name", type: "text", width: 50, align: 'center'},
+        { title: "Transaction ID", name: "transaction_id", type: "text", width: 40, align: 'center' },
+        { title: "Transaction Date", name: "transaction_date", type: "text", width: 50, align: 'center' },
+        { title: "Amount", name: "amount", type: "number", width: 20, align: 'center' },
+        // { title: "State", name: "state", type: "text", width: 30 },
+        { title: "State", name: "pg_state", type: "text", width: 40, align: 'center' },
+        // { title: "PG Response", name: "payment_gateway_response", type: "text", width: 50 },
     ],
     controller: {
         loadData: function(filter) {
