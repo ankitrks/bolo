@@ -11,7 +11,7 @@ from django.db import connections
 
 from dynamodb_api import query
 from redis_utils import get_redis, set_redis
-from advertisement.models import AdEvent, Seen, Skipped, Clicked, Playtime
+from advertisement.models import Ad, AdEvent, Seen, Skipped, Clicked, Playtime, Install, ShopNow, LearnMore, PlaceOrder
 from advertisement.utils import filter_data_from_dict
 from drf_spirit.models import SystemParameter
 
@@ -31,11 +31,15 @@ def process_ad_event(Model, event, keys):
         ':v2':{'N': get_last_processed_id('ad:%s:last_processed_id'%event),},
     }, 'event = :v1 and id > :v2')
 
+    ad_list = list(Ad.objects.all().values_list('id', flat=True))
     item_list = []
     max_id = 0
     for item in event_list:
         event_data = filter_data_from_dict(keys, item)
         item_list.append(Model(**event_data))
+
+        if not int(item.get('ad_id')) in ad_list:
+            continue
 
         if int(item.get('id')) > max_id:
             max_id = int(item.get('id'))
@@ -53,8 +57,8 @@ def process_events_in_parallel():
     pool.apply_async(process_ad_event, args=(Clicked, 'click', ('user_id', 'ad_id', 'created_at')))
     pool.apply_async(process_ad_event, args=(Playtime, 'playtime', ('user_id', 'ad_id', 'created_at', 'playtime')))
     pool.apply_async(process_ad_event, args=(Install, 'install_now', ('user_id', 'ad_id', 'created_at')))
-    pool.apply_async(process_ad_event, args=(Playtime, 'shop_now', ('user_id', 'ad_id', 'created_at')))
-    pool.apply_async(process_ad_event, args=(Playtime, 'buy_now', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(ShopNow, 'shop_now', ('user_id', 'ad_id', 'created_at')))
+    pool.apply_async(process_ad_event, args=(ShopNow, 'buy_now', ('user_id', 'ad_id', 'created_at')))
     pool.apply_async(process_ad_event, args=(LearnMore, 'learn_more', ('user_id', 'ad_id', 'created_at')))
     pool.apply_async(process_ad_event, args=(PlaceOrder, 'place_order', ('user_id', 'ad_id', 'created_at')))
 
