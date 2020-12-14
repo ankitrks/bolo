@@ -202,7 +202,7 @@ $('[name=q]').keyup(function(){
 
             console.log('form data', formData)
 
-            if(formData['account_number'] != formData['confirm_account_number']){
+            if(formData['payment_method'] == 'account_transfer'  &&  formData['account_number'] != formData['confirm_account_number']){
                 Swal.fire({
                         title: 'Error!',
                         text: "Account Number do not match",
@@ -362,7 +362,7 @@ $(document).ready(function(){
         }).autocomplete("instance")._renderItem = function( ul, item ) {
             console.log('result', ul, item)
             return $( "<li>" )
-                .append( "<div>" + item.name + "-" + item.id + "</div>" )
+                .append( "<div>" + item.name + "-" + item.id + "(" + item.username  + ")</div>" )
                 .appendTo( ul );
         };
     })

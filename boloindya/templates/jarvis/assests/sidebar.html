@@ -16,7 +16,7 @@
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">MAIN NAVIGATION</li>
         {% if user|is_user_in_group:"moderator" %}
-        <li class=" treeview">
+        <!-- <li class=" treeview">
           <a href="#">
             <i class="fa fa-pie-chart"></i> <span>Statistics</span>
             <span class="pull-right-container">
@@ -24,14 +24,11 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <!--<li class=""><a href="index.html"><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
-            <li><a href="index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
-          -->
             <li class="{% if request.path in '/jarvis/user_statistics/'%}active{% endif %}"><a href="/jarvis/user_statistics/"><i class="fa fa-pie-chart"></i> <span>User Statistics</span></a></li>
             <li class="{% if request.path in '/jarvis/video_statistics/'%}active{% endif %}"><a href="/jarvis/video_statistics/"><i class="fa fa-pie-chart"></i> <span>Video Statistics</span></a></li>
             <li class="{% if request.path in '/jarvis/statistics/all/'%}active{% endif %}"><a href="/jarvis/statistics/all/"><i class="fa fa-pie-chart"></i> <span>Overall</span></a></li>
           </ul>
-        </li>
+        </li> -->
 
         <li class="{% if request.path in '/jarvis/get_accepted_kyc_user_list/,/jarvis/get_submitted_kyc_user_list/,/jarvis/get_pending_kyc_user_list/,/jarvis/get_kyc_user_list/'%}active{% endif %} treeview">
           <a href="#">
@@ -121,7 +118,7 @@
         {% endif %}
         {% if user|is_user_in_group:"moderator" %}
         <li class="{% if request.path in '/jarvis/referral/'%}active{% endif %}"><a href="/jarvis/referral/"><i class="fa fa-envelope"></i> <span>Referrals</span></a></li>
-        <li class="{% if request.path in '/jarvis/get_active_reports/,/jarvis/get_moderated_reports/'%}active{% endif %} treeview">
+        <!-- <li class="{% if request.path in '/jarvis/get_active_reports/,/jarvis/get_moderated_reports/'%}active{% endif %} treeview">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Reports</span>
             <span class="pull-right-container">
@@ -132,7 +129,7 @@
             <li class="{% if request.path in '/jarvis/get_active_reports/'%}active{% endif %}"><a href="/jarvis/get_active_reports/"><i class="fa fa-circle-o"></i>Active Reports</a></li>
             <li class="{% if request.path in '/jarvis/get_moderated_reports/'%}active{% endif %}"><a href="/jarvis/get_moderated_reports/"><i class="fa fa-share"></i>Moderated Reports</a></li>
           </ul>
-        </li>
+        </li> -->
         <li class="{% if request.path in '/jarvis/bot_user_form/,/jarvis/bot_user_list/,/jarvis/get_bot_video_list/'%}active{% endif %} treeview">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>Bot Management</span>
@@ -203,3 +200,4 @@
     </section>
     <!-- /.sidebar -->
   </aside>
+
