@@ -38,6 +38,7 @@ def get_video_cdn(question_video):
     if question_video:
         regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
+        question_video = question_video.replace('https://s3.ap-south-1.amazonaws.com/in-boloindya', 'https://in-boloindya.s3.ap-south-1.amazonaws.com')
         url = find_urls_in_string.search(question_video)
         return str(question_video.replace(str(url.group()), settings.US_CDN_URL))
     else:
