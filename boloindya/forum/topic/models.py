@@ -490,6 +490,7 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         find_urls_in_string = re.compile(regex, re.IGNORECASE)
         url = find_urls_in_string.search(playback_url)
         if playback_url:
+            playback_url = playback_url.replace('https://s3.ap-south-1.amazonaws.com/in-boloindya', 'https://in-boloindya.s3.ap-south-1.amazonaws.com')
             return str(playback_url.replace(str(url.group()), cloufront_url))
         return ''
 
