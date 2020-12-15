@@ -360,8 +360,11 @@ class TopicSerializerwithComment(ModelSerializer):
                     cloufront_url = settings.IN_CDN_URL
                 regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
                 find_urls_in_string = re.compile(regex, re.IGNORECASE)
-                url = find_urls_in_string.search(instance.question_video)
-                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+                # url = find_urls_in_string.search(instance.question_video)
+                # return str(instance.question_video.replace(str(url.group()), cloufront_url))
+                temp_instance_question_video = instance.question_video.replace("https://s3.aws.com/in-boloindya/", "https://in-boloindya.s3.aws.com/")
+                url = find_urls_in_string.search(temp_instance_question_video)
+                return str(temp_instance_question_video.replace(str(url.group()), cloufront_url))
             else:
                 return ''
         except:
@@ -1010,8 +1013,11 @@ class CategoryVideoByteSerializer(ModelSerializer):
                     cloufront_url = settings.IN_CDN_URL
                 regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
                 find_urls_in_string = re.compile(regex, re.IGNORECASE)
-                url = find_urls_in_string.search(instance.question_video)
-                return str(instance.question_video.replace(str(url.group()), cloufront_url))
+                # url = find_urls_in_string.search(instance.question_video)
+                # return str(instance.question_video.replace(str(url.group()), cloufront_url))
+                temp_instance_question_video = instance.question_video.replace("https://s3.aws.com/in-boloindya/", "https://in-boloindya.s3.aws.com/")
+                url = find_urls_in_string.search(temp_instance_question_video)
+                return str(temp_instance_question_video.replace(str(url.group()), cloufront_url))
             else:
                 return ''
         except:
