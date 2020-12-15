@@ -4516,7 +4516,7 @@ def get_video_cdn(question_video):
                 cloufront_url = settings.IN_CDN_URL
             regex= '((?:(https?|s?ftp):\\/\\/)?(?:(?:[A-Z0-9][A-Z0-9-]{0,61}[A-Z0-9]\\.)+)(com|net|org|eu))'
             find_urls_in_string = re.compile(regex, re.IGNORECASE)
-            temp_instance_question_video = question_video.replace("https://s3.aws.com/in-boloindya/", "https://in-boloindya.s3.aws.com/")
+            temp_instance_question_video = question_video.replace('https://s3.ap-south-1.amazonaws.com/in-boloindya', 'https://in-boloindya.s3.ap-south-1.amazonaws.com')
             url = find_urls_in_string.search(temp_instance_question_video)
             return str(temp_instance_question_video.replace(str(url.group()), cloufront_url))
         else:
