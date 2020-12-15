@@ -36,6 +36,7 @@ def run_command(video):
 
         # print 'wget "%s" -O %s'%(video.get('question_video'), video_file_path)
         os.system('wget "%s" -O %s'%(video.get('question_video'), video_file_path))
+        # logger.info('ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path))
         # print 'ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path)
         os.system('ffmpeg -i %s -vn -acodec copy %s -y'%(video_file_path, audio_file_path))
 
@@ -54,6 +55,7 @@ def run_command(video):
         })
         Topic.objects.filter(id=video.get('id')).update(music_id=music.id, is_audio_extracted=True)
         os.remove(audio_file_path)
+        os.remove(video_file_path)
         return True
     except Exception as e:
         logger.info("Error while extracting audio from video: %s"%str(e))
