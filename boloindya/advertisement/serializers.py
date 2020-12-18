@@ -306,3 +306,4 @@ class ChangePasswordSerializer(serializers.Serializer):
         login(request, user)
 
         return validated_data
+

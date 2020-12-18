@@ -34,6 +34,4 @@ urlpatterns += [
     url(r'^change-password/$', ChangePasswordAPIView.as_view()),
 ]
 
-print "urlpatterns", urlpatterns
-
 

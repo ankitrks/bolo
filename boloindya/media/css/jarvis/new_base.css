@@ -1,0 +1,226 @@
+
+@font-face{
+    font-family: "Baloo Bhai";
+    src: url("/static/venders/BalooBhai-Regular.ttf");
+}
+body{
+    font-family: "Baloo Bhai";
+    font-style: normal;
+    font-weight: normal;
+}
+
+.avenir-font{
+    font-family: Avenir;
+}
+
+.page-title{
+    font-size: 50px;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.verticle-center{
+    min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+    display: flex;
+    align-items: center;
+}
+
+.header-row{
+    height: 100px;
+    margin-top: 20px;
+}
+
+.container.main{
+    max-width: 90%;
+    margin-left: 9%;
+    margin-right: 1%;
+}
+
+
+.count-div{
+    background: #F5F5F7;
+    border-radius: 14px;
+    height: 80px;
+    width: 180px;
+}
+
+.count{
+    font-size: 30px;
+}
+
+.count-text{
+    font-size: 15px;
+}
+
+.search-icon{
+    background: #F5F5F7;
+    border-style: none;
+}
+
+.search-input{
+    background: #F5F5F7;
+    border-style: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.search-input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #9F9F9F;
+    opacity: 1; /* Firefox */
+    font-weight: 500;
+}
+
+
+.jsgrid-table{
+    font-family: Avenir;
+}
+
+.jsgrid-grid-header{
+    height: 40px;
+    font-size: 14px;
+    border-style: none;
+    background: white !important;
+    /* margin-bottom: -25px; */
+}
+
+.jsgrid-grid-body{
+    border-style: none;
+}
+
+.jsgrid-header-row>.jsgrid-header-cell {
+    background: white !important;
+    border-style: none;
+}
+
+.jsgrid-table .jsgrid-row, .jsgrid-table .jsgrid-alt-row{
+    height: 35px;
+    font-size: 13px;
+    font-weight: 500;
+    border-style: none;
+}
+
+.jsgrid-row>.jsgrid-cell{
+    background: #F5F5F7;
+}
+
+.jsgrid-alt-row>.jsgrid-cell{
+    background: white;
+    border-style: none;
+}
+
+.jsgrid-pager-container{
+    margin-top: 10px;
+    background: #F5F5F7;
+    color:black;
+    font-family: Avenir;
+    font-size: 11px;
+    margin-left:auto; 
+    margin-right:0;
+}
+
+.jsgrid-pager .jsgrid-pager-page, .jsgrid-pager-nav-button{
+    border: 1px solid black;
+    margin: 0px 3px;
+}
+
+.jsgrid-pager .jsgrid-pager-page a, .jsgrid-pager-nav-button a{
+    color:black;
+}
+
+.jsgrid-pager-current-page{
+    color: white;
+    background: black;
+}
+
+.jsgrid-table .jsgrid-cell{
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.new-dropdown{
+    width: 108px;
+    height: 15px;
+    margin-top: -12px;
+    background: #F5F5F7;
+}
+
+.new-dropdown .filter-option-inner-inner{
+    font-family: Avenir;
+    font-size: 12px;
+    color: black;
+    padding-left: 6px;
+}
+
+
+.modal-backdrop.show {
+    opacity: 0 !important;
+}
+
+.modal{
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);  
+}
+
+.modal-content{
+    color: white;
+    background: #121111;
+    margin-top: 40%;
+    border-radius: 10px;
+}
+
+.modal-footer, .modal-header{
+    border: none;
+}
+
+.modal-body{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+
+.modalClose{
+    background: #3C3844;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    /* margin-top: 0px; */
+    /* margin-right: 10px; */
+    padding: 4px 7px;
+    text-shadow: none;
+}
+
+.close{
+    text-shadow: none;
+}
+
+.apply-button{
+    width: 228px;
+    height: 43px;
+    background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+    border-radius: 5px;
+    font-family: Avenir;
+    font-size: 18px;
+    padding-top: 9px;
+    text-align: center;
+}
+
+.modal input[type=text]{
+    background: black;
+    color: white
+}
+
+.modal input[type=text]::placeholder{
+    color: #9F9F9F;
+}
+
+.select2{
+    width: 100% !important;
+}
+
+.select2-results__option--highlighted{
+    background-color: #212529 !important;
+}

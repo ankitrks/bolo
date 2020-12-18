@@ -170,7 +170,8 @@ INSTALLED_APPS = [
     # 'forum.core.tests'
     'booking',
     'advertisement',
-    'nested_admin'
+    'nested_admin',
+    'marketing',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
