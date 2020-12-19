@@ -119,8 +119,8 @@ urlpatterns = [
     url(r'^ad/', include(advertisement.urls)),
     url(r'^report/', include(report.urls)),
     url(r'^events/(?P<event_id>\d+)/$', forum.topic.views.event_redirect_view),
-    url(r'^', include(marketing.web_urls)),
-    url(r'^api/v1/', include(marketing.api_urls)),
+    url(r'^marketing/', include(marketing.web_urls)),
+    url(r'^api/v1/marketing/', include(marketing.api_urls)),
 ]
 
 urlpatterns += i18n_patterns(

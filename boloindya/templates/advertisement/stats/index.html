@@ -8,14 +8,6 @@
             height: 60px !important;
         }
 
-        .creatorFilter{
-            border-style: solid;
-            border-color: black;
-            border-left: 0px;
-            border-right: 1px;
-            border-top: 1px;
-            border-bottom: 1px;
-        }
 
         #creatorNameFilterModal .search-icon, #creatorNameFilterModal .creatorNameList{
             background: black;
@@ -28,6 +20,10 @@
             max-height: 225px;
             overflow-y: scroll;
         }
+
+        /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
+            width: 50% !important;
+        } */
     </style>
 {% endblock css %}
 
@@ -47,7 +43,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-2 " id="totalViews">
+        <div class="col-3 " id="totalViews">
             <div class="row count-div">
                 <div class="col-6 pt-3 count value-count text-center">
                     -
@@ -57,7 +53,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-2" id="totalInstalls">
+        <div class="col-3" id="totalInstalls">
             <div class="row count-div">
                 <div class="col-6 pt-3 count value-count text-center" >
                     -
@@ -74,7 +70,7 @@
                 <div class="col-4" style="font-size: 20px;">
                     All Views
                 </div>
-                <div class="col-4 text-right" id="">
+                <div class="col-4" id="">
                     <select name="" id="allViewsSelect" class="selectpicker">
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
@@ -92,7 +88,7 @@
                 <div class="col-4" style="font-size: 20px;">
                     All Installs
                 </div>
-                <div class="col-4 text-right" id="">
+                <div class="col-4" id="">
                     <select name="" id="allInstallsSelect" class="selectpicker">
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
@@ -113,30 +109,58 @@
             </select>
         </div>
         <div class="col-2">
-            <div class="creatorFilter">
-                <button class="btn creatorFilterButton" data-toggle="modal" data-target="#creatorNameFilterModal">Creator Name</button>
+            <div class="label-group mb-2 mr-sm-2 pointer" data-toggle="modal" data-target="#creatorNameFilterModal">
+                <div class="label-group-prepend">
+                    <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <button class="btn creatorFilterButton">Creator Name</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <input type="text" class="form-control" id="dateRange" placeholder="Date Range">
+                </div>
+            </div>
+        </div>
+        <div class="col-2" id="fileTypeDiv">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text">
+                        <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
+                    </div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <select name="fileType" id="" class="selectpicker">
+                        <option value="">File Type</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
             </div>
             
         </div>
-        <div class="col-2">
-            <input type="text" class="form-control" id="dateRange" placeholder="Date Range Filter">
-        </div>
-        <div class="col-3" id="fileTypeDiv">
-            <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
-            <select name="fileType" id="" class="selectpicker">
-                <option value="">File Type</option>
-                <option value="csv">CSV</option>
-            </select>
-        </div>
-        <div class="col-3" id="recordCountDiv">
-            <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
-            <select name="recordsCount" id="pageSize" class="selectpicker">
-                <option value="10">10 Records</option>
-                <option value="20">20 Records</option>
-                <option value="50">50 Records</option>
-                <option value="100">100 Records</option>
-                <option value="500">500 Records</option>
-            </select>
+        <div class="col-2" id="recordCountDiv">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text">
+                        <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
+                    </div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <select name="recordsCount" id="pageSize" class="selectpicker">
+                        <option value="10">10 Records</option>
+                        <option value="20">20 Records</option>
+                        <option value="50">50 Records</option>
+                        <option value="100">100 Records</option>
+                        <option value="500">500 Records</option>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row mt-4">
@@ -182,6 +206,17 @@
 
 <script>
     let isDatePickerApplied = false;
+
+    const initTotalCounts = function(){
+        let countList = ['ad_install_dashboard_total_installs', 'ad_install_dashboard_total_views']
+        $.ajax('/api/v1/marketing/dashboard/counts/?queries='+countList.join(','), {
+            method: 'GET',
+            success: function(response){
+                $('#totalViews .value-count').text(response.ad_install_dashboard_total_views)
+                $('#totalInstalls .value-count').text(response.ad_install_dashboard_total_installs)
+            }
+        })
+    }
 
     let createChart = function(chartName, canvas, labels, dataset){
         return new Chart(canvas, {
@@ -279,7 +314,7 @@
 
                     return $.ajax({
                         type: "GET",
-                        url: "/api/v1/jarvis/ad/stats/",
+                        url: "/api/v1/marketing/ad/stats/",
                         data: filter,
                         headers: headers
                     });
@@ -326,24 +361,37 @@
     }
 
     const loadCreators = function(){
-        $.ajax('/api/v1/jarvis/ad/creator/', {
-            method: 'GET',
-            headers: headers,
-            success: function(response){
-                let creatorList = $('#creatorNameFilterModal .creatorNameList')
-                    creatorList.html('')
-                    $.each(response.results, function(i, item){
-                        creatorList.append(`<div class="row"><div class="form-group form-check">
-                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
-                            <label class="form-check-label">${ item.username }</label>
-                        </div></div>`)
-                    })
-            }
+        const getCreators = function(q){
+            $.ajax('/api/v1/marketing/ad/creator/?q='+q, {
+                method: 'GET',
+                headers: headers,
+                success: function(response){
+                    let creatorList = $('#creatorNameFilterModal .creatorNameList')
+                        creatorList.html('')
+                        $.each(response.results, function(i, item){
+                            creatorList.append(`<div class="row"><div class="form-group form-check">
+                                <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                                <label class="form-check-label">${ item.username }</label>
+                            </div></div>`)
+                        })
+                }
+            })
+        }
+
+        $(document).on('keyup', '#creatorNameFilterModal .search-input', function(){
+            let text = $(this).val()
+
+            if(text.length > 0 && text.lenght < 3)
+                return
+            
+            getCreators(text)
+
         })
+        getCreators('')
     }
 
     const loadBrands = function(){
-        $.ajax('/api/v1/jarvis/ad/brand/', {
+        $.ajax('/api/v1/marketing/ad/brand/', {
             method: 'GET',
             headers: headers,
             success: function(response){
@@ -372,7 +420,7 @@
         $(document).on('change', element, function(){
             $.ajax({
                 type: "GET",
-                url: "/api/v1/jarivs/ad/install/chart/?chart_type=" + type + "&data_type=" + $(this).val(),
+                url: "/api/v1/marketing/ad/install/chart/?chart_type=" + type + "&data_type=" + $(this).val(),
                 headers: headers,
                 success: function(response){
                     console.log("response", response)
@@ -384,12 +432,26 @@
         })
     }
 
+    const initDownloadCSV = function(){
+        $(document).on('click', '#exportOrder', function(){
+            let fileType = $('select[name=fileType]').val();
+            let params = {}
 
+            if(fileType)
+                params['format'] = fileType
+            
+            params = Object.assign(params, getExtraFilterData())
+
+            window.open('/report/ad/install/stats/download?' + $.param(params), '_self')
+        });
+    }
 
     $(document).ready(function(){
+        initTotalCounts()
         initiateTable()
         loadCreators()
         loadBrands()
+        initDownloadCSV()
         var allViewsChart = createChart('Views', document.getElementById('allViewsChart').getContext('2d'), [], []);
         var allInstallsChart = createChart('Install', document.getElementById('allInstallsChart').getContext('2d'), [], []);
         initChart('#allViewsSelect', 'views', allViewsChart)

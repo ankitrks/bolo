@@ -3,7 +3,7 @@ import json
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-
+from django.contrib.humanize.templatetags.humanize import intword
 from django.contrib.auth.models import User
 from django.db import connections
 
@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
+
+from drf_spirit.models import DatabaseRecordCount
 
 from advertisement.utils import PageNumberPaginationRemastered
 from advertisement.models import Brand
@@ -36,8 +38,8 @@ class AdStatsListAPIView(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        print pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
-                        'view_count', 'ad__title', 'ad__created_by__username' ))
+        # print pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
+        #                 'view_count', 'ad__title', 'ad__created_by__username' ))
         dataframe = pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
                         'view_count', 'ad__title', 'ad__created_by__username' ))
         
@@ -61,8 +63,8 @@ class AdStatsListAPIView(ListAPIView):
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        print "page", page, "page_size", page_size
-        print "data", json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
+        # print "page", page, "page_size", page_size
+        # print "data", json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
 
         return Response({
             'data': json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data'),
@@ -94,6 +96,14 @@ class AdStatsListAPIView(ListAPIView):
 class AdCreatorAPIView(ListAPIView, BaseMarketingAPIView):
     serializer_class = AdCreatorSerializer
     queryset = User.objects.filter(is_staff=True)
+
+    def get_queryset(self):
+        q = self.request.query_params.get('q')
+
+        if q:
+            return self.queryset.filter(username__istartswith=q)
+
+        return self.queryset
 
 
 class AdBrandAPIView(ListAPIView, BaseMarketingAPIView):
@@ -201,25 +211,25 @@ class AdInstallChartDataAPIView(APIView):
         }
 
     def get_weekly_data(self, query_data):
-        print "query data", query_data
+        # print "query data", query_data
         start_date = datetime.now() - timedelta(days=7)
         labels = []
         dataset = []
 
         for i in range(7):
             weekday = (start_date + timedelta(days=i+1)).weekday()
-            print "weekday", weekday
+            # print "weekday", weekday
             labels.append(self.WEEK_ENUM[weekday])
             dataset.append(query_data.get(weekday, 0))
         
         return labels, dataset
 
     def get_monthly_data(self, query_data):
-        print "query data", query_data
+        # print "query data", query_data
         today = datetime.now()
         start_date = datetime.strptime('01-%s-%s'%(today.month, today.year), '%d-%m-%Y')
         day_diff = (today - start_date).days + 1
-        print "day_diff", day_diff
+        # print "day_diff", day_diff
         labels = []
         dataset = []
 
@@ -230,7 +240,7 @@ class AdInstallChartDataAPIView(APIView):
         return labels, dataset
 
     def get_yearly_data(self, query_data):
-        print "query data", query_data
+        # print "query data", query_data
         today = datetime.now() 
         labels = []
         dataset = []
@@ -241,3 +251,19 @@ class AdInstallChartDataAPIView(APIView):
             dataset.append(query_data.get(month+1, 0))
         
         return labels, dataset
+
+
+class DashboadCountAPIView(APIView, BaseMarketingAPIView):
+    def get(self, request, *args, **kwargs):
+        counts = {}
+
+        for item in request.query_params.get('queries').split(','):
+            count = intword(DatabaseRecordCount.get_value(item))
+            count_split = count.split(' ') if not type(count) == int else []
+
+            if len(count_split) > 1:
+                count = str(int(float(count_split[0]))) + ' ' + count_split[1].capitalize()[0]
+
+            counts[item] = count
+
+        return Response(counts)
