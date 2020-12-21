@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from drf_spirit.models import DatabaseRecordCount
 
 from advertisement.utils import PageNumberPaginationRemastered
-from advertisement.models import Brand
+from advertisement.models import Brand, Ad
 
 from marketing.models import AdStats
 from marketing.serializers import AdStatsSerializer, AdCreatorSerializer, AdBrandSerializer
@@ -30,7 +30,7 @@ class BaseMarketingAPIView:
 
 class AdStatsListAPIView(ListAPIView):
     serializer_class = AdStatsSerializer
-    queryset = AdStats.objects.all()
+    queryset = AdStats.objects.filter(ad__ad_type='install_now')
     pagination_class = deepcopy(PageNumberPaginationRemastered)
     permission_classes = (IsAdminUser,)
     authentication_classes = (SessionAuthentication,)
@@ -41,19 +41,17 @@ class AdStatsListAPIView(ListAPIView):
         # print pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
         #                 'view_count', 'ad__title', 'ad__created_by__username' ))
         dataframe = pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
-                        'view_count', 'ad__product__name', 'ad__created_by__username' ))
+                        'view_count' ))
         
         if dataframe.empty:
             return Response({
                 'data': [],
                 'itemsCount': 0
         })
-        print "datafram", json.loads(dataframe.to_json(orient="table")).get('data')
-        dataframe = dataframe.groupby(['ad_id', 'ad__created_by__username']).sum()
-
+        dataframe = dataframe.groupby(['ad_id']).sum()
         dataframe['average_install_time'] = dataframe['install_playtime'] / dataframe['install_count']
         dataframe['average_skip_time'] = dataframe['skip_playtime'] / dataframe['skip_count']
-        dataframe['ctr'] = dataframe['install_count'] / dataframe['view_count']
+        dataframe['ctr'] = (dataframe['install_count'] / dataframe['view_count'])*100
 
         if request.query_params.get('sortField'):
             dataframe = dataframe.sort_values(by=request.query_params.get('sortField'), 
@@ -63,12 +61,19 @@ class AdStatsListAPIView(ListAPIView):
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        #print "page", page, "page_size", page_size
-        #print "datafram", json.loads(dataframe.to_json(orient="table")).get('data')
-        #print "data", json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
+        final_dataframe = dataframe[(page - 1) * page_size:(page) * page_size].round(2)
+        data = json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
+
+        # print Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username')
+
+        for ad in Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username'):
+            for item in data:
+                if item.get('ad_id') == ad.get('id'):
+                    item['ad__brand__name'] = ad.get('brand__name')
+                    item['ad__created_by__username'] = ad.get('created_by__username')
 
         return Response({
-            'data': json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data'),
+            'data': data,
             'itemsCount': len(dataframe)
         })
 
@@ -89,7 +94,7 @@ class AdStatsListAPIView(ListAPIView):
             start_date = datetime.strptime(start_date, '%d-%m-%Y').date()
             end_date = datetime.strptime(end_date, '%d-%m-%Y').date()
             print "start date", start_date, "end date", end_date
-            queryset = queryset.filter(date__gte=start_date, date__lte=end_date, ad__created_at__gte=start_date, ad__created_at__lte=end_date)
+            queryset = queryset.filter(date__gte=start_date, date__lte=end_date)
 
         return queryset
 

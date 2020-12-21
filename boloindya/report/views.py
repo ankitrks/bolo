@@ -152,7 +152,7 @@ class AdInstallStatsDownloadView(DownloadView):
         query = """
             select S."S No" as "Sr No", ad.title as "Video Title", u.username as "Creator Name", S.view_count as "Views", 
                 S.install_count as "Installs", 
-                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),2) as "CTR", 
+                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),4) * 100 as "CTR(%)", 
                 S.skip_count as "Skips",  S.full_watched as "Full Watched",
                 round(cast(float8(S.install_playtime)/float8(COALESCE(nullif(S.install_count, 0), 1)) as numeric),2) as "Avg. time before Install (Secs)", 
                 round(cast(float8(S.skip_playtime)/float8(COALESCE(nullif(S.skip_count, 0), 1)) as numeric),2) as "Avg. time before Skip (Secs)"
