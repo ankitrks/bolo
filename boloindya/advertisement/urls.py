@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^login/$', OrderDashboardLogin.as_view()),
     url(r'^logout/$', OrderDashboardLogout.as_view()),
     url(r'^reset-password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', OrderPasswordResetConfirmView.as_view()),
-    url(r'^send-reset-password-mail/$', OrderPasswordResetMailView.as_view()) 
+    url(r'^send-reset-password-mail/$', OrderPasswordResetMailView.as_view()),
 ]

@@ -27,6 +27,8 @@ import booking.api_urls_v2
 import advertisement.api_urls
 import advertisement.urls
 import report.urls
+import marketing.web_urls
+import marketing.api_urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -117,6 +119,8 @@ urlpatterns = [
     url(r'^ad/', include(advertisement.urls)),
     url(r'^report/', include(report.urls)),
     url(r'^events/(?P<event_id>\d+)/$', forum.topic.views.event_redirect_view),
+    url(r'^marketing/', include(marketing.web_urls)),
+    url(r'^api/v1/marketing/', include(marketing.api_urls)),
 ]
 
 urlpatterns += i18n_patterns(

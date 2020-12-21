@@ -144,3 +144,60 @@ class AdOrderDownload(DownloadView):
         query +=  " order by o.id desc"
 
         return query, params
+
+class AdInstallStatsDownloadView(DownloadView):
+    file_name = 'install_stats'
+
+    def get_query_with_params(self):
+        query = """
+            select S."S No" as "Sr No", ad.title as "Video Title", u.username as "Creator Name", S.view_count as "Views", 
+                S.install_count as "Installs", 
+                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),2) as "CTR", 
+                S.skip_count as "Skips",  S.full_watched as "Full Watched",
+                round(cast(float8(S.install_playtime)/float8(COALESCE(nullif(S.install_count, 0), 1)) as numeric),2) as "Avg. time before Install (Secs)", 
+                round(cast(float8(S.skip_playtime)/float8(COALESCE(nullif(S.skip_count, 0), 1)) as numeric),2) as "Avg. time before Skip (Secs)"
+                from (
+                select  ROW_NUMBER() OVER (ORDER BY stats.ad_id) as "S No", ad_id, sum(view_count) as view_count, 
+                    sum(install_count) as install_count, sum(full_watched) as full_watched, sum(skip_count) as skip_count,
+                    sum(install_playtime) as install_playtime, sum(skip_playtime) as skip_playtime
+                from marketing_adstats stats
+                where %s
+                group by ad_id
+                ) S
+            inner join advertisement_ad ad on ad.id = S.ad_id
+            inner join auth_user u on u.id = ad.created_by_id
+            where true
+        """
+        params = []
+
+        if self.request.GET.get('date_range'):
+            start_date, end_date = self.request.GET.get('date_range').split(' - ')
+            start_date = datetime.strptime(start_date, '%d-%m-%Y')
+            end_date = datetime.strptime(end_date, '%d-%m-%Y')
+
+            query = query%(" date between '%s' and '%s' "%(str(start_date), str(end_date)),)
+            
+            query += " and ad.start_time between %s and %s "
+            params.append(start_date)
+            params.append(end_date)
+        else:
+            query = query%"true"
+
+        if self.request.GET.get('creators'):
+            query += " and u.id in %s "
+            params.append(tuple(self.request.GET.get('creators').split(',')))
+
+        if self.request.GET.get('brand'):
+            query += "  and ad.brand_id = %s " 
+            params.append(int(self.request.GET.get('brand')))
+
+
+        # if self.request.GET.get('q'):
+        #     query += " and (address.name ilike %s or address.mobile ilike %s or address.email ilike %s ) "
+        #     params.append('%' + self.request.GET.get('q') + '%')
+        #     params.append('%' + self.request.GET.get('q') + '%')
+        #     params.append('%' + self.request.GET.get('q') + '%')
+
+        query +=  " order by ad.id "
+
+        return query, params

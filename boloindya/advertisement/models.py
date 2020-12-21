@@ -346,25 +346,16 @@ class CTA(models.Model):
 class AdEventAbstract(RecordTimeStamp):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='%(class)s')
     ad = models.ForeignKey(Ad, related_name='%(class)s', on_delete=models.CASCADE)
+    playtime = models.PositiveIntegerField(_("Playtime"), default=0)
 
     class Meta:
         abstract = True
-
 
 class Seen(AdEventAbstract):
     pass
 
 class Skipped(AdEventAbstract):
     pass
-
-
-class Clicked(AdEventAbstract):
-    cta = models.CharField(max_length=50, null=True, blank=True)
-
-
-class Playtime(AdEventAbstract):
-    playtime = models.PositiveIntegerField(default=0)
-
 
 class Install(AdEventAbstract):
     pass
@@ -376,4 +367,7 @@ class LearnMore(AdEventAbstract):
     pass
 
 class PlaceOrder(AdEventAbstract):
+    pass
+
+class FullWatched(AdEventAbstract):
     pass

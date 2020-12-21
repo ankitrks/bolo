@@ -22,7 +22,7 @@ def process_record_in_parallel():
     pool = Pool(processes=4)
 
     for record in DatabaseRecordCount.objects.filter(is_active=True):
-        if record.last_updated < datetime.now() - timedelta(seconds=record.update_time):
+        if record.last_updated < datetime.now() - timedelta(seconds=record.update_time) or record.count == 0:
             pool.apply_async(execute_query, args=(record,))
 
     pool.close()

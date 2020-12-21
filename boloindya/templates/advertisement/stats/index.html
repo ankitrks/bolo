@@ -1,0 +1,464 @@
+{% extends 'jarvis/new_layout/base.html' %}
+
+{% load static %}
+
+{% block css %}
+    <style>
+        .jsgrid-grid-header{
+            height: 60px !important;
+        }
+
+
+        #creatorNameFilterModal .search-icon, #creatorNameFilterModal .creatorNameList{
+            background: black;
+            color: white
+        }
+
+        #creatorNameFilterModal .creatorNameList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        }
+
+        /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
+            width: 50% !important;
+        } */
+    </style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="container main">
+    <div class="row verticle-center header-row">
+        <div class="col-7">
+            <div class="page-title">
+                Install Analytics Dashboard
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="row">
+            </div>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 " id="totalViews">
+            <div class="row count-div">
+                <div class="col-6 pt-3 count value-count text-center">
+                    -
+                </div>
+                <div class="col-6 pt-3 avenir-font count-text text-center">
+                    Total Views
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="totalInstalls">
+            <div class="row count-div">
+                <div class="col-6 pt-3 count value-count text-center" >
+                    -
+                </div>
+                <div class="col-6 pt-3 avenir-font count-text text-center">
+                    Total Installs
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-5 mr-4">
+            <div class="row justify-content-between">
+                <div class="col-4" style="font-size: 20px;">
+                    All Views
+                </div>
+                <div class="col-4" id="">
+                    <select name="" id="allViewsSelect" class="selectpicker">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <canvas id="allViewsChart"></canvas>
+            </div>
+            
+        </div>
+        <div class="col-5 mx-4">
+            <div class="row justify-content-between">
+                <div class="col-4" style="font-size: 20px;">
+                    All Installs
+                </div>
+                <div class="col-4" id="">
+                    <select name="" id="allInstallsSelect" class="selectpicker">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <canvas id="allInstallsChart"></canvas>
+            </div>
+            
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-2">
+            <select name="" id="" class="brandFilter">
+                <option value="">Brand Name</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <div class="label-group mb-2 mr-sm-2 pointer" data-toggle="modal" data-target="#creatorNameFilterModal">
+                <div class="label-group-prepend">
+                    <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <button class="btn creatorFilterButton">Creator Name</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <input type="text" class="form-control" id="dateRange" placeholder="Date Range">
+                </div>
+            </div>
+        </div>
+        <div class="col-2" id="fileTypeDiv">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text">
+                        <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
+                    </div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <select name="fileType" id="" class="selectpicker">
+                        <option value="">File Type</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-2" id="recordCountDiv">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text">
+                        <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
+                    </div>
+                </div>
+                <div class="label-group-content creatorFilter">
+                    <select name="recordsCount" id="pageSize" class="selectpicker">
+                        <option value="10">10 Records</option>
+                        <option value="20">20 Records</option>
+                        <option value="50">50 Records</option>
+                        <option value="100">100 Records</option>
+                        <option value="500">500 Records</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="" id="adStatsTable"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="creatorNameFilterModal" tabindex="-1" role="dialog" aria-labelledby="creatorNameFilterModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="creatorNameFilterModalLabel">Creator Name</h5>
+                <div class="modalClose">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row avenir-font">
+                    <div class="input-group m-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                        </div>
+                        <input type="text" class="form-control search-input avenir-font"  placeholder="Creators">
+                    </div>
+                </div>
+                <div class="row avenir-font">
+                    <div class="col creatorNameList">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <span class="apply-button pointer">Apply</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+<script>
+    let isDatePickerApplied = false;
+
+    const initTotalCounts = function(){
+        let countList = ['ad_install_dashboard_total_installs', 'ad_install_dashboard_total_views']
+        $.ajax('/api/v1/marketing/dashboard/counts/?queries='+countList.join(','), {
+            method: 'GET',
+            success: function(response){
+                $('#totalViews .value-count').text(response.ad_install_dashboard_total_views)
+                $('#totalInstalls .value-count').text(response.ad_install_dashboard_total_installs)
+            }
+        })
+    }
+
+    let createChart = function(chartName, canvas, labels, dataset){
+        return new Chart(canvas, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chartName,
+                    backgroundColor: 'rgb(0, 0, 0)',
+                    borderColor: 'rgb(0, 0, 0)',
+                    data: dataset,
+                    fill: false,
+                }],
+
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    }
+
+    let getExtraFilterData = function(){
+        let filters = {}
+
+        let creatorIdList = []
+        $.each($('.creatorNameList input[type=checkbox]:checked'), function(i, item){
+            creatorIdList.push($(this).val())
+        })
+
+        if(creatorIdList.length > 0)
+            filters['creators'] = creatorIdList.join(',')
+
+        let brandFilter = $('.brandFilter').val()
+        console.log('brand filter', brandFilter)
+
+        if(brandFilter)
+            filters['brand'] = brandFilter
+
+        let dateRange = $('#dateRange').val()
+
+        if(dateRange)
+            filters['date_range'] = dateRange
+
+        return filters;
+    }
+
+    const initiateTable = function(){
+        $("#adStatsTable").jsGrid({
+            width: "100%",
+            height: "450px",
+
+            inserting: false,
+            editing: false,
+            sorting: true,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            filtering: false,
+            pagerFormat: "{first} {pages} {last}",
+            pageButtonCount: 3,
+            pageSize: $("#pageSize").val(),
+            fields: [
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false, sorting: false,
+                    itemTemplate: function(value, _){
+                        let index = 0;
+                        $.each(this._grid.data, function(i, item){
+                            if(item.id == value){
+                                index = i;
+                                return false
+                            }
+                        })
+                        return index + 1
+                    }
+                },
+                { title: "Video Title", name: "ad__title", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Creator Name", name: "ad__created_by__username", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Views", name: "view_count", type: "text", width: 60, align: "center"},
+                { title: "Installs", name: "install_count", type: "text", width: 60, align: "center", css: "daterange-field"},
+                { title: "CTR", name: "ctr", type: "number", align: "center", width: 40, css: 'range-field'},
+                { title: "Skips", name: "skip_count", type: "text", align: "center"},
+                { title: "Full ad watched", name: "full_watched", type: "text", align: "center"},
+                { title: "Avg. time before Install (Secs)", name: "average_install_time", type: "text", align: "center"},
+                { title: "Avg. time before Skip (Secs)", name: "average_skip_time", type: "text", align: "center"},
+            ],
+            controller: {
+                loadData: function(filter) {
+                    filter['page'] = filter['pageIndex']
+                    filter['page_size'] = $("#pageSize").val()
+
+                    filter = Object.assign(filter, getExtraFilterData())
+                    console.log("filter", filter)
+
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/marketing/ad/stats/",
+                        data: filter,
+                        headers: headers
+                    });
+                },
+                
+            },
+            onDataLoaded: function(gridInstance){
+                
+            }
+        });
+
+        let grid = $("#adStatsTable").data("JSGrid");
+
+        $(document).on('click', '#creatorNameFilterModal .apply-button', function(){
+            grid.reset()
+            $('#creatorNameFilterModal .close').click()
+        })
+
+        $(document).on('change', '.brandFilter', function(){
+            grid.reset()
+        })
+
+        $(document).on('click', '#dateRange', function(){
+            if(isDatePickerApplied)
+                return
+
+            $('#dateRange').daterangepicker({
+                opens: 'center',
+                locale: {
+                    format: 'DD-MM-YYYY'
+                }
+            }, function(start, end, label) {});
+            isDatePickerApplied = true
+        })
+        
+
+        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+            grid.reset();
+        });
+
+        $(document).on('change', '#pageSize', function(){
+            grid.reset()
+        })
+    }
+
+    const loadCreators = function(){
+        const getCreators = function(q){
+            $.ajax('/api/v1/marketing/ad/creator/?q='+q, {
+                method: 'GET',
+                headers: headers,
+                success: function(response){
+                    let creatorList = $('#creatorNameFilterModal .creatorNameList')
+                        creatorList.html('')
+                        $.each(response.results, function(i, item){
+                            creatorList.append(`<div class="row"><div class="form-group form-check">
+                                <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                                <label class="form-check-label">${ item.username }</label>
+                            </div></div>`)
+                        })
+                }
+            })
+        }
+
+        $(document).on('keyup', '#creatorNameFilterModal .search-input', function(){
+            let text = $(this).val()
+
+            if(text.length > 0 && text.lenght < 3)
+                return
+            
+            getCreators(text)
+
+        })
+        getCreators('')
+    }
+
+    const loadBrands = function(){
+        $.ajax('/api/v1/marketing/ad/brand/', {
+            method: 'GET',
+            headers: headers,
+            success: function(response){
+                let selectDiv = $('.brandFilter');
+
+                $.each(response.results, function(i, item){
+                    selectDiv.append(`<option value="${ item.id }"> ${ item.name } </option>`)
+                })
+
+                selectDiv.select2();
+            }
+        })
+    }
+
+    const loadCounts = function(){
+        $.ajax('/api/v1/ad/dashboard-counts', {
+            method: 'GET',
+            success: function(response){
+                $("#totalViews").find('.value-count').text(response.total_ad_views)
+                $("#totalInstalls").find('.value-count').text(response.total_ad_installs)
+            }
+        })
+    }
+
+    const initChart = function(element, type, chartInstance){
+        $(document).on('change', element, function(){
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/marketing/ad/install/chart/?chart_type=" + type + "&data_type=" + $(this).val(),
+                headers: headers,
+                success: function(response){
+                    console.log("response", response)
+                    chartInstance.data.labels = response.labels
+                    chartInstance.data.datasets[0].data = response.dataset
+                    chartInstance.update()
+                }
+            });
+        })
+    }
+
+    const initDownloadCSV = function(){
+        $(document).on('click', '#exportOrder', function(){
+            let fileType = $('select[name=fileType]').val();
+            let params = {}
+
+            if(fileType)
+                params['format'] = fileType
+            
+            params = Object.assign(params, getExtraFilterData())
+
+            window.open('/report/ad/install/stats/download?' + $.param(params), '_self')
+        });
+    }
+
+    $(document).ready(function(){
+        initTotalCounts()
+        initiateTable()
+        loadCreators()
+        loadBrands()
+        initDownloadCSV()
+        var allViewsChart = createChart('Views', document.getElementById('allViewsChart').getContext('2d'), [], []);
+        var allInstallsChart = createChart('Install', document.getElementById('allInstallsChart').getContext('2d'), [], []);
+        initChart('#allViewsSelect', 'views', allViewsChart)
+        initChart('#allInstallsSelect', 'installs', allInstallsChart)
+        $('#allViewsSelect').trigger('change')
+        $('#allInstallsSelect').trigger('change')
+    })
+</script>
+
+{% endblock js %}

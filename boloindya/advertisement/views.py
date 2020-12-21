@@ -31,7 +31,7 @@ from drf_spirit.models import DatabaseRecordCount
 
 from advertisement.utils import query_fetch_data, convert_to_dict_format, filter_data_from_dict, PageNumberPaginationRemastered
 from advertisement.models import (Ad, ProductReview, Order, Product, Address, OrderLine, AdEvent,
-                                    Seen, Skipped, Clicked, Brand)
+                                    Seen, Skipped, Install, ShopNow, LearnMore, PlaceOrder, FullWatched, Brand)
 from advertisement.serializers import (AdSerializer, ReviewSerializer, OrderSerializer, ProductSerializer, AddressSerializer, 
                                         OrderCreateSerializer, OrderLineSerializer, ChangePasswordSerializer)
 from drf_spirit.utils import language_options
@@ -100,6 +100,9 @@ class JarvisAdViewset(ModelViewSet):
 
         return queryset.order_by('id')
 
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
 
 class JarvisOrderViewset(ModelViewSet):
     queryset = Order.objects.all()
@@ -790,10 +793,10 @@ class DashBoardCountAPIView(APIView):
             ('onboarded_products', Product.objects.filter(is_active=True), Value('i', 0, lock=lock)),
             ('impressions', Seen.objects.all(), Value('i', 0, lock=lock)),
             ('skips', Skipped.objects.all(), Value('i', 0, lock=lock)),
-            ('install_click', Clicked.objects.filter(cta='install'), Value('i', 0, lock=lock)),
-            ('shop_now_click', Clicked.objects.filter(cta='shop_now'), Value('i', 0, lock=lock)),
+            ('install_click', Install.objects.all(), Value('i', 0, lock=lock)),
+            ('shop_now_click', ShopNow.objects.all(), Value('i', 0, lock=lock)),
             ('brand_onboarded', Brand.objects.filter(is_active=True), Value('i', 0, lock=lock)),
-            ('learn_more_click', Clicked.objects.filter(cta='learn_more'), Value('i', 0, lock=lock)),
+            ('learn_more_click', LearnMore.objects.all(), Value('i', 0, lock=lock)),
             ('lifetime_order', Order.objects.exclude(state='draft'), Value('i', 0, lock=lock)),
             ('unique_order', Order.objects.exclude(state='draft').distinct('user_id'), Value('i', 0, lock=lock)),
             ('month_order', Order.objects.filter(date__gte='%s-%s-01'%(today.year, today.month)).exclude(state='draft'), Value('i', 0, lock=lock)),
@@ -1069,3 +1072,4 @@ class ChangePasswordAPIView(UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
