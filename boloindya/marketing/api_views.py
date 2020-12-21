@@ -37,19 +37,19 @@ class AdStatsListAPIView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
+        print 'queryset', queryset
         # print pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
         #                 'view_count', 'ad__title', 'ad__created_by__username' ))
         dataframe = pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
-                        'view_count', 'ad__title', 'ad__created_by__username' ))
+                        'view_count', 'ad__product__name', 'ad__created_by__username' ))
         
         if dataframe.empty:
             return Response({
                 'data': [],
                 'itemsCount': 0
         })
-
-        dataframe = dataframe.groupby(['ad_id', 'ad__title', 'ad__created_by__username']).sum()
+        print "datafram", json.loads(dataframe.to_json(orient="table")).get('data')
+        dataframe = dataframe.groupby(['ad_id', 'ad__created_by__username']).sum()
 
         dataframe['average_install_time'] = dataframe['install_playtime'] / dataframe['install_count']
         dataframe['average_skip_time'] = dataframe['skip_playtime'] / dataframe['skip_count']
@@ -63,8 +63,9 @@ class AdStatsListAPIView(ListAPIView):
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        # print "page", page, "page_size", page_size
-        # print "data", json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
+        #print "page", page, "page_size", page_size
+        #print "datafram", json.loads(dataframe.to_json(orient="table")).get('data')
+        #print "data", json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
 
         return Response({
             'data': json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data'),

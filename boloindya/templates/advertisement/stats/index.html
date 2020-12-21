@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% block title %}Bolo Indya | Analytics{% endblock title %}
+
 {% block css %}
     <style>
         .jsgrid-grid-header{
@@ -20,7 +22,23 @@
             max-height: 225px;
             overflow-y: scroll;
         }
+.jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
 
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
         /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
             width: 50% !important;
         } */
@@ -138,7 +156,7 @@
                 <div class="label-group-content creatorFilter">
                     <select name="fileType" id="" class="selectpicker">
                         <option value="">File Type</option>
-                        <option value="csv">CSV</option>
+                        <option value="csv" selected>CSV</option>
                     </select>
                 </div>
             </div>
@@ -282,11 +300,11 @@
             pageButtonCount: 3,
             pageSize: $("#pageSize").val(),
             fields: [
-                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false, sorting: false,
+                { title: "Sr. No.", name: "ad_id", type: "number", width: 30, align: "center", filtering: false, sorting: false,
                     itemTemplate: function(value, _){
                         let index = 0;
                         $.each(this._grid.data, function(i, item){
-                            if(item.id == value){
+                            if(item.ad_id == value){
                                 index = i;
                                 return false
                             }
@@ -294,7 +312,8 @@
                         return index + 1
                     }
                 },
-                { title: "Video Title", name: "ad__title", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Ad ID", name: "ad_id", type: "text", width: 60, align: "center"},
+                { title: "Video Title", name: "ad__product__name", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Creator Name", name: "ad__created_by__username", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Views", name: "view_count", type: "text", width: 60, align: "center"},
                 { title: "Installs", name: "install_count", type: "text", width: 60, align: "center", css: "daterange-field"},
