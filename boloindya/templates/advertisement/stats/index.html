@@ -21,6 +21,29 @@
             overflow-y: scroll;
         }
 
+        .jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
+
+        .creatorFilterButton{
+            height: 38px;
+            width: 140px;
+        }
+
         /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
             width: 50% !important;
         } */
@@ -72,9 +95,9 @@
                 </div>
                 <div class="col-4" id="">
                     <select name="" id="allViewsSelect" class="selectpicker">
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
+                        <option value="weekly">Daily</option>
+                        <option value="monthly">Weekly</option>
+                        <option value="yearly">Monthly</option>
                     </select>
                 </div>
             </div>
@@ -90,9 +113,9 @@
                 </div>
                 <div class="col-4" id="">
                     <select name="" id="allInstallsSelect" class="selectpicker">
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
+                        <option value="weekly">Daily</option>
+                        <option value="monthly">Weekly</option>
+                        <option value="yearly">Monthly</option>
                     </select>
                 </div>
             </div>
@@ -114,7 +137,7 @@
                     <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
                 </div>
                 <div class="label-group-content creatorFilter">
-                    <button class="btn creatorFilterButton">Creator Name</button>
+                    <button class="btn creatorFilterButton textEllipsis">Creator Name</button>
                 </div>
             </div>
         </div>
@@ -123,7 +146,7 @@
                 <div class="label-group-prepend">
                     <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
                 </div>
-                <div class="label-group-content creatorFilter">
+                <div class="label-group-content">
                     <input type="text" class="form-control" id="dateRange" placeholder="Date Range">
                 </div>
             </div>
@@ -135,10 +158,10 @@
                         <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
                     </div>
                 </div>
-                <div class="label-group-content creatorFilter">
+                <div class="label-group-content">
                     <select name="fileType" id="" class="selectpicker">
                         <option value="">File Type</option>
-                        <option value="csv">CSV</option>
+                        <option value="csv" selected>CSV</option>
                     </select>
                 </div>
             </div>
@@ -151,7 +174,7 @@
                         <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
                     </div>
                 </div>
-                <div class="label-group-content creatorFilter">
+                <div class="label-group-content">
                     <select name="recordsCount" id="pageSize" class="selectpicker">
                         <option value="10">10 Records</option>
                         <option value="20">20 Records</option>
@@ -246,7 +269,8 @@
 
         let creatorIdList = []
         $.each($('.creatorNameList input[type=checkbox]:checked'), function(i, item){
-            creatorIdList.push($(this).val())
+            if($(this).val() != 'all')
+                creatorIdList.push($(this).val())
         })
 
         if(creatorIdList.length > 0)
@@ -294,13 +318,13 @@
                         return index + 1
                     }
                 },
-                { title: "Video Title", name: "ad__title", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Brand", name: "ad__brand__name", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Creator Name", name: "ad__created_by__username", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Views", name: "view_count", type: "text", width: 60, align: "center"},
                 { title: "Installs", name: "install_count", type: "text", width: 60, align: "center", css: "daterange-field"},
-                { title: "CTR", name: "ctr", type: "number", align: "center", width: 40, css: 'range-field'},
+                { title: "CTR(%)", name: "ctr", type: "number", align: "center", width: 50, css: 'range-field'},
                 { title: "Skips", name: "skip_count", type: "text", align: "center"},
-                { title: "Full ad watched", name: "full_watched", type: "text", align: "center"},
+                { title: "Full ad watched", name: "full_watched", type: "text", align: "center", width: 50},
                 { title: "Avg. time before Install (Secs)", name: "average_install_time", type: "text", align: "center"},
                 { title: "Avg. time before Skip (Secs)", name: "average_skip_time", type: "text", align: "center"},
             ],
@@ -331,6 +355,18 @@
         $(document).on('click', '#creatorNameFilterModal .apply-button', function(){
             grid.reset()
             $('#creatorNameFilterModal .close').click()
+
+            let button = $(".creatorFilter button");
+            let buttonName = []
+            $.each($('.creatorNameList input[type="checkbox"]:checked:not(.creatorNameList input[type="checkbox"][value="all"])'), function(i, element){
+                buttonName.push($(element).parent().find('label').text())
+            });
+            
+            if(buttonName.length == 0)
+                button.text("Creator Name")
+            else
+                button.text(buttonName.join(', '))
+
         })
 
         $(document).on('change', '.brandFilter', function(){
@@ -344,7 +380,7 @@
             $('#dateRange').daterangepicker({
                 opens: 'center',
                 locale: {
-                    format: 'DD-MM-YYYY'
+                    format: 'DD/MM/YYYY'
                 }
             }, function(start, end, label) {});
             isDatePickerApplied = true
@@ -367,13 +403,31 @@
                 headers: headers,
                 success: function(response){
                     let creatorList = $('#creatorNameFilterModal .creatorNameList')
-                        creatorList.html('')
-                        $.each(response.results, function(i, item){
-                            creatorList.append(`<div class="row"><div class="form-group form-check">
-                                <input type="checkbox" value="${ item.id }" class="form-check-input"> 
-                                <label class="form-check-label">${ item.username }</label>
-                            </div></div>`)
-                        })
+                    creatorList.html('')
+                    creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="all" class="form-check-input"> 
+                            <label class="form-check-label">All</label>
+                        </div></div>`)
+                    $.each(response.results, function(i, item){
+                        creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                            <label class="form-check-label">${ item.username }</label>
+                        </div></div>`)
+                    })
+                    $(document).on('change', '.creatorNameList input[type="checkbox"][value="all"]', function(){
+                        console.log("change")
+                        if($('.creatorNameList input[type="checkbox"][value="all"]:checked').length > 0){
+                            $.each($('.creatorNameList input[type="checkbox"]:not(.creatorNameList input[type="checkbox"][value="all"])'), function(i, element){
+                                $(element).prop("checked", true);
+                            });
+                        }
+                        else{
+                            $.each($('.creatorNameList input[type="checkbox"]:not(.creatorNameList input[type="checkbox"][value="all"])'), function(i, element){
+                                console.log("element", $(element))
+                                $(element).prop("checked", false);
+                            });
+                        }
+                    })
                 }
             })
         }
