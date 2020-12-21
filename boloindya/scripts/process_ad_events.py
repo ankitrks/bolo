@@ -24,7 +24,9 @@ rand = Random()
 dashboard_data = {}
 
 def get_mapped_ad(ad_id):
-    return rand.randint(1, 6)
+    if ad_id in (0, 1, 2, 3):
+        return 4
+    return ad_id
 
 def get_last_processed_id(name):
     param, is_created = SystemParameter.objects.get_or_create(name=name, defaults={'value': 0})

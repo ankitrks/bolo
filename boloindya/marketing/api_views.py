@@ -37,7 +37,7 @@ class AdStatsListAPIView(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
+        print 'queryset', queryset
         # print pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
         #                 'view_count', 'ad__title', 'ad__created_by__username' ))
         dataframe = pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
@@ -48,9 +48,7 @@ class AdStatsListAPIView(ListAPIView):
                 'data': [],
                 'itemsCount': 0
         })
-
         dataframe = dataframe.groupby(['ad_id']).sum()
-
         dataframe['average_install_time'] = dataframe['install_playtime'] / dataframe['install_count']
         dataframe['average_skip_time'] = dataframe['skip_playtime'] / dataframe['skip_count']
         dataframe['ctr'] = (dataframe['install_count'] / dataframe['view_count'])*100
@@ -63,9 +61,6 @@ class AdStatsListAPIView(ListAPIView):
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        # print "page", page, "page_size", page_size
-        # print "data", json.dumps(json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")), indent=3)
-
         final_dataframe = dataframe[(page - 1) * page_size:(page) * page_size].round(2)
         data = json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
 
@@ -76,7 +71,6 @@ class AdStatsListAPIView(ListAPIView):
                 if item.get('ad_id') == ad.get('id'):
                     item['ad__brand__name'] = ad.get('brand__name')
                     item['ad__created_by__username'] = ad.get('created_by__username')
-
 
         return Response({
             'data': data,
