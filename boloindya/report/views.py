@@ -152,7 +152,7 @@ class AdInstallStatsDownloadView(DownloadView):
         query = """
             select S."S No" as "Sr No", ad.title as "Video Title", u.username as "Creator Name", S.view_count as "Views", 
                 S.install_count as "Installs", 
-                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),4) * 100 as "CTR(%)", 
+                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),4) as "CTR", 
                 S.skip_count as "Skips",  S.full_watched as "Full Watched",
                 round(cast(float8(S.install_playtime)/float8(COALESCE(nullif(S.install_count, 0), 1)) as numeric),2) as "Avg. time before Install (Secs)", 
                 round(cast(float8(S.skip_playtime)/float8(COALESCE(nullif(S.skip_count, 0), 1)) as numeric),2) as "Avg. time before Skip (Secs)"
@@ -172,14 +172,11 @@ class AdInstallStatsDownloadView(DownloadView):
 
         if self.request.GET.get('date_range'):
             start_date, end_date = self.request.GET.get('date_range').split(' - ')
-            start_date = datetime.strptime(start_date, '%d-%m-%Y')
-            end_date = datetime.strptime(end_date, '%d-%m-%Y')
-
-            query = query%(" date between '%s' and '%s' "%(str(start_date), str(end_date)),)
+            start_date = datetime.strptime(start_date, '%d/%m/%Y')
+            end_date = datetime.strptime(end_date, '%d/%m/%Y')
+            print "date ragnge", " date between '%s' and '%s' "%(datetime.strftime(start_date, '%Y-%m-%d'), datetime.strftime(end_date, '%Y-%m-%d'))
+            query = query%" date between '%s' and '%s' "%(datetime.strftime(start_date, '%Y-%m-%d'), datetime.strftime(end_date, '%Y-%m-%d'))
             
-            query += " and ad.start_time between %s and %s "
-            params.append(start_date)
-            params.append(end_date)
         else:
             query = query%"true"
 

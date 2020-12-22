@@ -45,6 +45,19 @@
             height: 38px;
             width: 140px;
         }
+
+        .fa.clear{
+            display: none;
+        }
+
+        .datePickerApplied .clear, .creatorFilterApplied .clear{
+            display: inline;
+            position: absolute;
+            right: 15%;
+            top: 10px;
+        }
+
+
         /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
             width: 50% !important;
         } */
@@ -68,22 +81,30 @@
     </div>
     <div class="row">
         <div class="col-3 " id="totalViews">
-            <div class="row count-div">
-                <div class="col-6 pt-3 count value-count text-center">
-                    -
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col ">
+                        Total Views <span class="totalValueBrand"></span>
+                    </div>
                 </div>
-                <div class="col-6 pt-3 avenir-font count-text text-center">
-                    Total Views
+                <div class="row pt-1 count  text-center">
+                    <div class="col value-count">
+                        -
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-3" id="totalInstalls">
-            <div class="row count-div">
-                <div class="col-6 pt-3 count value-count text-center" >
-                    -
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        Total Installs<span class="totalValueBrand"></span>
+                    </div>
                 </div>
-                <div class="col-6 pt-3 avenir-font count-text text-center">
-                    Total Installs
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,26 +150,28 @@
     <div class="row mt-5">
         <div class="col-2">
             <select name="" id="" class="brandFilter">
-                <option value="">Brand Name</option>
+                <option value="">All Brands</option>
             </select>
         </div>
         <div class="col-2">
-            <div class="label-group mb-2 mr-sm-2 pointer" data-toggle="modal" data-target="#creatorNameFilterModal">
-                <div class="label-group-prepend">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend showcreatorNameFilterModal">
                     <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
                 </div>
                 <div class="label-group-content creatorFilter">
-                    <button class="btn creatorFilterButton textEllipsis">Creator Name</button>
+                    <button class="btn creatorFilterButton textEllipsis showcreatorNameFilterModal">Creator Name</button>
+                    <i class="fa fa-times-circle clear" aria-hidden="true"></i>
                 </div>
             </div>
         </div>
-        <div class="col-2">
+        <div class="col-3">
             <div class="label-group mb-2 mr-sm-2 pointer">
                 <div class="label-group-prepend">
-                    <div class="label-group-text"><i class="fa fa-filter" aria-hidden="true"></i></div>
+                    <div class="label-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
                 </div>
                 <div class="label-group-content">
                     <input type="text" class="form-control" id="dateRange" placeholder="Date Range">
+                    <i class="fa fa-times-circle clear" aria-hidden="true"></i>
                 </div>
             </div>
         </div>
@@ -231,17 +254,6 @@
 <script>
     let isDatePickerApplied = false;
 
-    const initTotalCounts = function(){
-        let countList = ['ad_install_dashboard_total_installs', 'ad_install_dashboard_total_views']
-        $.ajax('/api/v1/marketing/dashboard/counts/?queries='+countList.join(','), {
-            method: 'GET',
-            success: function(response){
-                $('#totalViews .value-count').text(response.ad_install_dashboard_total_views)
-                $('#totalInstalls .value-count').text(response.ad_install_dashboard_total_installs)
-            }
-        })
-    }
-
     let createChart = function(chartName, canvas, labels, dataset){
         return new Chart(canvas, {
             // The type of chart we want to create
@@ -289,6 +301,28 @@
             filters['date_range'] = dateRange
 
         return filters;
+    }
+
+    const initTotalCounts = function(){
+        let countList = ['ad_install_dashboard_total_installs', 'ad_install_dashboard_total_views']
+        $.ajax('/api/v1/marketing/dashboard/counts/?queries='+countList.join(',') + '&' + $.param(getExtraFilterData()), {
+            method: 'GET',
+            success: function(response){
+                $('#totalViews .value-count').text(response.ad_install_dashboard_total_views)
+                $('#totalInstalls .value-count').text(response.ad_install_dashboard_total_installs)
+
+                if(response.brand_name){
+                    $.each($(".totalValueBrand"), function(i, element){
+                        $(element).text(' (' + response.brand_name + ')')
+                    })
+                }
+                else{
+                    $.each($(".totalValueBrand"), function(i, element){
+                        $(element).text('')
+                    })
+                }
+            }
+        })
     }
 
     const initiateTable = function(){
@@ -366,13 +400,23 @@
             
             if(buttonName.length == 0)
                 button.text("Creator Name")
-            else
+            else{
                 button.text(buttonName.join(', '))
+                button.parent().addClass("creatorFilterApplied")
+            }
+        })
 
+        $(document).on('click', '.creatorFilterApplied .clear', function(){
+            $.each($('.creatorNameList input[type="checkbox"]:checked'), function(i, element){
+                $(element).prop("checked", false);
+            });
+            $(".creatorFilter button").text("Creator Name").parent().removeClass("creatorFilterApplied")
+            grid.reset()
         })
 
         $(document).on('change', '.brandFilter', function(){
             grid.reset()
+            initTotalCounts()
         })
 
         $(document).on('click', '#dateRange', function(){
@@ -385,13 +429,24 @@
                     format: 'DD/MM/YYYY'
                 }
             }, function(start, end, label) {});
+
+            $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+                grid.reset();
+            });
             isDatePickerApplied = true
+            $('#dateRange').parent().addClass('datePickerApplied')
+
+            $(document).on('click', '.datePickerApplied .clear', function(){
+                let dateRangeElement = $('#dateRange')
+                dateRangeElement.data('daterangepicker').remove();
+                dateRangeElement.parent().removeClass('datePickerApplied')
+                dateRangeElement.val('')
+                isDatePickerApplied = false
+                grid.reset()
+            })
         })
         
 
-        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
-            grid.reset();
-        });
 
         $(document).on('change', '#pageSize', function(){
             grid.reset()
@@ -514,6 +569,10 @@
         initChart('#allInstallsSelect', 'installs', allInstallsChart)
         $('#allViewsSelect').trigger('change')
         $('#allInstallsSelect').trigger('change')
+
+        $(document).on('click', '.showcreatorNameFilterModal', function(){
+            $('#creatorNameFilterModal').modal({'show': true})
+        })
     })
 </script>
 
