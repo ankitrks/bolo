@@ -54,7 +54,7 @@ def run():
     #            .exclude(state__in=['completed', 'ongoing', 'inactive'], is_deleted=True)\
     #            .update(state='ongoing')
 
-    Ad.objects.filter(end_time__lte=now, state=['ongoing'], is_deleted=False).update(state='completed')
+    Ad.objects.filter(end_time__lte=now, state='ongoing', is_deleted=False).update(state='completed')
 
     cursor.execute("""
         SELECT ad.title, ad.id, ad.frequency_type, ad.languages, freq.sequence, freq.scroll
