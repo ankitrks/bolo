@@ -5751,7 +5751,7 @@ class MusicCreateAPIView(APIView):
 
 class MusicReportListAPIView(ListAPIView):
     serializer_class = MusicReportSerializer
-    queryset = MusicReport.objects.filter(is_active=True)
+    queryset = MusicReport.objects.filter(is_active=True, target__in=('general', 'music'))
 
 from copy import deepcopy
 
@@ -5766,6 +5766,43 @@ class MusicReportCreateAPIView(CreateAPIView):
         data = deepcopy(request.data)
         data['reporter'] = request.user.id
         data['music'] = request.parser_context.get('kwargs', {}).get('music_id')
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class ReportListAPIView(MusicReportListAPIView):
+    queryset = MusicReport.objects.filter(is_active=True)
+
+    def get_queryset(self):
+        queryset = self.queryset
+        target = self.request.query_params.get('target')
+
+        if target:
+            return queryset.filter(target=target)
+        else:
+            return queryset.filter(target='general')
+
+
+class ReportCreateAPIView(MusicReportCreateAPIView):
+    serializer_class = UserMusicReportSerializer
+
+    def create(self, request, target, id, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = deepcopy(request.data)
+        data['reporter'] = request.user.id
+
+        if target == 'music':
+            data['music'] = id
+        elif target == 'video':
+            data['video'] = id
+        elif target == 'user':
+            data['user'] = id
+
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

@@ -52,7 +52,7 @@ class MusicReportSerializer(ModelSerializer):
 class UserMusicReportSerializer(ModelSerializer):
     class Meta:
         model = UserMusicReport
-        fields = ('reporter', 'music', 'report')
+        fields = ('reporter', 'music', 'report', 'video', 'user', 'description')
 
 
 class TongueTwisterSerializer(ModelSerializer):

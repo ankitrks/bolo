@@ -501,9 +501,17 @@ class MusicAlbum(models.Model):
         ordering = ['order_no']
 
 
+MUSIC_REPORT_CHOICES = (
+    ('video', 'Video'),
+    ('music', 'Music'),
+    ('user', 'User'),
+    ('general', 'General'),
+)
+
 class MusicReport(models.Model):
     text = models.CharField(_("Text"), max_length=200)
     is_active = models.BooleanField(_("Is Active"), default=True)
+    target = models.CharField(_("Target"), max_length=30, choices=MUSIC_REPORT_CHOICES, null=True, blank=True, default='general')
 
     def __unicode__(self):
         return self.text
@@ -512,9 +520,14 @@ class MusicReport(models.Model):
 class UserMusicReport(models.Model):
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True, auto_now=False)
     reporter = models.ForeignKey('auth.User', related_name='music_reports')
-    music = models.ForeignKey('drf_spirit.MusicAlbum', related_name='reports') 
+    music = models.ForeignKey('drf_spirit.MusicAlbum', related_name='reports', null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='reports', null=True, blank=True)
+    video = models.ForeignKey('forum_topic.Topic', related_name='reports', null=True, blank=True)
     report = models.ForeignKey('drf_spirit.MusicReport', related_name='reports')
+    description = models.TextField(_("Description"), null=True, blank=True)
 
+    def __unicode__(self):
+        return '%s reported %s (%s)'%(self.reporter.username, self.music or self.user or self.video, self.report.target)
 
 class SystemParameter(models.Model):
     name = models.CharField(max_length=200)
