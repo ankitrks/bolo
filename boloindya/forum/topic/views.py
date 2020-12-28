@@ -1181,7 +1181,7 @@ def old_home(request):
 #====================New Home =============================
 def new_home_updated(request):
 
-    if hasattr(settings, 'IS_JAVIS_SERVER') and settings.IS_JAVIS_SERVER:
+    if hasattr(settings, 'IS_JAVIS_SERVER') and settings.IS_JAVIS_SERVER and 'jarvis.boloindya.com' in request.META.get('HTTP_HOST'):
         return redirect('/jarvis/')
 
     categories = []
