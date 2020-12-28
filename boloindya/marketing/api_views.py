@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.contrib.humanize.templatetags.humanize import intword
 from django.contrib.auth.models import User
 from django.db import connections
+from django.db.models import Sum
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -42,7 +43,7 @@ class AdStatsListAPIView(ListAPIView):
         #                 'view_count', 'ad__title', 'ad__created_by__username' ))
         dataframe = pd.DataFrame(queryset.values('ad_id', 'full_watched', 'install_count', 'skip_playtime', 'install_playtime', 'skip_count', 
                         'view_count' ))
-        
+
         if dataframe.empty:
             return Response({
                 'data': [],
@@ -66,11 +67,11 @@ class AdStatsListAPIView(ListAPIView):
 
         # print Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username')
 
-        for ad in Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username'):
+        for ad in Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'creator__username'):
             for item in data:
                 if item.get('ad_id') == ad.get('id'):
                     item['ad__brand__name'] = ad.get('brand__name')
-                    item['ad__created_by__username'] = ad.get('created_by__username')
+                    item['ad__created_by__username'] = ad.get('creator__username')
 
         return Response({
             'data': data,
@@ -84,15 +85,15 @@ class AdStatsListAPIView(ListAPIView):
         date_range = self.request.query_params.get('date_range')
 
         if creators:
-            queryset = queryset.filter(ad__created_by__in=creators.split(','))
+            queryset = queryset.filter(ad__creator_id__in=creators.split(','))
 
         if brand:
             queryset = queryset.filter(ad__brand_id=brand)
 
         if date_range:
             start_date, end_date = date_range.split(' - ')
-            start_date = datetime.strptime(start_date, '%d-%m-%Y').date()
-            end_date = datetime.strptime(end_date, '%d-%m-%Y').date()
+            start_date = datetime.strptime(start_date, '%d/%m/%Y').date()
+            end_date = datetime.strptime(end_date, '%d/%m/%Y').date()
             print "start date", start_date, "end date", end_date
             queryset = queryset.filter(date__gte=start_date, date__lte=end_date)
 
@@ -105,9 +106,10 @@ class AdCreatorAPIView(ListAPIView, BaseMarketingAPIView):
 
     def get_queryset(self):
         q = self.request.query_params.get('q')
+        ids = Ad.objects.filter(creator__isnull=False).values_list('creator_id', flat=True)
 
         if q:
-            return self.queryset.filter(username__istartswith=q)
+            return self.queryset.filter(username__istartswith=q, id__in=ids)
 
         return self.queryset
 
@@ -259,17 +261,32 @@ class AdInstallChartDataAPIView(APIView):
         return labels, dataset
 
 
-class DashboadCountAPIView(APIView, BaseMarketingAPIView):
+class AdInstallDashboadCountAPIView(APIView, BaseMarketingAPIView):
     def get(self, request, *args, **kwargs):
         counts = {}
+        brand_id = request.query_params.get('brand')
+        print "dashboard", request.query_params
+
 
         for item in request.query_params.get('queries').split(','):
-            count = intword(DatabaseRecordCount.get_value(item))
+            if brand_id:
+                if item == 'ad_install_dashboard_total_installs':
+                    count = AdStats.objects.filter(ad__brand_id=brand_id).aggregate(Sum('install_count')).get('install_count__sum', 0) or 0
+                elif item == 'ad_install_dashboard_total_views':
+                    count = AdStats.objects.filter(ad__brand_id=brand_id).aggregate(Sum('view_count')).get('view_count__sum', 0) or 0
+
+                count = intword(count)
+            else:
+                count = intword(DatabaseRecordCount.get_value(item))
+
             count_split = count.split(' ') if not type(count) == int else []
 
             if len(count_split) > 1:
                 count = str(int(float(count_split[0]))) + ' ' + count_split[1].capitalize()[0]
 
             counts[item] = count
+
+        if brand_id:
+            counts['brand_name'] = Brand.objects.get(id=brand_id).name
 
         return Response(counts)

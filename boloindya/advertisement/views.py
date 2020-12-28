@@ -440,6 +440,7 @@ def ad_creation_form(request):
                 website_link = request.POST.get('website_link', None)
                 ad_id = request.POST.get('ad_id', None)
                 languages = request.POST.getlist('lang_options',None)
+                creator = request.POST.get('creator', None)
                 ad_folder_key = request.POST.get('folder_prefix','from_upload_panel/advertisement/ad/')
                 if all(freq=='' for freq in scrolls):
                     return HttpResponse(json.dumps({'message':'fail','reason':'No Frequnecy scroll provided'}),content_type="application/json")
@@ -472,6 +473,7 @@ def ad_creation_form(request):
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
                 ad_dict['ad_type'] = ad_type
+                ad_dict['creator_id'] = creator
                 if languages:
                     ad_dict['languages'] = languages
 
