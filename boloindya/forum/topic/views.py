@@ -1625,3 +1625,21 @@ def delete_video(request):
 
 def event_redirect_view(request, event_id):
     return HttpResponsePermanentRedirect('https://play.google.com/store/apps/details?id=com.boloindya.boloindya&event=%s'%event_id)
+
+
+def serve_apple_app_site_association(request):
+    json_data = {
+        "applinks": {
+            "apps": [],
+            "details": [
+                {
+                    "appID": "G25XAGBSCB.com.boloindya.ios",
+                    "paths": [ "*" ]
+                }
+            ]
+        }
+    }
+    response = HttpResponse(json.dumps(json_data), content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="apple-app-site-association"'
+
+    return response

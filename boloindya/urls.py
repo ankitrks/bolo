@@ -146,6 +146,7 @@ urlpatterns += i18n_patterns(
     url(r'^(?P<username>[\w-]+)/(?P<id>\d+)/$', forum.topic.views.video_details, name='video_details'),
     url(r'^(?P<username>[\w-]+)/(?P<id>\d+)/(?P<userid>\d+)/$', forum.topic.views.video_details, name='video_details'),
     url(r'^test/testurllang/$', forum.topic.views.testurllang, name='testurllang'),
+    url(r'^apple-app-site-association$', forum.topic.views.serve_apple_app_site_association),
     #prefix_default_language=True
     
 )
