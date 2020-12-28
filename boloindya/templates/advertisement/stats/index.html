@@ -355,7 +355,7 @@
                 },
                 { title: "Brand", name: "ad__brand__name", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Ad ID", name: "ad_id", type: "text", width: 60, align: "center"},
-                { title: "Creator Name", name: "ad__created_by__username", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Creator Name", name: "creator", type: "text", width: 60, align: "center", sorting: false},
                 { title: "Views", name: "view_count", type: "text", width: 60, align: "center"},
                 { title: "Installs", name: "install_count", type: "text", width: 60, align: "center", css: "daterange-field"},
                 { title: "CTR(%)", name: "ctr", type: "number", align: "center", width: 50, css: 'range-field'},
@@ -450,6 +450,7 @@
 
         $(document).on('change', '#pageSize', function(){
             grid.reset()
+            $("#adStatsTable").jsGrid("option", "pageSize", $("#pageSize").val());
         })
     }
 
@@ -467,8 +468,8 @@
                         </div></div>`)
                     $.each(response.results, function(i, item){
                         creatorList.append(`<div class="row"><div class="form-group form-check">
-                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
-                            <label class="form-check-label">${ item.username }</label>
+                            <input type="checkbox" value="${ item }" class="form-check-input"> 
+                            <label class="form-check-label">${ item }</label>
                         </div></div>`)
                     })
                     $(document).on('change', '.creatorNameList input[type="checkbox"][value="all"]', function(){
