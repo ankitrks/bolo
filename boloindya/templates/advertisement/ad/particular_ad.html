@@ -1,5 +1,6 @@
 {% extends "advertisement/base.html" %}
 {% block local_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     #overlay {
   position: fixed; /* Sit on top of the page content */
@@ -83,6 +84,14 @@ ul li {
 .down {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+.select2-container{
+    width: 300px !important;
+}
+
+.select2-selection{
+    height: 35px !important;
 }
 </style>
 {% endblock local_css %}
@@ -182,6 +191,18 @@ ul li {
             
                 <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Product Discount: </label>
                 <input type="text" name="discount" placeholder="Enter Discount" id="discount">  
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 col-sm-3 col-xs-12 control-label">Creator</label>
+            <div class="col-md-8">
+                <select name="creator" id="creator">
+                    {% if ad.creator %}
+                        <option value="{{ ad.creator.id }}">{{ ad.creator.username }}</option>
+                    {% else %}
+                        <option>Select Creator</option>
+                    {% endif %}
+                </select>
+            </div>
         </div>
         <div class="form-group">
             <label for="name" class="col-md-3 col-sm-3 col-xs-12 control-label">Start Date: </label>
@@ -776,5 +797,41 @@ $(function() {
         });
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+ <script>
+     $(document).ready(function(){
+         // $("#creator").keyup(function(){
+         //     let term = $(this).val();
+         //     $.ajax("/api/v1/payment/user/?term=" + term, {
+         //         method: "GET",
+         //         success: function(response){
+         //             console.log("response", response)
+         //         }
+         //     })
+         // })
 
+         $("#creator").select2({
+             ajax: {
+                 url: '/api/v1/payment/user/',
+                 dataType: 'json',
+                 // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                 processResults: function (result) {
+                     console.log("result == ", result)
+                     let data = [];
+                     $.each(result, function(i, item){
+                         data.push({
+                             id: item.id,
+                             text: item.name ? item.username + ' (' + item.name + ')':item.username
+                         })
+                     })
+                     console.log("search user data", data)
+                     return {
+                         results: data
+                     };
+                 }
+             },
+         });
+         $('#creator').val("{{ ad.creator_id }}");
+     })
+ </script>
 {% endblock local_js %}

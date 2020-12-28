@@ -102,7 +102,7 @@ class AdStatsListAPIView(ListAPIView):
 
 class AdCreatorAPIView(ListAPIView, BaseMarketingAPIView):
     serializer_class = AdCreatorSerializer
-    queryset = User.objects.filter(is_staff=True)
+    queryset = User.objects.all()
 
     def get_queryset(self):
         q = self.request.query_params.get('q')
@@ -111,7 +111,7 @@ class AdCreatorAPIView(ListAPIView, BaseMarketingAPIView):
         if q:
             return self.queryset.filter(username__istartswith=q, id__in=ids)
 
-        return self.queryset
+        return self.queryset.filter(id__in=ids)
 
 
 class AdBrandAPIView(ListAPIView, BaseMarketingAPIView):
