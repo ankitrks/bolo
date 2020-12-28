@@ -62,19 +62,19 @@ class AdStatsListAPIView(ListAPIView):
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        final_dataframe = dataframe[(page - 1) * page_size:(page) * page_size].round(2)
-        data = json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(2).to_json(orient="table")).get('data')
+        final_dataframe = dataframe[(page - 1) * page_size:(page) * page_size].round(0)
+        data = json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(0).to_json(orient="table")).get('data')
 
         # print Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username')
 
-        for ad in Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'creator__username'):
+        for ad in Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'creator', 'state', 'start_time'):
             for item in data:
                 if item.get('ad_id') == ad.get('id'):
                     item['ad__brand__name'] = ad.get('brand__name')
-                    item['ad__created_by__username'] = ad.get('creator__username')
+                    item['creator'] = ad.get('creator')
 
         return Response({
-            'data': data,
+            'data': sorted(filter(lambda x: x.get('state') == 'ongoing', data), key=lambda x: x.get('start_time')) + sorted(filter(lambda x: x.get('state') != 'ongoing', data), key=lambda x: x.get('start_time')),
             'itemsCount': len(dataframe)
         })
 
@@ -85,7 +85,7 @@ class AdStatsListAPIView(ListAPIView):
         date_range = self.request.query_params.get('date_range')
 
         if creators:
-            queryset = queryset.filter(ad__creator_id__in=creators.split(','))
+            queryset = queryset.filter(ad__creator__in=creators.split(','))
 
         if brand:
             queryset = queryset.filter(ad__brand_id=brand)
@@ -100,18 +100,18 @@ class AdStatsListAPIView(ListAPIView):
         return queryset
 
 
-class AdCreatorAPIView(ListAPIView, BaseMarketingAPIView):
-    serializer_class = AdCreatorSerializer
-    queryset = User.objects.all()
-
-    def get_queryset(self):
+class AdCreatorAPIView(APIView, BaseMarketingAPIView):
+    def get(self, request, *args, **kwargs):
         q = self.request.query_params.get('q')
-        ids = Ad.objects.filter(creator__isnull=False).values_list('creator_id', flat=True)
 
         if q:
-            return self.queryset.filter(username__istartswith=q, id__in=ids)
+            queryset = Ad.objects.filter(creator__istartswith=q)
+        else:
+            queryset = Ad.objects.filter(creator__isnull=False)
 
-        return self.queryset.filter(id__in=ids)
+        return Response({
+            'results': queryset.distinct('creator').values_list('creator', flat=True)
+        }) 
 
 
 class AdBrandAPIView(ListAPIView, BaseMarketingAPIView):

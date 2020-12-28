@@ -473,7 +473,7 @@ def ad_creation_form(request):
                 ad_dict['description'] = description
                 ad_dict['start_time'] = start_date
                 ad_dict['ad_type'] = ad_type
-                ad_dict['creator_id'] = creator
+                ad_dict['creator'] = creator
                 if languages:
                     ad_dict['languages'] = languages
 
