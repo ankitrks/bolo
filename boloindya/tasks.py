@@ -519,5 +519,48 @@ def send_fcm_push_notifications(device_id, title, body = None, media_url = None,
         }
     )
 
+from django.core.mail import EmailMultiAlternatives
+
+@app.task
+def send_copyright_strike_mail(reporter, video_title, report_text, reported_user):
+    # COPYRIGHT_STRIKE_MAIL_TO = ['manvendra.s@boloindya.com', 'ishban@boloindya.com', 'anshika@boloindya.com', 
+    #         'tanmai@boloindya.com', 'varun@boloindya.com']
+    
+    message = """
+<p>Hi,</p>
+
+<p>Video titled <b><i>%s</i></b> created by user '<b><i>%s</i></b>' has been reported for copyright violation by '<b><i>%s</i></b>'</p>
+
+<p>Reason: <div><b><i>%s</i></b></div></p>
+
+<p>Please review this urgently. </p>
+
+Thanks.
+    """%(video_title, reported_user, reporter, report_text)
+
+    email_message = EmailMultiAlternatives('Copyright Strike', message, 'support@boloindya.com', settings.COPYRIGHT_STRIKE_MAIL_TO)
+    email_message.attach_alternative(message, 'text/html')
+    email_message.send()
+
+@app.task
+def send_against_the_guidelines(reporter, video_title, report_text, reported_user):
+    # AGAINST_THE_GUIDELINES_MAIL_TO = ['manvendra.s@boloindya.com', 'ishban@boloindya.com', 'anshika@boloindya.com']
+    message = """
+<p>Hi,</p>
+
+<p>Video titled <b><i>%s</i></b> created by user '<b><i>%s</i></b>' has been reported for community guidelines violation by '<b><i>%s</i></b>'</p>
+
+<p>Reason: <div><b><i>%s</i></b></div></p>
+
+<p>Please review this urgently. </p>
+
+Thanks.
+    """%(video_title, reported_user, reporter, report_text)
+
+    email_message = EmailMultiAlternatives('Content Against Guidelines', message, 'support@boloindya.com', settings.AGAINST_THE_GUIDELINES_MAIL_TO)
+    email_message.attach_alternative(message, 'text/html')
+    email_message.send()
+
+
 if __name__ == '__main__':
     app.start()
