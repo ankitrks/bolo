@@ -779,3 +779,6 @@ DYNAMODB_ENV = 'STAGE'
 #    'aws_secret_access_key': credentials.secret_key,
 #    'region_name': 'ap-south-1',
 #}
+
+COPYRIGHT_STRIKE_MAIL_TO = ['shadabmohammad1@gmail.com']
+AGAINST_THE_GUIDELINES_MAIL_TO = ['shadabmohammad1@gmail.com']

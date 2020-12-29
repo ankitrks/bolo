@@ -5808,3 +5808,14 @@ class ReportCreateAPIView(MusicReportCreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+
+        if instance.video:
+            if instance.report.text == 'Copyright Strike':
+                send_copyright_strike_mail.delay(instance.reporter.username, instance.video.title, instance.description, instance.video.user.username)
+                # send_copyright_strike_mail(instance.reporter.username, instance.video.title, instance.description, instance.video.user.username)
+            elif instance.report.text == 'Against the guidelines':
+                send_against_the_guidelines.delay(instance.reporter.username, instance.video.title, instance.description, instance.video.user.username)
+                # send_against_the_guidelines(instance.reporter.username, instance.video.title, instance.description, instance.video.user.username)
