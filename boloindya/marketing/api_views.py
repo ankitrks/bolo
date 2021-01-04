@@ -54,16 +54,12 @@ class AdStatsListAPIView(ListAPIView):
         dataframe['average_skip_time'] = dataframe['skip_playtime'] / dataframe['skip_count']
         dataframe['ctr'] = (dataframe['install_count'] / dataframe['view_count'])*100
 
-        if request.query_params.get('sortField'):
-            dataframe = dataframe.sort_values(by=request.query_params.get('sortField'), 
-                                                ascending=True if request.query_params.get('sortOrder') == 'asc' else False)
-
 
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
 
-        final_dataframe = dataframe[(page - 1) * page_size:(page) * page_size].round(0)
-        data = json.loads(dataframe[(page - 1) * page_size:(page) * page_size].round(0).to_json(orient="table")).get('data')
+        final_dataframe = dataframe.round(0)
+        data = json.loads(dataframe.round(0).to_json(orient="table")).get('data')
 
         # print Ad.objects.filter(id__in=final_dataframe.axes[0]).values('id', 'brand__name', 'created_by__username')
 
@@ -72,9 +68,16 @@ class AdStatsListAPIView(ListAPIView):
                 if item.get('ad_id') == ad.get('id'):
                     item['ad__brand__name'] = ad.get('brand__name')
                     item['creator'] = ad.get('creator')
+                    item['state'] = ad.get('state')
+                    item['start_time'] = ad.get('start_time')
+
+        if request.query_params.get('sortField'):
+            sorted_data = sorted(data, key=lambda x: x.get(request.query_params.get('sortField')), reverse=False if request.query_params.get('sortOrder') == 'asc' else True)
+        else:
+            sorted_data = sorted(filter(lambda x: x.get('state') == 'ongoing', data), key=lambda x: x.get('start_time')) + sorted(filter(lambda x: x.get('state') != 'ongoing', data), key=lambda x: x.get('start_time'))
 
         return Response({
-            'data': sorted(filter(lambda x: x.get('state') == 'ongoing', data), key=lambda x: x.get('start_time')) + sorted(filter(lambda x: x.get('state') != 'ongoing', data), key=lambda x: x.get('start_time')),
+            'data': sorted_data[(page - 1) * page_size:(page) * page_size],
             'itemsCount': len(dataframe)
         })
 

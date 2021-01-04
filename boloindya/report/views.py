@@ -150,21 +150,23 @@ class AdInstallStatsDownloadView(DownloadView):
 
     def get_query_with_params(self):
         query = """
-            select S."S No" as "Sr No", ad.title as "Video Title", u.username as "Creator Name", S.view_count as "Views", 
+            select S."S No" as "Sr No", brand.name as "Brand", ad.id as "Ad Id", ad.creator as "Creator Name", S.view_count as "Views", 
                 S.install_count as "Installs", 
-                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric),4) as "CTR", 
+                round(cast(float8(S.install_count)/float8(COALESCE(nullif(S.view_count, 0), 1)) as numeric), 2) * 100 as "CTR", 
                 S.skip_count as "Skips",  S.full_watched as "Full Watched",
-                round(cast(float8(S.install_playtime)/float8(COALESCE(nullif(S.install_count, 0), 1)) as numeric),2) as "Avg. time before Install (Secs)", 
-                round(cast(float8(S.skip_playtime)/float8(COALESCE(nullif(S.skip_count, 0), 1)) as numeric),2) as "Avg. time before Skip (Secs)"
+                round(cast(float8(S.install_playtime)/float8(COALESCE(nullif(S.install_count, 0), 1)) as numeric), 0) as "Avg. time before Install (Secs)", 
+                round(cast(float8(S.skip_playtime)/float8(COALESCE(nullif(S.skip_count, 0), 1)) as numeric), 0) as "Avg. time before Skip (Secs)"
                 from (
                 select  ROW_NUMBER() OVER (ORDER BY stats.ad_id) as "S No", ad_id, sum(view_count) as view_count, 
                     sum(install_count) as install_count, sum(full_watched) as full_watched, sum(skip_count) as skip_count,
                     sum(install_playtime) as install_playtime, sum(skip_playtime) as skip_playtime
                 from marketing_adstats stats
-                where %s
+                inner join advertisement_ad ad on ad.id = stats.ad_id
+                where ad.ad_type = 'install_now' and %s
                 group by ad_id
                 ) S
             inner join advertisement_ad ad on ad.id = S.ad_id
+            inner join advertisement_brand brand on brand.id = ad.brand_id
             inner join auth_user u on u.id = ad.created_by_id
             where true
         """
@@ -181,7 +183,7 @@ class AdInstallStatsDownloadView(DownloadView):
             query = query%"true"
 
         if self.request.GET.get('creators'):
-            query += " and u.id in %s "
+            query += " and ad.creator in %s "
             params.append(tuple(self.request.GET.get('creators').split(',')))
 
         if self.request.GET.get('brand'):
