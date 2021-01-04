@@ -550,6 +550,8 @@ def get_language_specific_audio_list(language_id, page_no):
         return audio_list
 
 def get_audio_list():
+    from .models import MusicAlbum
+    return list(MusicAlbum.objects.filter(is_extracted_audio=False).values('id', 'title', 'author_name', 'language_id', 's3_file_path', 'image_path', 'order_no', 'last_modified', 'is_extracted_audio'))
     try:
         results = []
         for key in redis_cli.keys("bi:audio_list:*"):
