@@ -384,7 +384,11 @@ class EventDetails(APIView):
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
 			if not event_slots_df.empty:
 				#fetch available slots event only
-				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				# available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_slots_event_df_no_tseries = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]				
+				available_slots_event_df_tseries = event_slots_df[( event_slots_df['event_id'].isin(ALLOWED_MULTIPLE_BOKING) ) ]
+				available_slots_event_df = pd.concat([available_slots_event_df_no_tseries, available_slots_event_df_tseries])
+				
 				available_events_ids = []
 				if not available_slots_event_df.empty:
 					available_events_ids = available_slots_event_df['event_id'].unique()
@@ -722,7 +726,10 @@ class EventDetailsV2(APIView):
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
 			if not event_slots_df.empty:
 				#fetch available slots event only
-				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_slots_event_df_no_tseries = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]				
+				available_slots_event_df_tseries = event_slots_df[( event_slots_df['event_id'].isin(ALLOWED_MULTIPLE_BOKING) ) ]
+				available_slots_event_df = pd.concat([available_slots_event_df_no_tseries, available_slots_event_df_tseries])
+
 				available_events_ids = []
 				if not available_slots_event_df.empty:
 					available_events_ids = available_slots_event_df['event_id'].unique()
