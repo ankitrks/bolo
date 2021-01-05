@@ -33,7 +33,7 @@ import json
 import os
 from payment.razorpay import create_order
 
-ALLOWED_MULTIPLE_BOKING = [958, ]
+ALLOWED_MULTIPLE_BOKING = [958, '958']
 
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
@@ -388,7 +388,7 @@ class EventDetails(APIView):
 				available_slots_event_df_no_tseries = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]				
 				available_slots_event_df_tseries = event_slots_df[( event_slots_df['event_id'].isin(ALLOWED_MULTIPLE_BOKING) ) ]
 				available_slots_event_df = pd.concat([available_slots_event_df_no_tseries, available_slots_event_df_tseries])
-				
+
 				available_events_ids = []
 				if not available_slots_event_df.empty:
 					available_events_ids = available_slots_event_df['event_id'].unique()
