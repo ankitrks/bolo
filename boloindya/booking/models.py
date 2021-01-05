@@ -10,6 +10,8 @@ from forum.topic.models import RecordTimeStamp
 from datetime import date
 import uuid
 
+EventBookingEvent = 'EventBookingEvent_%s'%settings.DYNAMODB_ENV
+
 class Booking(RecordTimeStamp):
 	creator = models.ForeignKey(settings.AUTH_USER_MODEL, blank = False, null = False, related_name='bookings')
 	title = models.TextField(blank = False, null = False)

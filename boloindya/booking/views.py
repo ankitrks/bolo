@@ -31,6 +31,8 @@ import time
 import boto3
 import json
 import os
+from copy import deepcopy
+from dynamodb_api import create as dynamodb_create
 
 from payment.razorpay import create_order
 
@@ -848,3 +850,16 @@ class EventDetailsV2(APIView):
 					os.remove(promo_thumbnail)
 		except Exception as e:
 			print(e)
+
+
+class BookingEventRegister(APIView):
+	def post(self, request, pk, *args, **kwargs):
+		data = deepcopy(request.data)
+		data.update({
+			'event_id': pk,
+			'user_id': request.user.id,
+			'created_at': datetime.now(),
+			'event': data.pop('event_name', '')
+		})
+		dynamodb_create(EventBookingEvent, data)
+		return JsonResponse({'status': 'Success'})
