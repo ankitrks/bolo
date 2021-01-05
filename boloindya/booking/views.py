@@ -31,8 +31,9 @@ import time
 import boto3
 import json
 import os
-
 from payment.razorpay import create_order
+
+ALLOWED_MULTIPLE_BOKING = [958, ]
 
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
@@ -452,7 +453,12 @@ class EventSlotsDetails(APIView):
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 	def get_event_slots(self, event_id, page_no):
-		available_event_slots = list(EventSlot.objects.filter(event_id=event_id, state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
+		if event_id in ALLOWED_MULTIPLE_BOKING:
+			available_event_slots = list(EventSlot.objects.filter(event_id=event_id, end_time__gt=datetime.now())\
+				.order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
+		else:
+			available_event_slots = list(EventSlot.objects.filter(event_id=event_id, state="available", end_time__gt=datetime.now())\
+				.order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
 		try:
 			result = get_slots_date_and_time_payload(available_event_slots, page_no)
 		except:
