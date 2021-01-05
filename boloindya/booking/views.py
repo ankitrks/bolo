@@ -33,8 +33,9 @@ import json
 import os
 from copy import deepcopy
 from dynamodb_api import create as dynamodb_create
-
 from payment.razorpay import create_order
+
+ALLOWED_MULTIPLE_BOKING = [958, '958']
 
 class BookingDetails(APIView):
 	def get(self, request, *args, **kwargs):
@@ -385,7 +386,11 @@ class EventDetails(APIView):
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
 			if not event_slots_df.empty:
 				#fetch available slots event only
-				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				# available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_slots_event_df_no_tseries = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]				
+				available_slots_event_df_tseries = event_slots_df[( event_slots_df['event_id'].isin(ALLOWED_MULTIPLE_BOKING) ) ]
+				available_slots_event_df = pd.concat([available_slots_event_df_no_tseries, available_slots_event_df_tseries])
+
 				available_events_ids = []
 				if not available_slots_event_df.empty:
 					available_events_ids = available_slots_event_df['event_id'].unique()
@@ -454,7 +459,12 @@ class EventSlotsDetails(APIView):
 			return JsonResponse({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 	def get_event_slots(self, event_id, page_no):
-		available_event_slots = list(EventSlot.objects.filter(event_id=event_id, state="available", end_time__gt=datetime.now()).order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
+		if event_id in ALLOWED_MULTIPLE_BOKING:
+			available_event_slots = list(EventSlot.objects.filter(event_id=event_id, end_time__gt=datetime.now())\
+				.order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
+		else:
+			available_event_slots = list(EventSlot.objects.filter(event_id=event_id, state="available", end_time__gt=datetime.now())\
+				.order_by('start_time').values('start_time', 'end_time', 'channel_id','id'))
 		try:
 			result = get_slots_date_and_time_payload(available_event_slots, page_no)
 		except:
@@ -718,7 +728,10 @@ class EventDetailsV2(APIView):
 			event_slots_df = pd.DataFrame.from_records(EventSlot.objects.all().values('start_time','end_time','event_id','state'))
 			if not event_slots_df.empty:
 				#fetch available slots event only
-				available_slots_event_df = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]
+				available_slots_event_df_no_tseries = event_slots_df[(event_slots_df['end_time']>=datetime.now()) & (event_slots_df['state']=="available")]				
+				available_slots_event_df_tseries = event_slots_df[( event_slots_df['event_id'].isin(ALLOWED_MULTIPLE_BOKING) ) ]
+				available_slots_event_df = pd.concat([available_slots_event_df_no_tseries, available_slots_event_df_tseries])
+
 				available_events_ids = []
 				if not available_slots_event_df.empty:
 					available_events_ids = available_slots_event_df['event_id'].unique()
