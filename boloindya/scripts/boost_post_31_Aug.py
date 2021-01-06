@@ -66,14 +66,14 @@ def run():
                 print "i am non popular: ",multiplication_factor
             if each_seen.date +timedelta(minutes=30) > now:
                 number_seen = random.randrange(6,100)
-            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count < int(4*multiplication_factor):
-                number_seen = random.randrange(1,int(4*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(minutes=6) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count < int(8*multiplication_factor):
-                number_seen = random.randrange(1,int(8*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=96) > now and each_seen.view_count < int(12*multiplication_factor):
-                number_seen = random.randrange(1,int(12*multiplication_factor)-each_seen.view_count)
-            elif each_seen.date +timedelta(hours=96) < now and each_seen.view_count < int(16*multiplication_factor):
-                number_seen = random.randrange(1,int(16*multiplication_factor)-each_seen.view_count)
+            elif each_seen.date +timedelta(minutes=30) < now and each_seen.date +timedelta(hours=6) > now and each_seen.view_count - each_seen.imp_count < int(4*multiplication_factor):
+                number_seen = random.randrange(1,int(4*multiplication_factor)-each_seen.view_count - each_seen.imp_count)
+            elif each_seen.date +timedelta(minutes=6) < now and each_seen.date +timedelta(hours=24) > now and each_seen.view_count - each_seen.imp_count < int(8*multiplication_factor):
+                number_seen = random.randrange(1,int(8*multiplication_factor)-each_seen.view_count - each_seen.imp_count)
+            elif each_seen.date +timedelta(hours=24) < now and each_seen.date +timedelta(hours=96) > now and each_seen.view_count - each_seen.imp_count < int(12*multiplication_factor):
+                number_seen = random.randrange(1,int(12*multiplication_factor)-each_seen.view_count - each_seen.imp_count)
+            elif each_seen.date +timedelta(hours=96) < now and each_seen.view_count - each_seen.imp_count < int(16*multiplication_factor):
+                number_seen = random.randrange(1,int(16*multiplication_factor)-each_seen.view_count - each_seen.imp_count)
             else:
                 number_seen = 0
             i = 0
@@ -151,14 +151,14 @@ def check_like(topic_id):
     else:
         multiplication_factor = 1
 
-    if each_like.date < now and each_like.date +timedelta(hours=1) > now and each_like.likes_count < int(4*multiplication_factor):
-        number_like = random.randrange(1,int(4*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=1) < now and each_like.date +timedelta(hours=24) > now and each_like.likes_count < int(8*multiplication_factor):
-        number_like = random.randrange(1,int(8*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=24) < now and each_like.date +timedelta(hours=96) > now and each_like.likes_count < int(12*multiplication_factor):
-        number_like = random.randrange(1,int(12*multiplication_factor)-each_like.likes_count)
-    elif each_like.date +timedelta(hours=96) < now and each_like.likes_count < int(16*multiplication_factor):
-        number_like = random.randrange(1,int(16*multiplication_factor)-each_like.likes_count)
+    if each_like.date < now and each_like.date +timedelta(hours=1) > now and each_like.likes_count - each_like.topic_like_count < int(4*multiplication_factor):
+        number_like = random.randrange(1,int(4*multiplication_factor)-each_like.likes_count - each_like.topic_like_count)
+    elif each_like.date +timedelta(hours=1) < now and each_like.date +timedelta(hours=24) > now and each_like.likes_count - each_like.topic_like_count < int(8*multiplication_factor):
+        number_like = random.randrange(1,int(8*multiplication_factor)-each_like.likes_count - each_like.topic_like_count)
+    elif each_like.date +timedelta(hours=24) < now and each_like.date +timedelta(hours=96) > now and each_like.likes_count - each_like.topic_like_count < int(12*multiplication_factor):
+        number_like = random.randrange(1,int(12*multiplication_factor)-each_like.likes_count - each_like.topic_like_count)
+    elif each_like.date +timedelta(hours=96) < now and each_like.likes_count - each_like.topic_like_count < int(16*multiplication_factor):
+        number_like = random.randrange(1,int(16*multiplication_factor)-each_like.likes_count - each_like.topic_like_count)
     else:
         number_like = 0
 
@@ -191,8 +191,9 @@ def check_follower(user_id):
             if time_passed > boost_span:
                 time_passed = boost_span
             multiplication_factor = int(multiplication_factor*decimal.Decimal(time_passed)/boost_span)
-            if userprofile.follower_count < int(400*multiplication_factor):
-                required_follower = random.randrange(1,int(400*multiplication_factor)-userprofile.follower_count)
+            fake_follower = Follower.objects.filter(user_following_id = userprofile.user_id, user_follower__st__is_test_user = True, is_active = True).count()
+            if fake_follower < int(400*multiplication_factor):
+                required_follower = random.randrange(1,int(400*multiplication_factor)-fake_follower)
             else:
                 required_follower = 0
             print required_follower
