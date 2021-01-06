@@ -342,7 +342,7 @@ def new_algo_update_redis_paginated_data(key, query,trending = False, cache_max_
             temp_topics_df = topics_df.loc[mask]
             if not temp_topics_df.empty:
                 while(page != None):
-                    if settings.ALLOW_DUPLICATE_USER_POST:
+                    if settings.ALLOW_DUPLICATE_USER_POST  or len(temp_topics_df) <= 75:
                         updated_df = temp_topics_df.query('id not in [' + ','.join(exclude_ids) + ']')\
                                 .nlargest(items_per_page, 'vb_score', keep = 'first')
                     else:
