@@ -115,7 +115,7 @@ class AggregateHashtagTopics:
                 paging_dict = {}
 
                 while True:
-                    if settings.ALLOW_DUPLICATE_USER_POST:
+                    if settings.ALLOW_DUPLICATE_USER_POST or len(topics_df) <= 75:
                         selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']')[:items_per_page]
                     else:
                         selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')[:items_per_page]
