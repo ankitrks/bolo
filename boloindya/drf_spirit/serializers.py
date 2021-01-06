@@ -77,7 +77,13 @@ class TongueTwisterSerializer(ModelSerializer):
                         video_count = Topic.objects.filter(first_hash_tag=instance,is_removed=False,is_vb=True, language_id__in = language_ids).count()
                     return shorcountertopic(video_count)
                 else:
-                    return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False, language_id__in = language_ids).count())
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = instance, language__in = language_ids)
+                    hash_tag_counter_values = list(hash_tag_counter.values('video_count'))
+                    video_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    video_count = sum(video_count_values)
+                    if any(value<999 for value in video_count_values):
+                        video_count = Topic.objects.filter(first_hash_tag=instance,is_removed=False,is_vb=True, language_id__in = language_ids).count()
+                    return shorcountertopic(video_count)
             else:
                 return shorcountertopic(Topic.objects.filter(hash_tags=instance,is_vb=True,is_removed=False).count())
         except Exception as e:
@@ -102,7 +108,16 @@ class TongueTwisterSerializer(ModelSerializer):
                             view_count = all_view_count['view_count__sum']
                     return shorcountertopic(view_count)
                 else:
-                    return shorcountertopic(instance.total_views)
+                    hash_tag_counter=HashtagViewCounter.objects.filter(hashtag = instance, language__in = language_ids)
+                    hash_tag_counter_values = list(hash_tag_counter.values('view_count', 'video_count'))
+                    view_count = sum(item['view_count'] for item in hash_tag_counter_values)
+                    video_count_values = [item['video_count'] for item in hash_tag_counter_values]
+                    video_count = sum(video_count_values)
+                    if any(value<999 for value in video_count_values):
+                        all_view_count = Topic.objects.filter(first_hash_tag=instance,is_removed=False,is_vb=True, language_id__in = language_ids).aggregate(Sum('view_count'))
+                        if all_view_count.has_key('view_count__sum') and all_view_count['view_count__sum']:
+                            view_count = all_view_count['view_count__sum']
+                    return shorcountertopic(view_count)
             else:
                 return shorcountertopic(instance.total_views)    
         except Exception as e:
