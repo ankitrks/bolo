@@ -7,7 +7,7 @@ from rest_framework import serializers
 from forum.category.models import Category
 from advertisement.models import Ad, Brand
 from booking.models import Event, EventBooking
-from marketing.models import AdStats
+from marketing.models import AdStats, EventStats
 
 
 class AdSerializer(serializers.ModelSerializer):
@@ -78,3 +78,9 @@ class EventBookingSerializer(serializers.ModelSerializer):
         data = super(EventBookingSerializer, self).to_representation(instance)
         data['created_at'] = datetime.strftime(instance.created_at, '%B %d, %Y %I:%M %p')
         return data
+
+
+class EventStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventStats
+        fields = '__all__'

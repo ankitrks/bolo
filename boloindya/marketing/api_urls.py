@@ -4,7 +4,8 @@ from rest_framework import routers
 
 from marketing.api_views import (AdStatsListAPIView, AdCreatorAPIView, AdBrandAPIView, AdInstallChartDataAPIView, 
                                 AdInstallDashboadCountAPIView, EventBookingListAPIView, EventCreatorListAPIView,
-                                EventCategoryListAPIView, EventBookingCountsAPIView)
+                                EventCategoryListAPIView, EventBookingCountsAPIView, EventStatsListAPIView,
+                                EventStatsCountsAPIView, EventStatsChartDataAPIView)
 
 urlpatterns = [
     url(r'^dashboard/counts/$', AdInstallDashboadCountAPIView.as_view()),
@@ -16,4 +17,7 @@ urlpatterns = [
     url(r'^event/creator/$', EventCreatorListAPIView.as_view()),
     url(r'^event/category/$', EventCategoryListAPIView.as_view()),
     url(r'^event/booking/counts/$', EventBookingCountsAPIView.as_view()),
+    url(r'^event/(?P<event_id>\d+)/stats/$', EventStatsListAPIView.as_view()),
+    url(r'^event/(?P<event_id>\d+)/counts/$', EventStatsCountsAPIView.as_view()),
+    url(r'^event/(?P<event_id>\d+)/chart/$', EventStatsChartDataAPIView.as_view()),
 ]

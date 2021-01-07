@@ -1,6 +1,7 @@
-
 from django.views.generic import RedirectView, TemplateView, DetailView
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+
+from booking.models import Event, EventBooking
 
 class AdStatsDashboardView(TemplateView):
     template_name = 'advertisement/stats/index.html'
@@ -31,3 +32,7 @@ class PasswordResetMailView(PasswordResetView):
 
 class BookingDashboardView(TemplateView):
     template_name = 'marketing/event/booking/index.html'
+
+class EventDashboardView(DetailView):
+    template_name = 'marketing/event/index.html'
+    queryset = Event.objects.all()

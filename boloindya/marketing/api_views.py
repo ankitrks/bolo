@@ -25,9 +25,9 @@ from advertisement.models import Brand, Ad
 
 from booking.models import Event, EventBooking
 
-from marketing.models import AdStats
+from marketing.models import AdStats, EventStats
 from marketing.serializers import (AdStatsSerializer, AdCreatorSerializer, AdBrandSerializer, EventBookingSerializer,
-                                    CategorySerializer)
+                                    CategorySerializer, EventStatsSerializer)
 
 
 class BaseMarketingAPIView:
@@ -374,7 +374,208 @@ class EventBookingCountsAPIView(APIView, BaseMarketingAPIView):
             'lifetime_revenues': EventBooking.objects.aggregate(sum_revenue=Sum('event__price')).get('sum_revenue'),
             'current_month_revenues': EventBooking.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date).aggregate(sum_revenue=Sum('event__price')).get('sum_revenue'),
             'order_amount_min': Event.objects.aggregate(min_price=Min('price')).get('min_price'),
-            'order_amount_max': 2000, #Event.objects.aggregate(max_price=Max('price')).get('max_price'),
+            'order_amount_max': Event.objects.aggregate(max_price=Max('price')).get('max_price'),
             'current_month_name': datetime.strftime(today, '%B')
         }
         return Response(data)
+
+class EventStatsListAPIView(ListAPIView, BaseMarketingAPIView):
+    queryset = EventStats.objects.all()
+    serializer_class = EventStatsSerializer
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+
+    def get_queryset(self):
+        queryset = self.queryset.filter(event_id=self.kwargs.get('event_id'))
+        date_range = self.request.query_params.get('date_range')
+
+        if date_range:
+            start_date, end_date = date_range.split(' - ')
+            start_date = datetime.strptime(start_date, '%d/%m/%Y').date()
+            end_date = datetime.strptime(end_date, '%d/%m/%Y').date()
+            print "start date", start_date, "end date", end_date
+            queryset = queryset.filter(date__gte=start_date, date__lte=end_date)
+
+        return queryset.order_by('-date')
+
+
+class EventStatsCountsAPIView(APIView, BaseMarketingAPIView):
+    def get(self, request, event_id, *args, **kwargs):
+        event_queryset = EventStats.objects.filter(event_id=event_id)
+        data = {
+            'lifetime_bookings': event_queryset.aggregate(sum_bookings=Sum('confirm_booking_count')).get('sum_bookings'),
+            'lifetime_revenues': event_queryset.aggregate(sum_revenues=Sum('total_revenue')).get('sum_revenues'),
+            'lifetime_views': event_queryset.aggregate(sum_views=Sum('view_count')).get('sum_views'),
+            'lifetime_clicks': event_queryset.aggregate(sum_clicks=Sum('click_count')).get('sum_clicks'),
+        }
+        return Response(data)
+
+
+class EventStatsChartDataAPIView(APIView):
+    WEEK_ENUM = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    MONTH_ENUM = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    def get(self, request, event_id, *args, **kwargs):
+        chart_type = request.query_params.get('chart_type')
+        data_type = request.query_params.get('data_type')
+        cursor = connections['read'].cursor()
+        date_range = request.query_params.get('date_range')
+
+        if date_range:
+            start_date, end_date = date_range.split(' - ')
+        else:
+            start_date, end_date = None, None
+
+        result = [[], []]
+
+        if chart_type == 'views':
+            if data_type == 'daily':
+                cursor.execute("""
+                    select date::varchar, count
+                    from (
+                        select date::date, sum(view_count) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by date::date
+                    ) A
+                """, [event_id])
+                result = self.get_daily_data(self.dictfetchall(cursor))
+                
+            elif data_type == 'weekly':
+                today = datetime.now()
+                cursor.execute("""
+                    select date::date::varchar, count
+                    from (
+                        select DATE_TRUNC('week', date) as date, sum(view_count) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by DATE_TRUNC('week', date)
+                    ) A
+                """, [event_id])
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'monthly':
+                today = datetime.now()
+                cursor.execute("""
+                    select date::date::varchar, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(view_count) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, [event_id])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
+
+        elif chart_type == 'bookings':
+            if data_type == 'daily':
+                cursor.execute("""
+                    select date::varchar, count
+                    from (
+                        select date::date, sum(total_revenue) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by date::date
+                    ) A
+                """, [event_id])
+                result = self.get_daily_data(self.dictfetchall(cursor))
+                
+            elif data_type == 'weekly':
+                today = datetime.now()
+                cursor.execute("""
+                    select date::date::varchar, count
+                    from (
+                        select DATE_TRUNC('week', date) as date, sum(total_revenue) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by DATE_TRUNC('week', date)
+                    ) A
+                """, [event_id])
+                result = self.get_weekly_data(self.dictfetchall(cursor))
+
+            elif data_type == 'monthly':
+                today = datetime.now()
+                cursor.execute("""
+                    select date::date::varchar, count
+                    from (
+                        select DATE_TRUNC('month', date) as date, sum(total_revenue) as count
+                        from marketing_eventstats
+                        where event_id = %s
+                        group by DATE_TRUNC('month', date)
+                    ) A
+                """, [event_id])
+                result = self.get_monthly_data(self.dictfetchall(cursor))
+
+        return Response({
+            'labels': result[0],
+            'dataset': result[1],
+        })
+
+    def dictfetchall(self, cursor):
+        return {
+            row[0]: row[1] for row in cursor.fetchall()
+        }
+
+    def get_daily_data(self, query_data):
+        start_date = datetime.strptime(min(query_data.keys()), '%Y-%m-%d')
+        end_date = datetime.now()
+        interval = (end_date - start_date).days
+
+        labels = []
+        dataset = []
+
+        for i in range(interval+1):
+            current_date = str((start_date + timedelta(i)).date())
+            labels.append(current_date)
+            dataset.append(query_data.get(current_date))
+
+        return labels, dataset
+
+
+    def get_weekly_data(self, query_data):
+        print "query data", query_data
+        start_date = datetime.strptime(min(query_data.keys()), '%Y-%m-%d')
+        end_date = datetime.now()
+
+        labels = []
+        dataset = []
+
+        current_date = start_date
+        while current_date <= end_date:
+            labels.append(datetime.strftime(current_date, '%d-%m-%y'))
+            dataset.append(query_data.get(str(current_date.date()), 0))
+
+            current_date += relativedelta(days=7)
+
+        return labels, dataset
+
+    def get_monthly_data(self, query_data):
+        print "query data", query_data
+        start_date = datetime.strptime(min(query_data.keys()), '%Y-%m-%d')
+        end_date = datetime.now()
+        end_date = datetime.strptime('%d-%d-01'%(end_date.year, end_date.month), '%Y-%m-%d')
+
+        labels = []
+        dataset = []
+
+        current_date = start_date
+        while current_date <= end_date:
+            labels.append(datetime.strftime(current_date, '%B-%y'))
+            dataset.append(query_data.get(str(current_date.date()), 0))
+
+            current_date += relativedelta(months=1)
+
+        return labels, dataset
+
+    def get_yearly_data(self, query_data):
+        # print "query data", query_data
+        today = datetime.now() 
+        labels = []
+        dataset = []
+
+        for month in range(today.month):
+            print "month", month
+            labels.append(self.MONTH_ENUM[month])
+            dataset.append(query_data.get(month+1, 0))
+        
+        return labels, dataset
+

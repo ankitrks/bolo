@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .web_views import (AdStatsDashboardView, LoginView, LogoutView, PasswordResetConfirmView, PasswordResetMailView,
-                        BookingDashboardView)
+                        BookingDashboardView, EventDashboardView)
 
 urlpatterns = [
     url(r'^login/', LoginView.as_view()),
@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^send-reset-password-mail/$', PasswordResetMailView.as_view()),
     url(r'^ad/install/stats/$', staff_member_required(AdStatsDashboardView.as_view(), login_url='/marketing/login/')),
     url(r'^event/booking/dashboard/$', staff_member_required(BookingDashboardView.as_view(), login_url = '/marketing/login/')),
+    url(r'^event/(?P<pk>\d+)/dashboard/$', staff_member_required(EventDashboardView.as_view(), login_url = '/marketing/login/')),
 ]
