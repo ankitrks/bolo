@@ -1,4 +1,3 @@
-
 import os
 import sys
 import json
@@ -33,7 +32,7 @@ class AggregateHashtagTopics:
         popular_hashtags_values = ','.join(["(%s, '%s')"%(row[0], row[1]) for row in self.popular_hashtags])
 
         query = """
-            SELECT * FROM (
+            (SELECT * FROM (
                 (SELECT * from (
                     SELECT topic.id, topic.is_popular, topic.created_at, topic.vb_score, topic.user_id, topic.language_id,
                         hashtag.tonguetwister_id, topic.created_at::date as create_date, (extract(hour FROM topic.created_at)::int / {slot_size}) as hour_slot,
@@ -62,7 +61,22 @@ class AggregateHashtagTopics:
                         not topic.is_popular AND
                         topic.created_at::date > '{start_date}'
                     ) B WHERE B.rank < 300)
-            ) C ORDER BY is_popular DESC, create_date DESC, hour_slot DESC, vb_score DESC
+            ) C ORDER BY is_popular DESC, create_date DESC, hour_slot DESC, vb_score DESC)
+            UNION ALL
+            (SELECT * FROM (
+                (SELECT * from (
+                    SELECT topic.id, topic.is_popular, topic.created_at, topic.vb_score, topic.user_id, topic.language_id,
+                        hashtag.tonguetwister_id, topic.created_at::date as create_date, (extract(hour FROM topic.created_at)::int / {slot_size}) as hour_slot,
+                        rank() OVER (PARTITION BY topic.language_id ORDER by topic.created_at::date desc, (extract(hour FROM topic.created_at)::int / {slot_size}) desc, vb_score desc) 
+                    FROM forum_topic_topic topic
+                    INNER JOIN forum_topic_topic_hash_tags hashtag on hashtag.topic_id = topic.id
+                    INNER JOIN (VALUES {popular_hashtags_values}) as language_hashtag(hashtag_id, language_id) on 
+                            language_hashtag.hashtag_id = hashtag.tonguetwister_id AND
+                            (language_hashtag.language_id != '0' AND language_hashtag.language_id = topic.language_id OR language_hashtag.language_id = '0')
+                    WHERE 
+                        topic.created_at::date <= '{start_date}'
+                    ) A )
+            ) C ORDER BY is_popular DESC, create_date DESC, hour_slot DESC, vb_score DESC)
             """.format( start_date=start_date, slot_size=SLOT_SIZE,
                             popular_hashtags_values=popular_hashtags_values)
 
@@ -102,7 +116,7 @@ class AggregateHashtagTopics:
 
         for language_id in all_topics_df.drop_duplicates('language_id')['language_id'].tolist():
             for hashtag_id in all_topics_df.drop_duplicates('tonguetwister_id')['tonguetwister_id'].tolist():
-
+                # if hashtag_id == 188705:
                 topics_df = all_topics_df[all_topics_df['tonguetwister_id'] == hashtag_id]
                 topics_df = topics_df[topics_df['language_id'] == language_id]
 
@@ -116,11 +130,11 @@ class AggregateHashtagTopics:
 
                 while True:
                     if settings.ALLOW_DUPLICATE_USER_POST or len(topics_df) <= 75:
-                        selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']')[:items_per_page]
+                        selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('id')[:items_per_page]
                     else:
-                        selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('user_id')[:items_per_page]
+                        selected_df = topics_df.query('id not in [' + ','.join(exclude_ids) + ']').drop_duplicates('id')\
+                            .drop_duplicates('user_id')[:items_per_page]
                                         
-
                     if selected_df.empty:
                         break
 
@@ -190,3 +204,4 @@ def run():
     topic_ids = instance.create_pages(instance.get_hashtag_topics())
     # instance.create_csv()
     # instance.send_topic_list_to_mail()
+
