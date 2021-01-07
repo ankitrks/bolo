@@ -2,11 +2,12 @@ import pandas as pd
 import json
 from copy import deepcopy
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from django.contrib.humanize.templatetags.humanize import intword
 from django.contrib.auth.models import User
 from django.db import connections
-from django.db.models import Sum
+from django.db.models import Sum, Min, Max, Q
 
 from rest_framework.generics import RetrieveAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.viewsets import ModelViewSet
@@ -17,11 +18,16 @@ from rest_framework.response import Response
 
 from drf_spirit.models import DatabaseRecordCount
 
+from forum.category.models import Category
+
 from advertisement.utils import PageNumberPaginationRemastered
 from advertisement.models import Brand, Ad
 
+from booking.models import Event, EventBooking
+
 from marketing.models import AdStats
-from marketing.serializers import AdStatsSerializer, AdCreatorSerializer, AdBrandSerializer
+from marketing.serializers import (AdStatsSerializer, AdCreatorSerializer, AdBrandSerializer, EventBookingSerializer,
+                                    CategorySerializer)
 
 
 class BaseMarketingAPIView:
@@ -293,3 +299,82 @@ class AdInstallDashboadCountAPIView(APIView, BaseMarketingAPIView):
             counts['brand_name'] = Brand.objects.get(id=brand_id).name
 
         return Response(counts)
+
+class EventBookingListAPIView(ListAPIView, BaseMarketingAPIView):
+    queryset = EventBooking.objects.all()
+    pagination_class = deepcopy(PageNumberPaginationRemastered)
+    serializer_class = EventBookingSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+        q = self.request.query_params.get('q')
+        page_size = self.request.query_params.get('page_size')
+        state = self.request.query_params.get('state')
+        creators = self.request.query_params.get('creators')
+        categories = self.request.query_params.get('categories')
+        date_range = self.request.query_params.get('date')
+        price_range = self.request.query_params.get('price_range')
+
+        if q:
+            queryset = queryset.filter(Q(user__st__name__icontains=q) | Q(user__st__mobile_no__icontains=q) |\
+                                        Q(user__email__icontains=q) | Q(event__creator__st__name__icontains=q))
+
+        if state == 'order':
+            queryset = queryset.filter(state='booked')
+
+        if creators:
+            print "Creators", creators
+            queryset = queryset.filter(event__creator__in=creators.split(','))
+
+        if categories:
+            print "Categories", categories
+            queryset = queryset.filter(event__category__in=categories.split(','))
+
+        if date_range:
+            start_date, end_date = date_range.split(' - ')
+            start_date = datetime.strptime(start_date, '%d-%m-%Y').date()
+            end_date = datetime.strptime(end_date, '%d-%m-%Y').date()
+            print "start date", start_date, "end date", end_date
+            queryset = queryset.filter(created_at__gte=start_date, created_at__lte=end_date)
+
+        if price_range:
+            start_price, end_price = price_range.split(' - ')
+            queryset = queryset.filter(event__price__gte=start_price, event__price__lte=end_price)
+
+        if page_size:
+            self.pagination_class.page_size = int(page_size)
+
+        return queryset.order_by('id')
+
+class EventCreatorListAPIView(APIView, BaseMarketingAPIView):
+    def get(self, request, *args, **kwargs):
+        q = request.query_params.get('q')
+        queryset = Event.objects.all()
+
+        if q:
+            queryset = queryset.filter(creator__username__icontains=q)
+        
+        return Response({
+            'results': queryset.distinct('creator_id').values('creator_id', 'creator__username')
+        })
+
+class EventCategoryListAPIView(ListAPIView, BaseMarketingAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class EventBookingCountsAPIView(APIView, BaseMarketingAPIView):
+    def get(self, request, *args, **kwargs):
+        today = datetime.now()
+        start_date = today - timedelta(days=today.day-1)
+        end_date = start_date + relativedelta(months=1) - timedelta(days=1)
+        data = {
+            'lifetime_bookings': EventBooking.objects.count(),
+            'current_month_bookings': EventBooking.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date).count(),
+            'lifetime_revenues': EventBooking.objects.aggregate(sum_revenue=Sum('event__price')).get('sum_revenue'),
+            'current_month_revenues': EventBooking.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date).aggregate(sum_revenue=Sum('event__price')).get('sum_revenue'),
+            'order_amount_min': Event.objects.aggregate(min_price=Min('price')).get('min_price'),
+            'order_amount_max': 2000, #Event.objects.aggregate(max_price=Max('price')).get('max_price'),
+            'current_month_name': datetime.strftime(today, '%B')
+        }
+        return Response(data)

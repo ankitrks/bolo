@@ -323,4 +323,60 @@ body{
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+}
+
+.daterangepicker{
+    background: #121111;
+    color: white;
+    position: fixed !important;
+    top: 200px !important;
+    left: 35% !important;
+    font-family: Avenir;
+}
+
+.daterangepicker .calendar-table{
+    background: black;
+    border: none;
+}
+
+.daterangepicker td.start-date.active, .daterangepicker td.end-date.active, .daterangepicker td.start-date:hover, .daterangepicker td.end-date:hover{
+    border-radius: 50% !important;
+    background: #10A5F9 !important;
+    color: white !important;
+
+}
+.daterangepicker td.in-range.available {
+    color: #A9D3AB;
+    background: black;
+}
+
+.daterangepicker td.off{
+    color: #3C3844;
+    background: black;
+}
+
+.daterangepicker td.available{
+    color: #7A7585;;
+}
+
+.daterangepicker .drp-buttons{
+    border: none;
+}
+
+.daterangepicker .applyBtn{
+    width: 228px;
+    height: 30px;
+    background: linear-gradient(180deg, #0270BE 0%, #10A5F9 100%);
+    border-radius: 5px;
+    font-family: Avenir;
+    font-size: 14px;
+    padding-top: 4px;
+}
+
+.daterangepicker .cancelBtn{
+    background: #272727;
+    border-radius: 5px;
+    /* width: 228px; */
+    height: 30px;
+    color: #818181;
+}

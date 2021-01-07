@@ -27,3 +27,7 @@ class PasswordResetMailView(PasswordResetView):
     success_url = '/marketing/login/?reset_password=success'
     html_email_template_name = 'marketing/registration/password_reset_email.html'
     email_template_name = 'marketing/registration/password_reset_email.html'
+
+
+class BookingDashboardView(TemplateView):
+    template_name = 'marketing/event/booking/index.html'
