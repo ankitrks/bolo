@@ -379,13 +379,23 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
                 'display_name': user_str
             }))
 
+    def delete_video_url(self):
+        self.question_video = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
+        self.backup_url = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
+        self.save()
+
+    def restore_video_url(self):
+        self.question_video = self.safe_backup_url
+        self.backup_url = self.safe_backup_url
+        self.save()
+
     def delete(self,is_user_deleted=False):
         from forum.topic.utils import set_redis_removed_videos
         try:
             self.is_monetized = False
             self.is_removed = True
             self.save()
-
+            self.delete_video_url()
             #try:
             #    post_delete.send(sender=type(self), instance=self, created=False)
             #except Exception as e:
@@ -411,6 +421,8 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
     def restore(self):
         self.is_removed = False
         self.save()
+        self.restore_video_url()
+        
         userprofile = UserProfile.objects.filter(user = self.user)
         if self.is_vb: # userprofile.vb_count
             userprofile.update(vb_count = F('vb_count')+1)
@@ -436,6 +448,8 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
         self.is_removed = False
         self.is_monetized = True
         self.save()
+        self.restore_video_url()
+
         userprofile = UserProfile.objects.filter(user = self.user)
         if self.language_id =='1':
             add_bolo_score(self.user.id, 'create_topic_en', self)
