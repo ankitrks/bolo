@@ -380,14 +380,16 @@ class Topic(RecordTimeStamp, ModelDiffMixin):
             }))
 
     def delete_video_url(self):
-        self.question_video = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
-        self.backup_url = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
-        self.save()
+        if self.is_removed:
+            self.question_video = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
+            self.backup_url = 'https://in-boloindya.s3.ap-south-1.amazonaws.com/media/1608973143_160897316717.mp4'
+            self.save()
 
     def restore_video_url(self):
-        self.question_video = self.safe_backup_url
-        self.backup_url = self.safe_backup_url
-        self.save()
+        if not self.is_removed:
+            self.question_video = self.safe_backup_url
+            self.backup_url = self.safe_backup_url
+            self.save()
 
     def delete(self,is_user_deleted=False):
         from forum.topic.utils import set_redis_removed_videos
