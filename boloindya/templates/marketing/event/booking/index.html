@@ -75,6 +75,59 @@
         /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
             width: 50% !important;
         } */
+
+        #userNameFilterModal .search-icon, #userNameFilterModal .creatorNameList, #categoryFilterModal .search-icon, #categoryFilterModal .categoryList{
+            background: black;
+            color: white
+        }
+
+        #userNameFilterModal .creatorNameList, #categoryFilterModal .categoryList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        }
+
+        #orderAmountFilterModal .modal-content{
+            width: 600px;
+            height: 250px;
+        }
+
+        #orderAmountFilterModal .ui-slider-horizontal{
+            height: 3px;
+            border-radius: 3px;
+        }
+
+        #orderAmountFilterModal .ui-widget-header{
+            background: #0270BE;
+            height: 3px;
+            margin-top: -1px;
+        }
+
+        #orderAmountFilterModal .ui-slider .ui-slider-handle {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+        }
+
+        #orderAmountFilterModal #price-slider-range{
+            margin-top: 30px;
+        }
+
+        #amountMinLabel, #amountMaxLabel{
+            font-size: 20px;
+        }
+
+        #amountSliderInput{
+            border:0; 
+            color: white; 
+            background: #121111;
+            font-weight: bold
+        }
+
+        #setting{
+            display: none;
+        }
     </style>
 {% endblock css %}
 
@@ -211,7 +264,7 @@
                             <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
                             <select name="fileType" id="" class="selectpicker">
                                 <option value="">File Type</option>
-                                <option value="csv">CSV</option>
+                                <option value="csv" selected>CSV</option>
                             </select>
                         </div>
                         <div class="col" id="recordCountDiv">
@@ -467,7 +520,12 @@
                 { title: "Amount Paid", name: "event.price", type: "text", width: 60, align: "center"},
                 { title: "Creator Name", name: "event.creator.name", type: "text", width: 60, align: "center", css: "daterange-field"},
                 { title: "Creator UserName", name: "event.creator.username", type: "number", align: "center", width: 50, css: 'range-field'},
-                { title: "Event Title", name: "event.title", type: "text", align: "center"},
+                { title: "Event Title", name: "event.title", type: "text", align: "center", 
+                    itemTemplate: function(value, data){
+                        console.log("===", value, data, this)
+                        return `<a href="/marketing/event/${ data.event.id }/dashboard/" title="${ value }">${ value }</a>`
+                    }
+                },
                 { title: "Category", name: "category_name", type: "text", align: "center", width: 50},
                 { title: "Order Date", name: "created_at", type: "text", align: "center"},
                 { title: "Status", name: "state", type: "text", align: "center"},
@@ -551,6 +609,7 @@
 
         $('#orderAmountFilterModal .apply-button').click(function(){
             grid.reset();
+            $("#orderAmountFilterModal .close").click()
         })
 
         $('[name=q]').keyup(function(){
@@ -617,7 +676,7 @@
             
             params = Object.assign(params, getExtraFilterData())
 
-            window.open('/report/ad/install/stats/download?' + $.param(params), '_self')
+            window.open('/report/event/booking/stats/download?' + $.param(params), '_self')
         });
     }
 

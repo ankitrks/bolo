@@ -344,7 +344,7 @@ class EventBookingListAPIView(ListAPIView, BaseMarketingAPIView):
         if page_size:
             self.pagination_class.page_size = int(page_size)
 
-        return queryset.order_by('id')
+        return queryset.order_by('-created_at')
 
 class EventCreatorListAPIView(APIView, BaseMarketingAPIView):
     def get(self, request, *args, **kwargs):

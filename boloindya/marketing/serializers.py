@@ -76,7 +76,7 @@ class EventBookingSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super(EventBookingSerializer, self).to_representation(instance)
-        data['created_at'] = datetime.strftime(instance.created_at, '%B %d, %Y %I:%M %p')
+        data['created_at'] = datetime.strftime(instance.created_at, '%d/%m/%Y')
         return data
 
 

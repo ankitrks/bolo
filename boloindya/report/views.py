@@ -200,3 +200,92 @@ class AdInstallStatsDownloadView(DownloadView):
         query +=  " order by ad.id "
 
         return query, params
+
+
+
+class EventBookingStatsDownloadView(DownloadView):
+    file_name = 'install_stats'
+
+    def get_query_with_params(self):
+        query = """
+            select  booker_profile.name as "Name", 
+                    booker_profile.mobile_no as "Phone Number", booker.email as "Email Id", e.price as "Amount Paid",
+                    creator_profile.name as "Creator Name", creator.username as "Creator UserName", 
+                    e.title as "Event Title", category.title as "Category",
+                    booking.created_at::date as "Order Date", booking.state as "Status"
+            from booking_eventbooking booking
+            left join booking_event e on booking.event_id = e.id
+            left join auth_user booker on booker.id = booking.user_id
+            left join forum_user_userprofile booker_profile on booker_profile.user_id = booking.user_id
+            left join auth_user creator on creator.id = e.creator_id
+            left join forum_user_userprofile creator_profile on creator_profile.user_id = e.creator_id
+            left join forum_category_category category on category.id = e.category_id
+            where true
+        """
+        params = []
+
+        if self.request.GET.get('state') == 'order':
+            query += " and booking.state = 'booked' "
+
+        if self.request.GET.get('date'):
+            start_date, end_date = self.request.GET.get('date').split(' - ')
+            start_date = datetime.strptime(start_date, '%d-%m-%Y')
+            end_date = datetime.strptime(end_date, '%d-%m-%Y')
+            print "date ragnge", " date between '%s' and '%s' "%(datetime.strftime(start_date, '%Y-%m-%d'), datetime.strftime(end_date, '%Y-%m-%d'))
+            query += " and booking.created_at between '%s' and '%s' "%(datetime.strftime(start_date, '%Y-%m-%d'), datetime.strftime(end_date, '%Y-%m-%d'))
+
+
+        if self.request.GET.get('creators'):
+            query += " and e.creator_id in %s "
+            params.append(tuple(self.request.GET.get('creators').split(',')))
+
+        if self.request.GET.get('categories'):
+            query += "  and e.category_id in %s " 
+            params.append(tuple(self.request.GET.get('categories').split(',')))
+
+
+        if self.request.GET.get('price_range'):
+            min_price, max_price = self.request.GET.get('price_range').split(' - ')
+            query += " and e.price between %s and %s "
+            params.append(int(min_price))
+            params.append(int(max_price))
+
+        if self.request.GET.get('q'):
+            query += " and (booker_profile.name ilike %s or booker_profile.mobile_no ilike %s or booker.email ilike %s or creator_profile.name ilike %s ) "
+            params.append('%' + self.request.GET.get('q') + '%')
+            params.append('%' + self.request.GET.get('q') + '%')
+            params.append('%' + self.request.GET.get('q') + '%')
+            params.append('%' + self.request.GET.get('q') + '%')
+
+        query +=  " order by booking.created_at desc "
+
+        return query, params
+
+    def prepare_csv_data(self, fields, rows, file_name):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=%s'%self.complete_file_name
+
+        writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+
+        writer.writerow([name.encode('utf-8') for name in fields])
+
+        for i, data in enumerate(rows):
+            row = []
+            for d in data:
+                if isinstance(d, unicode):
+                    try:
+                        d = d.encode('utf-8')
+                    except UnicodeError as e:
+                        print str(e)
+                        pass
+                if d is False: d = None
+
+                # Spreadsheet apps tend to detect formulas on leading =, + and -
+                #if type(d) is str and d.startswith(('=', '-', '+')):
+                #    d = "'" + d
+
+                row.append(d)
+            row.insert(0, i+1)
+            writer.writerow(row)
+
+        return response
