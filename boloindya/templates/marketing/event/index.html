@@ -1,0 +1,410 @@
+{% extends 'jarvis/new_layout/base.html' %}
+
+{% load static %}
+
+{% block title %}Bolo Indya | Analytics{% endblock title %}
+
+{% block css %}
+    <style>
+        .jsgrid-grid-header{
+            height: 60px !important;
+        }
+
+
+        #creatorNameFilterModal .search-icon, #creatorNameFilterModal .creatorNameList{
+            background: black;
+            color: white
+        }
+
+        #creatorNameFilterModal .creatorNameList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        }
+.jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+        .jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
+        .creatorFilterButton{
+            height: 38px;
+            width: 140px;
+        }
+
+        .fa.clear{
+            display: none;
+        }
+
+        .datePickerApplied .clear, .creatorFilterApplied .clear{
+            display: inline;
+            position: absolute;
+            right: 15%;
+            top: 10px;
+        }
+
+
+        /* [data-id="totalViewsSelect"], [data-id="totalBookingSelect"]{
+            width: 50% !important;
+        } */
+    </style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="container main">
+    <div class="row verticle-center header-row">
+        <div class="col-10">
+            <div class="page-title">
+                {{ object.title }}
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-3 " id="lifetimeBookings">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col ">
+                        Lifetime Bookings
+                    </div>
+                </div>
+                <div class="row pt-1 count  text-center">
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="lifetimeRevenue">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        Lifetime Revenue
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="lifetimeViews">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        Lifetime Views
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="lifetimeClicks">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        Lifetime Clicks
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-5 mr-4">
+            <div class="row justify-content-between">
+                <div class="col-4" style="font-size: 20px;">
+                    All Views
+                </div>
+                <div class="col-4" id="">
+                    <select name="" id="totalViewsSelect" class="selectpicker">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <canvas id="totalViewsChart"></canvas>
+            </div>
+            
+        </div>
+        <div class="col-5 mx-4">
+            <div class="row justify-content-between">
+                <div class="col-4" style="font-size: 20px;">
+                    All Bookings
+                </div>
+                <div class="col-4" id="">
+                    <select name="" id="totalBookingSelect" class="selectpicker">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <canvas id="totalBookingChart"></canvas>
+            </div>
+            
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-3">
+            <div class="label-group mb-2 mr-sm-2 pointer">
+                <div class="label-group-prepend">
+                    <div class="label-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                </div>
+                <div class="label-group-content">
+                    <input type="text" class="form-control" id="dateRange" placeholder="Date Range">
+                    <i class="fa fa-times-circle clear" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="" id="adStatsTable"></div>
+    </div>
+</div>
+
+<input name="event_id" value="{{ object.id }}" type="hidden">
+
+<div class="modal fade" id="creatorNameFilterModal" tabindex="-1" role="dialog" aria-labelledby="creatorNameFilterModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="creatorNameFilterModalLabel">Creator Name</h5>
+                <div class="modalClose">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row avenir-font">
+                    <div class="input-group m-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                        </div>
+                        <input type="text" class="form-control search-input avenir-font"  placeholder="Creators">
+                    </div>
+                </div>
+                <div class="row avenir-font">
+                    <div class="col creatorNameList">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <span class="apply-button pointer">Apply</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+
+<script>
+    let isDatePickerApplied = false;
+
+    let createChart = function(chartName, canvas, labels, dataset){
+        return new Chart(canvas, {
+            // The type of chart we want to create
+            type: 'line',
+
+            // The data for our dataset
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chartName,
+                    backgroundColor: 'rgb(0, 0, 0)',
+                    borderColor: 'rgb(0, 0, 0)',
+                    data: dataset,
+                    fill: false,
+                }],
+
+            },
+
+            // Configuration options go here
+            options: {}
+        });
+    }
+
+    let getExtraFilterData = function(){
+        let filters = {}
+
+        let dateRange = $('#dateRange').val()
+
+        if(dateRange)
+            filters['date_range'] = dateRange
+
+        return filters;
+    }
+
+    const initTotalCounts = function(){
+        $.ajax('/api/v1/marketing/event/'+$('[name=event_id]').val()+'/counts/', {
+            method: 'GET',
+            success: function(response){
+                $('#lifetimeBookings .value-count').text(response.lifetime_bookings)
+                $('#lifetimeRevenue .value-count').text(response.lifetime_revenues)
+                $('#lifetimeViews .value-count').text(response.lifetime_views)
+                $('#lifetimeClicks .value-count').text(response.lifetime_clicks)
+            }
+        })
+    }
+
+    const initiateTable = function(){
+        $("#adStatsTable").jsGrid({
+            width: "100%",
+            height: "450px",
+
+            inserting: false,
+            editing: false,
+            sorting: false,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            filtering: false,
+            pagerFormat: "{first} {pages} {last}",
+            pageButtonCount: 3,
+            pageSize: $("#pageSize").val(),
+            fields: [
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false, sorting: false,
+                    itemTemplate: function(value, _){
+                        let index = 0;
+                        $.each(this._grid.data, function(i, item){
+                            if(item.id == value){
+                                index = i;
+                                return false
+                            }
+                        })
+                        return index + 1
+                    }
+                },
+                { title: "Date", name: "date", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Views", name: "view_count", type: "number", width: 60, align: "center"},
+                { title: "Clicks", name: "click_count", type: "number", width: 60, align: "center", sorting: false},
+                { title: "Payment Initiated", name: "payment_initiated_count", type: "number", width: 60, align: "center"},
+                { title: "Payment Bookings", name: "confirm_booking_count", type: "number", width: 60, align: "center"},
+                { title: "Total Revenue", name: "total_revenue", type: "number", align: "center", width: 50},
+            ],
+            controller: {
+                loadData: function(filter) {
+                    filter['page'] = filter['pageIndex']
+                    filter['page_size'] = $("#pageSize").val()
+
+                    filter = Object.assign(filter, getExtraFilterData())
+                    console.log("filter", filter)
+
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/marketing/event/" + $('[name=event_id]').val() + "/stats/",
+                        data: filter,
+                        headers: headers
+                    });
+                },
+                
+            },
+            onDataLoaded: function(gridInstance){
+                
+            }
+        });
+
+        let grid = $("#adStatsTable").data("JSGrid");
+
+        $(document).on('click', '#dateRange', function(){
+            if(isDatePickerApplied)
+                return
+
+            $('#dateRange').daterangepicker({
+                opens: 'center',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            }, function(start, end, label) {});
+
+            $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+                grid.reset();
+                $('#totalViewsSelect').trigger('change')
+                $('#totalBookingSelect').trigger('change')
+            });
+            isDatePickerApplied = true
+            $('#dateRange').parent().addClass('datePickerApplied')
+
+            $(document).on('click', '.datePickerApplied .clear', function(){
+                let dateRangeElement = $('#dateRange')
+                dateRangeElement.data('daterangepicker').remove();
+                dateRangeElement.parent().removeClass('datePickerApplied')
+                dateRangeElement.val('')
+                isDatePickerApplied = false
+                grid.reset()
+            })
+        })
+        
+
+        $(document).on('change', '#pageSize', function(){
+            grid.reset()
+            $("#adStatsTable").jsGrid("option", "pageSize", $("#pageSize").val());
+        })
+    }
+
+    const initChart = function(element, type, chartInstance){
+        const updateChart = function(){
+            let filters = {
+                date_range: $('#dateRange').val(),
+                data_type: $(this).val(),
+                chart_type: type
+            }
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/marketing/event/"+$('[name=event_id]').val()+"/chart/?" + $.param(filters),
+                headers: headers,
+                success: function(response){
+                    console.log("response", response)
+                    chartInstance.data.labels = response.labels
+                    chartInstance.data.datasets[0].data = response.dataset
+                    chartInstance.update()
+                }
+            });
+        }
+
+        $(document).on('change', element, updateChart)
+    }
+
+    $(document).ready(function(){
+        initTotalCounts()
+        initiateTable()
+        var totalViewsChart = createChart('Views', document.getElementById('totalViewsChart').getContext('2d'), [], []);
+        var totalBookingChart = createChart('Bookings', document.getElementById('totalBookingChart').getContext('2d'), [], []);
+        initChart('#totalViewsSelect', 'views', totalViewsChart)
+        initChart('#totalBookingSelect', 'bookings', totalBookingChart)
+        $('#totalViewsSelect').trigger('change')
+        $('#totalBookingSelect').trigger('change')
+
+    })
+</script>
+
+{% endblock js %}

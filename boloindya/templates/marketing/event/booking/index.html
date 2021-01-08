@@ -1,0 +1,747 @@
+{% extends 'jarvis/new_layout/base.html' %}
+
+{% load static %}
+
+{% block title %}Bolo Indya | Analytics{% endblock title %}
+
+{% block css %}
+    <style>
+        .jsgrid-grid-header{
+            height: 60px !important;
+        }
+
+        .header-row{
+            margin-bottom: 50px;
+        }
+
+        /* #userNameFilterModal .search-icon, #userNameFilterModal .creatorNameList{
+            background: black;
+            color: white
+        }
+
+        #userNameFilterModal .creatorNameList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        } */
+.jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+        .jsgrid-header-sortable:before {
+            content: url('/static/img/icons/sortable-icon.png');
+        }
+        .jsgrid-header-sort-desc:before {
+            content: '' !important;
+            border-width: 5px 5px 0;
+            margin-top: 5px;
+            border-color: #009a67 transparent transparent !important;
+        }
+
+        .jsgrid-header-sort-asc:before {
+            content: "" !important;
+            margin-top: -5px;
+            border-width: 0 5px 5px;
+            border-color: transparent transparent #009a67 !important;
+        }
+        .creatorFilterButton{
+            height: 38px;
+            width: 140px;
+        }
+
+        .fa.clear{
+            display: none;
+        }
+
+        .datePickerApplied .clear, .creatorFilterApplied .clear{
+            display: inline;
+            position: absolute;
+            right: 15%;
+            top: 10px;
+        }
+
+        #fileTypeDiv .dropdown.bootstrap-select, #recordCountDiv .dropdown.bootstrap-select{
+            width: 75% !important;
+            color: black;
+        }
+
+        #filterGroup{
+            background: #F5F5F7;
+            color: black;
+            border: none;
+            font-family: "Baloo Bhai";
+        }
+
+        /* [data-id="allViewsSelect"], [data-id="allInstallsSelect"]{
+            width: 50% !important;
+        } */
+
+        #userNameFilterModal .search-icon, #userNameFilterModal .creatorNameList, #categoryFilterModal .search-icon, #categoryFilterModal .categoryList{
+            background: black;
+            color: white
+        }
+
+        #userNameFilterModal .creatorNameList, #categoryFilterModal .categoryList{
+            margin: 2px 20px;
+            padding: 25px;
+            max-height: 225px;
+            overflow-y: scroll;
+        }
+
+        #orderAmountFilterModal .modal-content{
+            width: 600px;
+            height: 250px;
+        }
+
+        #orderAmountFilterModal .ui-slider-horizontal{
+            height: 3px;
+            border-radius: 3px;
+        }
+
+        #orderAmountFilterModal .ui-widget-header{
+            background: #0270BE;
+            height: 3px;
+            margin-top: -1px;
+        }
+
+        #orderAmountFilterModal .ui-slider .ui-slider-handle {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+        }
+
+        #orderAmountFilterModal #price-slider-range{
+            margin-top: 30px;
+        }
+
+        #amountMinLabel, #amountMaxLabel{
+            font-size: 20px;
+        }
+
+        #amountSliderInput{
+            border:0; 
+            color: white; 
+            background: #121111;
+            font-weight: bold
+        }
+
+        #setting{
+            display: none;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="container main">
+    {% include 'jarvis/new_layout/home_navbar.html' %}
+    <div class="row verticle-center header-row">
+        <div class="col-7">
+            <div class="page-title">
+                Booking Dashboard
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="row greeting-div">
+                <div class="col greeting-message my-2 pl-5">
+                    <div class="row">
+                        <h2>Hello {% if user.st.name %}{{ user.st.name }}{% else %}{{ user.username }}{% endif %}!</h2>
+                    </div>
+                    <div class="row avenir-font">
+                        It's good to see you again
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3 " id="lifetimeBookings">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col ">
+                        Lifetime Bookings
+                    </div>
+                </div>
+                <div class="row pt-1 count  text-center">
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="currentMonthBooking">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        <span class="currentMonthName"></span>'s Bookings
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="lifetimeRevenue">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        Lifetime Revenue
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" id="currentMonthRevenue">
+            <div class="count-div">
+                <div class="row pt-2 avenir-font count-text text-center">
+                    <div class="col">
+                        <span class="currentMonthName"></span>'s Revenue
+                    </div>
+                </div>
+                <div class="row pt-1 count text-center" >
+                    <div class="col value-count">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="state" id="" value="order" checked>
+                <label class="form-check-label" for="">
+                    Order List
+                </label>
+              </div>
+        </div>
+        <div class="col-3">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="state" id="" value="transactional">
+                <label class="form-check-label" for="">
+                    Transactional List
+                </label>
+              </div>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col">
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon.svg' %}" ></div>
+                        </div>
+                        <input type="text" class="form-control search-input avenir-font"  placeholder="Search by Name, Phone, E-mail, Creator Name" name="q" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row">
+                        <div class="col">
+                            <div class="btn-group avenir-font" role="group" aria-label="Button group with nested dropdown">
+                                <div class="btn-group" role="group">
+                                    <button id="filterGroup" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <img src="{% static '/img/brand-dashboard/filter-icon.svg' %}" class="pr-3">Filter
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="filterGroup">
+                                        <a class="dropdown-item" href="#" id="categoryFilter" data-toggle="modal" data-target="#categoryFilterModal">Category</a>
+                                        <a class="dropdown-item" href="#" id="userNameFilter"data-toggle="modal" data-target="#userNameFilterModal" >UserName</a>
+                                        <a class="dropdown-item" href="#" id="orderAmountFilter" data-toggle="modal" data-target="#orderAmountFilterModal">Amount Paid</a>
+                                        <a class="dropdown-item" href="#" id="orderDateFilter" >Order Date</a>
+                                    </div>
+                                    <input type="hidden" name="orderDateInput">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col" id="fileTypeDiv">
+                            <img src="{% static '/img/brand-dashboard/download-icon.svg' %}" class="recordCountIcon pointer" id="exportOrder">
+                            <select name="fileType" id="" class="selectpicker">
+                                <option value="">File Type</option>
+                                <option value="csv" selected>CSV</option>
+                            </select>
+                        </div>
+                        <div class="col" id="recordCountDiv">
+                            <img src="{% static '/img/brand-dashboard/record-icon.svg' %}" class="recordCountIcon" id="stockIcon">
+                            <select name="recordsCount" id="pageSize" class="selectpicker">
+                                <option value="10">10 Records</option>
+                                <option value="20">20 Records</option>
+                                <option value="50">50 Records</option>
+                                <option value="100">100 Records</option>
+                                <option value="500">500 Records</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="row" id="userOrderTable"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="" id="eventBookingTable"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="userNameFilterModal" tabindex="-1" role="dialog" aria-labelledby="userNameFilterModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userNameFilterModalLabel">Creator Name</h5>
+                <div class="modalClose">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row avenir-font">
+                    <div class="input-group m-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                        </div>
+                        <input type="text" class="form-control search-input avenir-font"  placeholder="Creators">
+                    </div>
+                </div>
+                <div class="row avenir-font">
+                    <div class="col creatorNameList">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <span class="apply-button pointer">Apply</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="orderAmountFilterModal" tabindex="-1" role="dialog" aria-labelledby="orderAmountFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderAmountFilterModalLabel">Order Amount</h5>
+                <div class="modalClose">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row text-center">
+                    <div class="col">
+                        <input type="text" id="amountSliderInput" readonly class="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col" id="amountMinLabel"></div>
+                    <div class="col text-right" id="amountMaxLabel"></div>
+                </div>
+                <div id="price-slider-range"></div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <span class="apply-button pointer">Apply</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="categoryFilterModal" tabindex="-1" role="dialog" aria-labelledby="categoryFilterModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryFilterModalLabel">Category</h5>
+                <div class="modalClose">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row avenir-font">
+                    <div class="input-group m-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text search-icon"><img src="{% static '/img/brand-dashboard/search-icon-light.svg' %}" ></div>
+                        </div>
+                        <input type="text" class="form-control search-input avenir-font"  placeholder="Category">
+                    </div>
+                </div>
+                <div class="row avenir-font">
+                    <div class="col categoryList">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <span class="apply-button pointer">Apply</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+
+<script>
+    let isDatePickerApplied = false;
+
+    let getExtraFilterData = function(){
+        let filters = {}
+
+        let creatorIdList = []
+        $.each($('.creatorNameList input[type=checkbox]:checked'), function(i, item){
+            if($(this).val() != 'all')
+                creatorIdList.push($(this).val())
+        })
+
+        if(creatorIdList.length > 0)
+            filters['creators'] = creatorIdList.join(',')
+
+        let categoryIdList = []
+        console.log("categories list", $('.categoryList input[type=checkbox]:checked'))
+        $.each($('.categoryList input[type=checkbox]:checked'), function(i, item){
+            if($(this).val() != 'all')
+                categoryIdList.push($(this).val())
+        })
+
+        if(categoryIdList.length > 0)
+            filters['categories'] = categoryIdList.join(',')
+
+        let dateRange = $('#dateRange').val()
+
+        if(dateRange)
+            filters['date_range'] = dateRange
+
+        if($('[name=state]:checked').val())
+            filters['state'] = $('[name=state]:checked').val()
+
+        console.log("isDatePickerApplied", isDatePickerApplied)
+
+        if(isDatePickerApplied)
+            filters['date'] = $('input[name="orderDateInput"]').val()
+
+        filters['price_range'] = $("#amountSliderInput").val()
+
+        if($('[name=q]').val())
+            filters['q'] = $('[name=q]').val()
+
+        return filters;
+    }
+
+    const initTotalCounts = function(){
+        $.ajax('/api/v1/marketing/event/booking/counts/', {
+            method: 'GET',
+            success: function(response){
+                $('#lifetimeBookings .value-count').text(response.lifetime_bookings);
+                $('#currentMonthBooking .value-count').text(response.current_month_bookings);
+                $('#lifetimeRevenue .value-count').text(response.lifetime_revenues);
+                $('#currentMonthRevenue .value-count').text(response.current_month_revenues);
+                $('#currentMonthBooking .currentMonthName').text(response.current_month_name);
+                $('#currentMonthRevenue .currentMonthName').text(response.current_month_name);
+                $('#amountMinLabel').text(response.order_amount_min);
+                $('#amountMaxLabel').text(response.order_amount_max);
+
+                $( "#price-slider-range" ).slider({
+                    range: true,
+                    min: response.order_amount_min,
+                    max: response.order_amount_max,
+                    values: [response.order_amount_min, response.order_amount_max],
+                    slide: function( event, ui ) {
+                        $( "#amountSliderInput" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+                    }
+                });
+            }
+        })
+    }
+
+    let addDateFilter = function(){
+        $('input[name="orderDateInput"]').daterangepicker({
+                opens: 'center',
+                locale: {
+                    format: 'DD-MM-YYYY'
+                }
+            }, function(start, end, label) {
+                
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+        $('input[name="orderDateInput"]').on('show.daterangepicker', function(ev, picker) {
+            $("#dateFilterModal").modal({show: true})
+        });
+        $('input[name="orderDateInput"]').on('hide.daterangepicker', function(ev, picker) {
+            $("#dateFilterModal .close").click()
+        });
+
+        $('#orderDateFilter').click(function(){
+            $('input[name="orderDateInput"]').click()
+            isDatePickerApplied = true
+        })
+        $('input[name="orderDateInput"]').val('')
+    }
+
+    const initiateTable = function(){
+        $("#eventBookingTable").jsGrid({
+            width: "100%",
+            height: "450px",
+
+            inserting: false,
+            editing: false,
+            sorting: false,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            filtering: false,
+            pagerFormat: "{first} {pages} {last}",
+            pageButtonCount: 3,
+            pageSize: $("#pageSize").val(),
+            fields: [
+                { title: "Sr. No.", name: "id", type: "number", width: 30, align: "center", filtering: false, sorting: false,
+                    itemTemplate: function(value, _){
+                        let index = 0;
+                        $.each(this._grid.data, function(i, item){
+                            if(item.id == value){
+                                index = i;
+                                return false
+                            }
+                        })
+                        return index + 1
+                    }
+                },
+                { title: "Name", name: "user.name", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Phone Number", name: "user.phone_number", type: "text", width: 60, align: "center"},
+                { title: "Email ID", name: "user.email", type: "text", width: 60, align: "center", sorting: false},
+                { title: "Amount Paid", name: "event.price", type: "text", width: 60, align: "center"},
+                { title: "Creator Name", name: "event.creator.name", type: "text", width: 60, align: "center", css: "daterange-field"},
+                { title: "Creator UserName", name: "event.creator.username", type: "number", align: "center", width: 50, css: 'range-field'},
+                { title: "Event Title", name: "event.title", type: "text", align: "center", 
+                    itemTemplate: function(value, data){
+                        console.log("===", value, data, this)
+                        return `<a href="/marketing/event/${ data.event.id }/dashboard/" title="${ value }">${ value }</a>`
+                    }
+                },
+                { title: "Category", name: "category_name", type: "text", align: "center", width: 50},
+                { title: "Order Date", name: "created_at", type: "text", align: "center"},
+                { title: "Status", name: "state", type: "text", align: "center"},
+            ],
+            controller: {
+                loadData: function(filter) {
+                    filter['page'] = filter['pageIndex']
+                    filter['page_size'] = $("#pageSize").val()
+
+                    filter = Object.assign(filter, getExtraFilterData())
+                    console.log("filter", filter)
+
+                    return $.ajax({
+                        type: "GET",
+                        url: "/api/v1/marketing/event/booking/",
+                        data: filter,
+                        headers: headers
+                    });
+                },
+                
+            },
+            onDataLoaded: function(gridInstance){
+                
+            }
+        });
+
+        let grid = $("#eventBookingTable").data("JSGrid");
+
+        $(document).on('click', '#userNameFilterModal .apply-button', function(){
+            grid.reset()
+            $('#userNameFilterModal .close').click()
+            
+        })
+
+        $(document).on('click', '#categoryFilterModal .apply-button', function(){
+            grid.reset()
+            $('#categoryFilterModal .close').click()
+        })
+
+
+        // $(document).on('click', '#dateRange', function(){
+        //     if(isDatePickerApplied)
+        //         return
+
+        //     $('#dateRange').daterangepicker({
+        //         opens: 'center',
+        //         locale: {
+        //             format: 'DD/MM/YYYY'
+        //         }
+        //     }, function(start, end, label) {});
+
+        //     $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+        //         grid.reset();
+        //     });
+        //     isDatePickerApplied = true
+        //     $('#dateRange').parent().addClass('datePickerApplied')
+
+        //     $(document).on('click', '.datePickerApplied .clear', function(){
+        //         let dateRangeElement = $('#dateRange')
+        //         dateRangeElement.data('daterangepicker').remove();
+        //         dateRangeElement.parent().removeClass('datePickerApplied')
+        //         dateRangeElement.val('')
+        //         isDatePickerApplied = false
+        //         grid.reset()
+        //     })
+        // })
+        
+
+        $(document).on('change', '#pageSize', function(){
+            grid.reset()
+            $("#eventBookingTable").jsGrid("option", "pageSize", $("#pageSize").val());
+        })
+
+        $(document).on('change', '[name=state]', function(){
+            grid.reset()
+        })
+
+        $('input[name="orderDateInput"]').on('apply.daterangepicker', function(ev, picker) {
+            grid.reset();
+        });
+
+        $('#orderAmountFilterModal .apply-button').click(function(){
+            grid.reset();
+            $("#orderAmountFilterModal .close").click()
+        })
+
+        $('[name=q]').keyup(function(){
+            grid.reset()
+        })
+    }
+
+    const loadCreators = function(){
+        const getCreators = function(q){
+            $.ajax('/api/v1/marketing/event/creator/?q='+q, {
+                method: 'GET',
+                headers: headers,
+                success: function(response){
+                    let creatorList = $('#userNameFilterModal .creatorNameList')
+                    creatorList.html('')
+                    creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="all" class="form-check-input"> 
+                            <label class="form-check-label">All</label>
+                        </div></div>`)
+                    $.each(response.results, function(i, item){
+                        creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="${ item.creator_id }" class="form-check-input"> 
+                            <label class="form-check-label">${ item.creator__username}</label>
+                        </div></div>`)
+                    })
+                    $(document).on('change', '.creatorNameList input[type="checkbox"][value="all"]', function(){
+                        console.log("change")
+                        if($('.creatorNameList input[type="checkbox"][value="all"]:checked').length > 0){
+                            $.each($('.creatorNameList input[type="checkbox"]:not(.creatorNameList input[type="checkbox"][value="all"])'), function(i, element){
+                                $(element).prop("checked", true);
+                            });
+                        }
+                        else{
+                            $.each($('.creatorNameList input[type="checkbox"]:not(.creatorNameList input[type="checkbox"][value="all"])'), function(i, element){
+                                console.log("element", $(element))
+                                $(element).prop("checked", false);
+                            });
+                        }
+                    })
+                }
+            })
+        }
+
+        $(document).on('keyup', '#userNameFilterModal .search-input', function(){
+            let text = $(this).val()
+
+            if(text.length > 0 && text.lenght < 3)
+                return
+            
+            getCreators(text)
+
+        })
+        getCreators('')
+    }
+
+
+    const initDownloadCSV = function(){
+        $(document).on('click', '#exportOrder', function(){
+            let fileType = $('select[name=fileType]').val();
+            let params = {}
+
+            if(fileType)
+                params['format'] = fileType
+            
+            params = Object.assign(params, getExtraFilterData())
+
+            window.open('/report/event/booking/stats/download?' + $.param(params), '_self')
+        });
+    }
+
+
+    let loadCategories = function(){
+        const getCategories = function(q){
+            $.ajax('/api/v1/marketing/event/category/?q='+q, {
+                method: 'GET',
+                headers: headers,
+                success: function(response){
+                    let creatorList = $('#categoryFilterModal .categoryList')
+                    creatorList.html('')
+                    creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="all" class="form-check-input"> 
+                            <label class="form-check-label">All</label>
+                        </div></div>`)
+                    $.each(response.results, function(i, item){
+                        creatorList.append(`<div class="row"><div class="form-group form-check">
+                            <input type="checkbox" value="${ item.id }" class="form-check-input"> 
+                            <label class="form-check-label">${ item.title}</label>
+                        </div></div>`)
+                    })
+                    $(document).on('change', '.categoryList input[type="checkbox"][value="all"]', function(){
+                        console.log("change")
+                        if($('.categoryList input[type="checkbox"][value="all"]:checked').length > 0){
+                            $.each($('.categoryList input[type="checkbox"]:not(.categoryList input[type="checkbox"][value="all"])'), function(i, element){
+                                $(element).prop("checked", true);
+                            });
+                        }
+                        else{
+                            $.each($('.categoryList input[type="checkbox"]:not(.categoryList input[type="checkbox"][value="all"])'), function(i, element){
+                                console.log("element", $(element))
+                                $(element).prop("checked", false);
+                            });
+                        }
+                    })
+                }
+            })
+        }
+
+        $(document).on('keyup', '#categoryFilterModal .search-input', function(){
+            let text = $(this).val()
+
+            if(text.length > 0 && text.lenght < 3)
+                return
+            
+            getCategories(text)
+
+        })
+        getCategories('')
+    }
+
+    $(document).ready(function(){
+        initTotalCounts()
+        initiateTable()
+        loadCreators()
+        loadCategories()
+        // loadBrands()
+        initDownloadCSV()
+        addDateFilter()
+
+        $(document).on('click', '.showuserNameFilterModal', function(){
+            $('#userNameFilterModal').modal({'show': true})
+        })
+    })
+</script>
+
+{% endblock js %}
