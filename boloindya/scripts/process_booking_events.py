@@ -14,14 +14,17 @@ from django.db import transaction
 
 from dynamodb_api import query
 from redis_utils import get_redis, set_redis
-from advertisement.models import Ad, AdEvent, Seen, Skipped, Install, ShopNow, LearnMore, PlaceOrder, FullWatched
+from booking.models import EventBookingEvent
 from advertisement.utils import filter_data_from_dict
 from drf_spirit.models import SystemParameter
-from marketing.models import AdStats
+from marketing.models import EventStats
 
 rand = Random()
 
 dashboard_data = {}
+
+def get_mapped_ad(ad_id):
+    return rand.randint(1, 5)
 
 
 def get_last_processed_id(name):
@@ -34,11 +37,11 @@ def update_last_processed_id(name, value):
     param.save()
 
 @transaction.atomic
-def process_ad_event(event, keys):
+def process_event_booking_event(event, keys):
     print "Processing for event: ", event
-    event_list = query('EventBookingEvent_PROD', {
+    event_list = query(EventBookingEvent, {
         ':v1': {'S': event,},
-        ':v2':{'N': get_last_processed_id('ad:%s:last_processed_id'%event),},
+        ':v2':{'N': get_last_processed_id('event:booking:%s:last_processed_id'%event),},
     }, 'event = :v1 and id > :v2')
 
     item_list = []
@@ -47,6 +50,7 @@ def process_ad_event(event, keys):
     for item in event_list:
         event_data = filter_data_from_dict(keys, item)
         event_data['event_id'] = int(item.get('event_id'))
+        # event_data['event_id'] = get_mapped_ad(event_data['event_id'])
 
         if int(item.get('id')) > max_id:
             max_id = int(item.get('id'))
@@ -56,7 +60,7 @@ def process_ad_event(event, keys):
     if max_id == 0:
         return
 
-    update_last_processed_id('ad:%s:last_processed_id'%event, max_id)
+    update_last_processed_id('event:booking:%s:last_processed_id'%event, max_id)
 
     for item in event_list:
         data = dashboard_data.setdefault(int(item.get('event_id')), {}).setdefault(str(datetime.strptime(item.get('created_at'), '%Y-%m-%d %H:%M:%S.%f').date()), {})
@@ -73,18 +77,21 @@ def process_ad_event(event, keys):
 
         elif event == 'confirm_booking':
             data['confirm_booking'] = data.setdefault('confirm_booking', 0) + 1
+            data['total_revenue'] = data.setdefault('total_revenue', 0) + int(item.get('data', {}).get('price', '0'))
 
 
 def process_events_in_parallel():
     for event in ['event_view', 'event_register_click', 'payment_initiated', 'confirm_booking']:
         get_last_processed_id('event:booking:%s:last_processed_id'%event)
 
-    process_ad_event('event_view', ('user_id', 'event_id', 'created_at'))
-    process_ad_event('event_register_click', ('user_id', 'event_id', 'created_at'))
-    process_ad_event('payment_initiated', ('user_id', 'event_id', 'created_at'))
-    process_ad_event('confirm_booking', ('user_id', 'event_id', 'created_at'))
+    process_event_booking_event('event_view', ('user_id', 'event_id', 'created_at'))
+    process_event_booking_event('event_register_click', ('user_id', 'event_id', 'created_at'))
+    process_event_booking_event('payment_initiated', ('user_id', 'event_id', 'created_at'))
+    process_event_booking_event('confirm_booking', ('user_id', 'event_id', 'created_at', 'data'))
 
     item_list = []
+    
+    print "dashboard data", dashboard_data
 
     for event_id, data in dashboard_data.items():
         for date, item in data.items():
@@ -93,6 +100,7 @@ def process_events_in_parallel():
             stats.click_count += item.get('event_register_click', 0)
             stats.payment_initiated_count += item.get('payment_initiated', 0)
             stats.confirm_booking_count += item.get('confirm_booking', 0)
+            stats.total_revenue += item.get('total_revenue', 0)
             stats.save()
 
 def run():

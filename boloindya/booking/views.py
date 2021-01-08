@@ -523,6 +523,17 @@ class BookingPaymentRedirectView(RedirectView):
 		booking.event_slot.state = 'hold'
 		booking.event_slot.save()
 
+		try:
+			data = {
+				'event_id': booking.event.id,
+				'user_id': self.request.user.id,
+				'created_at': datetime.now(),
+				'event': 'payment_initiated'
+			}
+			dynamodb_create(EventBookingEvent, data)
+		except Exception as e:
+			print "While updating event booking event", str(e)
+
 		webengage_event.delay({
 			"userId": booking.user_id,
 			"eventName": "Booking Payment Initiated",
@@ -533,8 +544,8 @@ class BookingPaymentRedirectView(RedirectView):
 				"slot_status": booking.event_slot.state,
 				"booking_status": booking.state,
 				"payment_status": booking.payment_status,
-				"creator_id": booking.user_id,
-				"booker_id": booking.event.creator_id,
+				"booker_id": booking.user_id,
+				"creator_id": booking.event.creator_id,
 				"slot_start_time": booking.event_slot.start_time.strftime("%Y-%m-%d %H:%M:%S"),
 				"slot_end_time": booking.event_slot.end_time.strftime("%Y-%m-%d %H:%M:%S"),
 			}

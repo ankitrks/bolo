@@ -1,7 +1,10 @@
 from django.db import connections
+from datetime import datetime
 
 from tasks import webengage_event, send_fcm_push_notifications
+from dynamodb_api import create as dynamodb_create
 
+from booking.models import EventBookingEvent
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -77,7 +80,8 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
             RETURNING forum_topic_notification.id;
             SELECT b.id, e.title, coalesce(NULLIF(cp.name, ''), cp.slug) as creator, 
                 coalesce(NULLIF(bp.name,''), bp.slug) as booker, cf.reg_id as creator_device_id,
-                (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining
+                (EXTRACT(EPOCH FROM (s.start_time - now()))/60)::numeric::integer as time_remaining,
+                e.price as event_price, e.id as event_id, b.user_id as booker_id
             FROM booking_eventbooking b
             INNER JOIN booking_eventslot s on s.id = b.event_slot_id
             INNER JOIN booking_event e on e.id = b.event_id
@@ -96,6 +100,20 @@ def update_booking_payment_status(order_id, payment_status, transaction_id=None)
                 "Bolo Meet Booking Alert",
                 "%s has booked your session '%s'"%(booking_info.get('booker'), booking_info.get('title')), 
             )
+
+        try:
+            data = {
+                'event_id': booking_info.get('event_id'),
+                'user_id': booking_info.get('booker_id'),
+                'created_at': datetime.now(),
+                'event': 'confirm_booking',
+                'data': {
+                    'price': booking_info.get('event_price')
+                }
+            }
+            dynamodb_create(EventBookingEvent, data)
+        except Exception as e:
+            print "While updating event booking event", str(e)
 
     elif payment_status == 'failed':
         execute_query("""

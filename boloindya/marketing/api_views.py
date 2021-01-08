@@ -429,80 +429,122 @@ class EventStatsChartDataAPIView(APIView):
 
         if chart_type == 'views':
             if data_type == 'daily':
-                cursor.execute("""
+                query = """
                     select date::varchar, count
                     from (
                         select date::date, sum(view_count) as count
                         from marketing_eventstats
                         where event_id = %s
-                        group by date::date
-                    ) A
-                """, [event_id])
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by date::date) A "
+                cursor.execute(query, params)
                 result = self.get_daily_data(self.dictfetchall(cursor))
                 
             elif data_type == 'weekly':
                 today = datetime.now()
-                cursor.execute("""
+                query = """
                     select date::date::varchar, count
                     from (
                         select DATE_TRUNC('week', date) as date, sum(view_count) as count
                         from marketing_eventstats
-                        where event_id = %s
-                        group by DATE_TRUNC('week', date)
-                    ) A
-                """, [event_id])
+                        where event_id = %s 
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by DATE_TRUNC('week', date)) A "
+                cursor.execute(query, params)
                 result = self.get_weekly_data(self.dictfetchall(cursor))
 
             elif data_type == 'monthly':
                 today = datetime.now()
-                cursor.execute("""
+                query = """
                     select date::date::varchar, count
                     from (
                         select DATE_TRUNC('month', date) as date, sum(view_count) as count
                         from marketing_eventstats
                         where event_id = %s
-                        group by DATE_TRUNC('month', date)
-                    ) A
-                """, [event_id])
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by DATE_TRUNC('month', date)) A "
+                cursor.execute(query, params)
                 result = self.get_monthly_data(self.dictfetchall(cursor))
 
         elif chart_type == 'bookings':
             if data_type == 'daily':
-                cursor.execute("""
+                query = """
                     select date::varchar, count
                     from (
                         select date::date, sum(total_revenue) as count
                         from marketing_eventstats
                         where event_id = %s
-                        group by date::date
-                    ) A
-                """, [event_id])
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by date::date) A "
+                cursor.execute(query, params)
                 result = self.get_daily_data(self.dictfetchall(cursor))
                 
             elif data_type == 'weekly':
                 today = datetime.now()
-                cursor.execute("""
+                query = """
                     select date::date::varchar, count
                     from (
                         select DATE_TRUNC('week', date) as date, sum(total_revenue) as count
                         from marketing_eventstats
                         where event_id = %s
-                        group by DATE_TRUNC('week', date)
-                    ) A
-                """, [event_id])
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by DATE_TRUNC('week', date)) A "
+                cursor.execute(query, params)
                 result = self.get_weekly_data(self.dictfetchall(cursor))
 
             elif data_type == 'monthly':
                 today = datetime.now()
-                cursor.execute("""
+                query = """
                     select date::date::varchar, count
                     from (
                         select DATE_TRUNC('month', date) as date, sum(total_revenue) as count
                         from marketing_eventstats
                         where event_id = %s
-                        group by DATE_TRUNC('month', date)
-                    ) A
-                """, [event_id])
+                """
+                params = [event_id]
+
+                if date_range:
+                    query += " and date between %s and %s "
+                    params.append(start_date)
+                    params.append(end_date)
+                    
+                query += " group by DATE_TRUNC('month', date)) A "
+                cursor.execute(query, params)
                 result = self.get_monthly_data(self.dictfetchall(cursor))
 
         return Response({
@@ -524,9 +566,9 @@ class EventStatsChartDataAPIView(APIView):
         dataset = []
 
         for i in range(interval+1):
-            current_date = str((start_date + timedelta(i)).date())
-            labels.append(current_date)
-            dataset.append(query_data.get(current_date))
+            current_date = start_date + timedelta(i)
+            labels.append(datetime.strftime(current_date, '%d-%m-%Y'))
+            dataset.append(query_data.get(str(current_date.date()), 0))
 
         return labels, dataset
 
