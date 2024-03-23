@@ -1,0 +1,9 @@
+byobu
+cd /var/live_code/boloindya/
+source pyenv/bin/activate
+git fetch
+git stash && git rebase origin/deploy/prod && git stash pop
+python boloindya/manage_local.py collectstatic --no-input
+python boloindya/manage_local.py migrate
+pip install -r requirements.txt 
+sudo service celery restart && sudo service uwsgi restart && sudo service nginx restart

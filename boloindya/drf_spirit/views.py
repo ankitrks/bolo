@@ -91,7 +91,6 @@ def timestamp_to_datetime(timestamp):
             return datetime.fromtimestamp(int(timestamp)/1000)
         return timestamp
     except Exception as e:
-        print e
 
 
 class ShufflePagination(LimitOffsetPagination):
@@ -113,7 +112,6 @@ class NotificationAPI(GenericAPIView):
     limit = 15
 
     def post(self, request, action, format = None):
-        # print "request user", request.user, action
 
         if action == 'get':
             notifications,next_offset = self.get_notifications(request.user.id)
@@ -143,7 +141,6 @@ class NotificationAPI(GenericAPIView):
         limit = int(self.request.data.get('limit') or self.limit)
         next_offset=''
 
-        # print "offset",offset,"page_size",page_size
 
         notifications = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at')[offset:offset+limit]
         total_notification_count = Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').count()
@@ -154,7 +151,6 @@ class NotificationAPI(GenericAPIView):
             if total_offset > offset:
                 next_offset = offset+limit
             update_notification_ids = list(Notification.objects.filter(for_user = self.request.user, is_active = True).order_by('-created_at').values_list('pk',flat=True))[offset:offset+limit]
-            #print update_notification_ids
             Notification.objects.filter(pk__in=update_notification_ids).exclude(status=2).update(status=1)
 
         result = []
@@ -272,7 +268,6 @@ class Usertimeline(generics.ListCreateAPIView):
                 sort_recent = True
 
             if filter_dic:
-                #print filter_dic
                 if is_user_timeline:
                     filter_dic['is_removed'] = False
                     topics = Topic.objects.filter(**filter_dic)
@@ -297,36 +292,30 @@ class Usertimeline(generics.ListCreateAPIView):
                     topics=[]
                     # startdate = datetime.today()
                     # enddate = startdate - timedelta(days=1)
-                    # print search_term
                     if 'language_id' in search_term and not 'category' in search_term:
-                        # print "a"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False)
                         else:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),language_id = self.request.GET.get('language_id'),is_removed = False,is_vb = False).order_by('-last_commented')
                     elif 'category' in search_term and not 'language_id' in search_term:
-                        # print "b"
                         # post1 = Topic.objects.filter(category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
                             post2 = Topic.objects.filter(m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
                     elif 'language_id' in search_term and 'category' in search_term:
-                        # print "maaz"
                         # post1 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),category__slug =self.request.GET.get('category'),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False)
                         else:
                             post2 = Topic.objects.filter(language_id = self.request.GET.get('language_id'),m2mcategory__slug =self.request.GET.get('category'),is_removed = False,is_vb = False).order_by('-last_commented')
                     else:
-                        # print "d"
                         # post1 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(category_id__in = category_follow),is_removed = False,date__gte=enddate)
                         if not sort_recent:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False)
                         else:
                             post2 = Topic.objects.filter(Q(user_id__in=all_follower)|Q(m2mcategory__id__in = category_follow),is_removed = False,is_vb = False).order_by('-last_commented')
-                    # print post1,post2
                     # if post1:
                     #     topics = topics+list(post1)
                     if post2:
@@ -657,7 +646,6 @@ def GetChallengeDetails(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API GetChallengeDetails/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1259,7 +1247,6 @@ def upload_media(media_file, key="media/"):
         filepath = 'https://'+settings.BOLOINDYA_AWS_IN_BUCKET_NAME +'.s3.ap-south-1.amazonaws.com/' + key + final_filename
         return filepath
     except Exception as e:
-        print(e)
         return None
 
 def validateUser(request):
@@ -1297,7 +1284,6 @@ def upload_profile_image(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API upload_profile_image/ :" + log
         return JsonResponse({'message': 'Unable to upload profile image! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -1316,7 +1302,6 @@ def upload_cover_pic(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API coverPic/ :" + log
         return JsonResponse({'message': 'Unable to upload cover image! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1350,7 +1335,6 @@ def upload_pii(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API kyc/ :" + log
         return JsonResponse({'message': 'Unable to upload kyc image! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -1980,7 +1964,6 @@ def createTopic(request):
             topic_type = ContentType.objects.get_for_model(topic)
             notify_owner = Notification.objects.create(for_user_id = topic.user.id ,topic_id = topic.id, topic_type = topic_type, notification_type='6', user_id = topic.user.id)
         except Exception as e:
-            print(e)
             capture_exception(e)
 
 
@@ -1990,9 +1973,7 @@ def createTopic(request):
 
         # try:
         #     c = topic.m2mcategory.all()
-        #     print(topic.location, c, topic.language_id, topic.id)
         # except Exception as e:
-        #     print(e)
         return JsonResponse({'message': message,'topic':topic_json}, status=status.HTTP_201_CREATED)
     except User.DoesNotExist:
         return JsonResponse({'message': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
@@ -2011,21 +1992,16 @@ def invoke_watermark_service(topic, user):
             payload = {"input_key": input_key, "topic_id": topic_id, "username": username,"user_id":user_id,"duration":duration}
             response = requests.request("POST", url, headers = {}, data = json.dumps(payload), files = [],timeout=60)
             if response.status_code == 200:
-                print("success")
             else:
-                print("failure with response code"+str(response.status_code))
     except Exception as e:
-        print("Exception raised {}".format(e))
         capture_exception(e)
 
 
 def provide_view_count(view_count,topic):
     try:
-        print view_count
         FVBseen.objects.create(topic_id = topic.id, view_count = view_count)
         update_profile_counter(topic.user_id,'view_count',view_count, True)
     except Exception as e:
-        print e,"view"
 
 @api_view(['POST'])
 def editTopic(request):
@@ -2136,7 +2112,6 @@ def editComment(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API editComment/ :" + log
         return JsonResponse({'message': 'Unable to edit comment! Please try again.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 from HTMLParser import HTMLParser
@@ -2177,7 +2152,6 @@ def topic_delete(request):
     topic = Topic.objects.get(pk= topic_id)
     now = datetime.now()
     allowed_date = datetime.strptime('01-'+str(now.month)+'-'+str(now.year)+' 00:00:00', "%d-%m-%Y %H:%M:%S")
-    print request.user
     if allowed_date <= topic.date:
         if topic.user == request.user and not topic.is_removed:
 
@@ -2522,7 +2496,6 @@ class SingUpOTPCountryCodeView(generics.CreateAPIView):
         if not response_status:
             log = str({'request':str(self.request.__dict__),'response':str(status.HTTP_417_EXPECTATION_FAILED),'messgae':'OTP could not be sent',\
                 'error':'-'})
-            print "Error in API  otp/send_with_country_code/ :" + log
             return JsonResponse({'message': 'OTP could not be sent'}, status=status.HTTP_417_EXPECTATION_FAILED)
         return JsonResponse({'message': 'OTP sent'}, status=status.HTTP_200_OK)
 
@@ -2585,7 +2558,6 @@ def get_user_bolo_info(request):
         else:
             log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-            print "Error in API get_user_bolo_info/ :" + log
             return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -2641,7 +2613,6 @@ def get_user_bolo_info(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_user_bolo_info/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -2956,7 +2927,6 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created=False
             except Exception as e:
-                print e
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
@@ -2967,7 +2937,6 @@ def fb_profile_settings(request):
             if not userprofile.user.is_active:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
-                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 add_bolo_score(user.id, 'initial_signup', userprofile)
@@ -3029,7 +2998,6 @@ def fb_profile_settings(request):
                 user=userprofile.user
                 is_created = False
             except Exception as e:
-                print e
                 # user_exists,num_user = check_user(extra_data['first_name'],extra_data['last_name'])
                 #username = generate_username(extra_data['first_name'],extra_data['last_name'],num_user) if user_exists else str(str(extra_data['first_name'])+str(extra_data['last_name']))
                 username = get_random_username()
@@ -3039,7 +3007,6 @@ def fb_profile_settings(request):
             if not userprofile.user.is_active:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':'You have been banned permanently for violating terms of usage.',\
                 'error':'None'})
-                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'You have been banned permanently for violating terms of usage.', 'is_signup' : is_created}, status=status.HTTP_400_BAD_REQUEST)
             if is_created:
                 update_dict = {}
@@ -3153,7 +3120,6 @@ def fb_profile_settings(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
-                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'settings_changed':
             try:
@@ -3178,7 +3144,6 @@ def fb_profile_settings(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
-                print "Error in API fb_profile_settings/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
         elif activity == 'android_login':
             if not android_did:
@@ -3232,7 +3197,6 @@ def fb_profile_settings(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API fb_profile_settings/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e), 'is_signup' : is_signup}, status=status.HTTP_400_BAD_REQUEST)
 
 #### KYC Views ####
@@ -3245,7 +3209,6 @@ def get_kyc_status(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_kyc_status/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -3284,7 +3247,6 @@ def save_kyc_basic_info(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_kyc_basic_info/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3325,7 +3287,6 @@ def save_kyc_documents(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_kyc_documents/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3348,7 +3309,6 @@ def save_kyc_selfie(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_kyc_selfie/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3377,7 +3337,6 @@ def save_kyc_additional_info(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_kyc_additional_info/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3428,7 +3387,6 @@ def save_bank_details_info(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_bank_details_info/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3442,7 +3400,6 @@ def get_bolo_details(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_bolo_details/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -3516,7 +3473,6 @@ def follow_user(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API follow_user/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3541,7 +3497,6 @@ def follow_sub_category(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API follow_sub_category/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3591,7 +3546,6 @@ def like(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API like/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3621,7 +3575,6 @@ def shareontimeline(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                         'error':str(e)})
-                print "Error in API shareontimeline/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif share_on == 'facebook_share':
             try:
@@ -3637,7 +3590,6 @@ def shareontimeline(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                         'error':str(e)})
-                print "Error in API shareontimeline/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif share_on == 'whatsapp_share':
             try:
@@ -3653,7 +3605,6 @@ def shareontimeline(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                         'error':str(e)})
-                print "Error in API shareontimeline/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif share_on == 'linkedin_share':
             try:
@@ -3669,7 +3620,6 @@ def shareontimeline(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                         'error':str(e)})
-                print "Error in API shareontimeline/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         elif share_on == 'twitter_share':
             try:
@@ -3685,7 +3635,6 @@ def shareontimeline(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                         'error':str(e)})
-                print "Error in API shareontimeline/ :" + log
                 return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'message': 'Unauthorised User',}, status=status.HTTP_400_BAD_REQUEST)
@@ -3714,7 +3663,6 @@ def comment_view(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API comment_view/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3751,7 +3699,6 @@ def vb_seen(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API vb_seen/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -3781,7 +3728,6 @@ def follow_like_list(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API follow_like_list/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3793,7 +3739,6 @@ def my_app_version(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API my_app_version/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -3818,7 +3763,6 @@ def get_follow_user(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_follow_user/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetFollowigList(generics.ListCreateAPIView):
@@ -3863,7 +3807,6 @@ def get_following_list(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_following_list/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -3882,7 +3825,6 @@ def get_follower_list(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_follower_list/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 ''''
 def deafult_boloindya_follow(user,language):
@@ -3922,7 +3864,6 @@ def get_bolo_score(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_bolo_score/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 ####
@@ -4126,7 +4067,6 @@ def check_url(file_path):
         u = urllib2.urlopen(str(file_path))
         return "200"
     except Exception as e:
-        # print e,file_path
         return "403"
 
 def get_cloudfront_url(instance):
@@ -4157,7 +4097,6 @@ def SyncDump(request):
             except Exception as e:
                 log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                     'error':str(e)})
-                print "Error in API SyncDump/ :" + log
                 return JsonResponse({'message' : 'fail','error':str(e)})
     else:
         return JsonResponse({'messgae' : 'user_missing'})
@@ -4173,7 +4112,6 @@ def save_android_logs(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_android_logs/ :" + log
         return JsonResponse({'message' : 'fail','error':str(e)})
 
 @api_view(['POST'])
@@ -4194,7 +4132,6 @@ def get_hash_list(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_hash_list/ :" + log
         return JsonResponse({'message':'fail','error':str(e)})
 
 
@@ -4218,7 +4155,6 @@ def redirect_to_store(request):
 #     #    user_data_dump = json.load(json_file)       # storing the data in a dict
 
 #     all_traction_data = UserJarvisDump.objects.filter(is_executed=False)
-#     # print all_traction_data
     
 #     for user_jarvis in all_traction_data:
 
@@ -4321,10 +4257,8 @@ def redirect_to_store(request):
 #                 num_profile_reported = user_data_list[9], num_vb_shared = user_data_list[10], num_viewed_following_list = user_data_list[11], num_entry_points = user_data_list[13]
 #             )
 #             user_data_obj.save()
-#             print(user_data_obj)
 
 #         except Exception as e:
-#             print(str(e))
 
 #     return JsonResponse({'message':'success'}, status=status.HTTP_201_CREATED)    
 
@@ -4338,7 +4272,6 @@ def get_category_detail(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_category_detail/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -4386,7 +4319,6 @@ def get_category_with_video_bytes(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_category_with_video_bytes/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -4405,7 +4337,6 @@ def get_category_detail_with_views(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_category_detail_with_views/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -4428,7 +4359,6 @@ def get_category_video_bytes(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_category_video_bytes/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -4487,7 +4417,6 @@ def old_algo_get_popular_video_bytes(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API old_algo_get_popular_video_bytes/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -4507,7 +4436,6 @@ def get_popular_video_bytes(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_popular_video_bytes/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -4698,19 +4626,16 @@ class PopularVideoBytes(APIView):
         previous_topic_ids = []
 
         if page_number == 1:
-            # print "deleting key for page 1", key
             redis_cli.delete(key)
         else:
             id_list = redis_cli_read_only.hget(key, str(page_number))
 
             if id_list:
-                print " from redis id list", id_list
                 return json.loads(id_list)
             
             for topics_ids in redis_cli_read_only.hgetall(key).values():
                 previous_topic_ids += json.loads(topics_ids)
 
-        # print "recalculating trendings"
 
 
         all_seen_vb= []
@@ -4718,9 +4643,6 @@ class PopularVideoBytes(APIView):
             all_seen_vb = get_redis_vb_seen(user_id)
 
         exclude_list = previous_topic_ids + all_seen_vb
-
-        print "previous_topic_ids", previous_topic_ids
-        # print "all_seen_vb", all_seen_vb
 
         cache_timespan = settings.TRENDING_CACHE_TIMESPAN*24
         start_date = datetime.now()
@@ -4738,7 +4660,6 @@ class PopularVideoBytes(APIView):
             topics = Topic.objects.filter(is_vb = True, is_removed = False, 
                 language_id__in = language_ids, is_popular = True, date__lte=end_date.date())\
                 .exclude(pk__in = exclude_list).order_by('-id', '-vb_score').values('id', 'user_id', 'vb_score','date')[:1000]
-
 
         topics_df = pd.DataFrame.from_records(topics)
 
@@ -4763,8 +4684,6 @@ class PopularVideoBytes(APIView):
                 break
 
             id_list = selected_df['id'].tolist()
-            # print "id_list", id_list
-            # print "vb score", selected_df['vb_score'].tolist()
 
             redis_cli.hset(key, str(page_number), json.dumps(id_list))
             exclude_ids += map(str, id_list)
@@ -4775,9 +4694,7 @@ class PopularVideoBytes(APIView):
             page_number += 1
             page_created += 1
 
-        print redis_cli_read_only.hgetall(key)
 
-        # print "return after calcuating all"
 
         return start_page_id_list
 
@@ -4794,7 +4711,6 @@ class PopularVideoBytesV2(PopularVideoBytes):
         else:
             stick_posts = []
 
-        print "sticky posts", Topic.objects.filter(is_sticky=True).values_list('id', flat=True)
 
 
         ad_list = get_ad_to_display(request.user.id, request.GET, request.user.st.language)
@@ -4840,7 +4756,6 @@ def pubsub_popular(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API pubsub_popular/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -4860,7 +4775,6 @@ def get_user_follow_and_like_list(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_user_follow_and_like_list/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -4915,7 +4829,6 @@ def get_recent_videos(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_recent_videos/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -4938,7 +4851,6 @@ def get_popular_bolo(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_popular_bolo/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -4959,7 +4871,6 @@ def submit_user_feedback(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API submit_user_feedback/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_authorised_user_ids():
@@ -5016,7 +4927,6 @@ def get_landing_page_video(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_landing_page_video/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
       
 @api_view(['GET'])
@@ -5045,7 +4955,6 @@ def get_ip_to_language(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_ip_to_language/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5062,7 +4971,6 @@ def set_user_email(request):
     except:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API set_user_email/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5085,7 +4993,6 @@ def store_phone_book(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API store_phone_book/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5110,7 +5017,6 @@ def update_mobile_no(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API update_mobile_no/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5134,7 +5040,6 @@ def verify_otp_and_update_profile(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API verify_otp_and_update_profile/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5161,7 +5066,6 @@ def update_mobile_no_with_country_code(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API update_mobile_no_with_country_code/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5187,7 +5091,6 @@ def verify_otp_and_update_profile_with_country_code(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API verify_otp_and_update_profile_with_country_code/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5210,7 +5113,6 @@ def verify_otp_and_update_paytm_number(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API verify_otp_and_update_paytm_number/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5221,7 +5123,6 @@ def userprofile_update_paytm_number(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API userprofile_update_paytm_number/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5246,7 +5147,6 @@ def get_refer_earn_data(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API get_refer_earn_data/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5271,7 +5171,6 @@ def update_mobile_invited(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-        print "Error in API update_mobile_invited/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5288,7 +5187,6 @@ def get_refer_earn_stat(request):
         except Exception as e:
             log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
                 'error':str(e)})
-            print "Error in API get_refer_earn_stat/ :" + log
             return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
         downloaded =ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = True).distinct('android_id')
         signedup = ReferralCodeUsed.objects.filter(code = referalcode, is_download = True, by_user__isnull = False).distinct('android_id')
@@ -5299,13 +5197,11 @@ def get_refer_earn_stat(request):
         result_page = get_paginated_data(signedup_users, int(page_size), int(page))
         if result_page[1]<int(page):
             return JsonResponse({'message': 'No page exist'}, status=status.HTTP_400_BAD_REQUEST)
-        # print result_page[1]
         return JsonResponse({'message': 'success','download_count':download_count,'signedup_count':signedup_count,'users':ReferralCodeUsedStatSerializer(result_page[0].object_list,many=True).data,'total_page':result_page[1]}, status=status.HTTP_200_OK)
 
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_refer_earn_stat/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -5321,7 +5217,6 @@ def save_banner_response(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API save_banner_response/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -5342,7 +5237,6 @@ def get_hash_discover(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_hash_discover/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -5354,7 +5248,6 @@ def get_hash_discover_topics(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_hash_discover_topics/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -5366,7 +5259,6 @@ def get_m3u8_of_ids(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_m3u8_of_ids/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5391,7 +5283,6 @@ def report(request):
             report_type = request.POST.get('report_type', None)
             target_id = request.POST.get('target_id', None)
             target_type = request.POST.get('target_type', None) # choices 'topic','user'
-            print report_type,target_type,target_id
             try:
                 target_type = ContentType.objects.get(model=target_type)
             except Exception as e:
@@ -5405,7 +5296,6 @@ def report(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API report/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 from redis_utils import *
@@ -5417,7 +5307,6 @@ def get_campaigns(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_campaigns/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -5439,7 +5328,6 @@ def get_user_details_from_topic_id(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_user_details_from_topic_id/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5476,11 +5364,8 @@ def update_profanity_details(request):
         return JsonResponse({'message': "success"}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        print("==============")
-        print("update_profanity_details failed with {}".format(str(e)))
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API update_profanity_details/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -5497,7 +5382,6 @@ def update_download_url_in_topic(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API update_download_url_in_topic/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
@@ -5511,7 +5395,6 @@ def get_user_last_vid_lang(request):
             language = ''
             if all_vids:
                 last_vid = all_vids[0]
-                print(last_vid.id)
                 language = last_vid.language_id
 
             return JsonResponse({'language_id': language}, status=status.HTTP_200_OK)
@@ -5521,7 +5404,6 @@ def get_user_last_vid_lang(request):
     except Exception as e:
         log = str({'request':str(request.__dict__),'response':str(status.HTTP_400_BAD_REQUEST),'messgae':str(e),\
             'error':str(e)})
-        print "Error in API get_user_last_vid_lang/ :" + log
         return JsonResponse({'message': 'Something went wrong! Please try again later.','error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_location(location_data):
@@ -5547,13 +5429,11 @@ def get_location(location_data):
 
         if country_name:
             country, created = Country.objects.get_or_create(name=country_name)
-            print(1, country, created)
         if state_name:
             state_data = {'name' : state_name}
             if country:
                 state_data['country'] = country
             state, created = State.objects.get_or_create(**state_data)
-            print(2, state, created)
         if city_name:
             city_data = {'name': city_name}
             if state:
@@ -5561,7 +5441,6 @@ def get_location(location_data):
             if city_id:
                 city_data['place_id'] = city_id
             city, created = City.objects.get_or_create(**city_data)
-            print(4, city, created)
             return city
     else:
         return None
@@ -5732,7 +5611,6 @@ class MusicCreateAPIView(APIView):
     authentication_classes = (JWTAuthentication,)
 
     def post(self, request, *args, **kwargs):
-        print "data", request.data
         topic = Topic.objects.get(id=request.data.get('topic_id'))
         music = MusicAlbum.objects.create(**{
             'image_path': topic.user.st.profile_pic or 'https://boloindyapp-prod.s3.amazonaws.com/public/thumbnail/music-default.png',
